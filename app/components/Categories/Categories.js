@@ -11,7 +11,7 @@ export default function Categories() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://192.168.1.3:1337/api/main-categories?populate=*');
+                const response = await fetch('https://admindoggy.adsdigitalmedia.com/api/main-categories?populate=*');
                 const result = await response.json();
                 setData(result.data);
                 console.log(data)

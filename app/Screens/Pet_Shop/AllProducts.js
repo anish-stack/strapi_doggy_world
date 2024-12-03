@@ -22,7 +22,7 @@ export default function AllProducts() {
             try {
                 setError(null); // Clear previous errors
                 const response = await axios.get(
-                    'http://192.168.1.3:1337/api/products?populate=*'
+                    'https://admindoggy.adsdigitalmedia.com/api/products?populate=*'
                 );
                 setProducts(response.data.data); 
             } catch (err) {

@@ -17,7 +17,7 @@ export default function SuperficialCart() {
   const fetchOffers = async () => {
     setError('');
     try {
-      const { data } = await axios.get('http://192.168.1.3:1337/api/offers?populate=*');
+      const { data } = await axios.get('https://admindoggy.adsdigitalmedia.com/api/offers?populate=*');
       if (data && data.data.length) {
         setOffers(data.data);
       } else {
