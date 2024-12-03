@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_variants_product_variants",
+  "info": {
+    "displayName": "ProductVariant",
+    "icon": "twitter"
+  },
+  "options": {},
+  "attributes": {
+    "type": {
+      "type": "string"
+    },
+    "price": {
+      "type": "integer"
+    },
+    "dis_price": {
+      "type": "decimal"
+    },
+    "off_percentage": {
+      "type": "string"
+    },
+    "stock": {
+      "type": "integer"
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "tag": {
+      "type": "string"
+    }
+  }
+}

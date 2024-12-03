@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ad_ons",
+  "info": {
+    "singularName": "ad-on",
+    "pluralName": "ad-ons",
+    "displayName": "ad_on",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "small_desc": {
+      "type": "string"
+    },
+    "Price": {
+      "type": "decimal"
+    },
+    "Discount_price": {
+      "type": "decimal"
+    },
+    "Tag": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "stock": {
+      "type": "string"
+    },
+    "Position": {
+      "type": "integer",
+      "required": true,
+      "unique": true
+    }
+  }
+}

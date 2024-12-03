@@ -1,0 +1,77 @@
+{
+  "kind": "collectionType",
+  "collectionName": "clinics",
+  "info": {
+    "singularName": "clinic",
+    "pluralName": "clinics",
+    "displayName": "clinic",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "clinic_name": {
+      "type": "string"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "contact_details": {
+      "type": "biginteger"
+    },
+    "Address": {
+      "type": "text"
+    },
+    "time": {
+      "type": "text"
+    },
+    "opening_stauts": {
+      "type": "boolean",
+      "required": true
+    },
+    "Map_Location": {
+      "type": "string"
+    },
+    "Rating": {
+      "type": "decimal"
+    },
+    "lab_tests": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::lab-test.lab-test",
+      "mappedBy": "clinics"
+    },
+    "Slots": {
+      "displayName": "Slots",
+      "type": "component",
+      "repeatable": true,
+      "component": "slots.slots"
+    },
+    "ScanTestAvailable": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "Position": {
+      "type": "integer",
+      "required": true,
+      "unique": true
+    },
+    "vaccinations": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::vaccination.vaccination",
+      "mappedBy": "clinics"
+    }
+  }
+}

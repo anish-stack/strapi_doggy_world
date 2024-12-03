@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pet_bakeries",
+  "info": {
+    "singularName": "pet-bakery",
+    "pluralName": "pet-bakeries",
+    "displayName": "Pet bakery",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "titile": {
+      "type": "string"
+    },
+    "screen_name": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "tag": {
+      "type": "string"
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "Postion": {
+      "type": "integer"
+    },
+    "products": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product",
+      "mappedBy": "catgory"
+    },
+    "bakery_sliders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::bakery-slider.bakery-slider",
+      "mappedBy": "category"
+    }
+  }
+}

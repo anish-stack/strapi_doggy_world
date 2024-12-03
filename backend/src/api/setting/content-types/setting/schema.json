@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "settings",
+  "info": {
+    "singularName": "setting",
+    "pluralName": "settings",
+    "displayName": "Setting",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Home_Collection_Start_time": {
+      "type": "time"
+    },
+    "Home_Collection_End_time": {
+      "type": "time"
+    },
+    "Clinic_booking_time_start": {
+      "type": "time"
+    },
+    "Clinic_booking_time_end": {
+      "type": "time"
+    },
+    "ultrasound_booking_time_start": {
+      "type": "time"
+    },
+    "ultrasound_booking_end_time": {
+      "type": "time"
+    },
+    "Home_slots_gap": {
+      "type": "string"
+    },
+    "Clinic_slots_gap": {
+      "type": "string"
+    }
+  }
+}

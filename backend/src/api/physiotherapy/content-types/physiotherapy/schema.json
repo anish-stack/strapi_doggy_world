@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "physiotherapies",
+  "info": {
+    "singularName": "physiotherapy",
+    "pluralName": "physiotherapies",
+    "displayName": "Physiotherapy"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "small_desc": {
+      "type": "string"
+    },
+    "Description": {
+      "type": "richtext"
+    },
+    "price": {
+      "type": "biginteger"
+    },
+    "price_minute": {
+      "type": "string"
+    },
+    "discount_price": {
+      "type": "biginteger"
+    },
+    "Popular": {
+      "type": "boolean"
+    },
+    "images": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "home_page_sliders",
+  "info": {
+    "singularName": "home-page-slider",
+    "pluralName": "home-page-sliders",
+    "displayName": "Home Page slider"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

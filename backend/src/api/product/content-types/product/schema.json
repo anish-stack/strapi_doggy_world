@@ -1,0 +1,65 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "product",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "variant": {
+      "displayName": "Variants",
+      "type": "component",
+      "repeatable": true,
+      "component": "variants.variants"
+    },
+    "images": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "small_desc": {
+      "type": "string"
+    },
+    "suitable_for": {
+      "type": "string"
+    },
+    "catgory": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::pet-bakery.pet-bakery",
+      "inversedBy": "products"
+    },
+    "varient_stauts": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "price": {
+      "type": "decimal"
+    },
+    "disc_price": {
+      "type": "decimal"
+    },
+    "off_dis_percentage": {
+      "type": "decimal"
+    },
+    "content": {
+      "type": "blocks"
+    }
+  }
+}

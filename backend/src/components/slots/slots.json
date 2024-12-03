@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_slots_slots",
+  "info": {
+    "displayName": "Slots",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "Slot_title": {
+      "type": "string"
+    },
+    "Slot_start": {
+      "type": "time"
+    },
+    "slot_end": {
+      "type": "time"
+    },
+    "maximum_bookings": {
+      "type": "biginteger"
+    },
+    "isTwentyFourSeven": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    }
+  }
+}

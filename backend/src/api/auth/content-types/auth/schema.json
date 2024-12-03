@@ -1,0 +1,42 @@
+{
+  "kind": "collectionType",
+  "collectionName": "auth",
+  "info": {
+    "singularName": "auth",
+    "pluralName": "auths",
+    "displayName": "auth"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "PetType": {
+      "type": "string"
+    },
+    "petName": {
+      "type": "string"
+    },
+    "contact_number": {
+      "type": "string"
+    },
+    "Breed": {
+      "type": "string"
+    },
+    "DOB": {
+      "type": "date"
+    },
+    "Age": {
+      "type": "string"
+    },
+    "otp": {
+      "type": "string"
+    },
+    "otpExpired": {
+      "type": "date"
+    },
+    "password": {
+      "type": "password"
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pet_shop_categories",
+  "info": {
+    "singularName": "pet-shop-category",
+    "pluralName": "pet-shop-categories",
+    "displayName": "Pet_shop_category",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "petshops": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::petshop.petshop",
+      "inversedBy": "pet_shop_categories"
+    },
+    "pet_shop_products": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::pet-shop-product.pet-shop-product",
+      "mappedBy": "category_foods"
+    },
+    "Position": {
+      "type": "integer",
+      "required": false,
+      "unique": true
+    },
+    "bakery_sliders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::bakery-slider.bakery-slider",
+      "mappedBy": "pet_shop_category"
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "kind": "collectionType",
+  "collectionName": "lab_tests",
+  "info": {
+    "singularName": "lab-test",
+    "pluralName": "lab-tests",
+    "displayName": "LabTest",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "test_name": {
+      "type": "string"
+    },
+    "test_price": {
+      "type": "biginteger"
+    },
+    "discountPrice": {
+      "type": "biginteger"
+    },
+    "discountPercentage": {
+      "type": "biginteger"
+    },
+    "TestAvailability": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "Sample_Image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "OtherImages": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Details": {
+      "type": "richtext"
+    },
+    "PetType": {
+      "type": "string"
+    },
+    "clinics": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::clinic.clinic",
+      "inversedBy": "lab_tests"
+    },
+    "Position": {
+      "type": "integer",
+      "required": true,
+      "unique": true
+    },
+    "isPopular": {
+      "type": "boolean",
+      "default": false
+    },
+    "Is_common_disease": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "common_disease_dog": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "common_disease_cat": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "is_available_at_main_branch": {
+      "type": "boolean"
+    },
+    "isAdsOnTest": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

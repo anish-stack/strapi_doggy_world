@@ -1,0 +1,60 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bakery_sliders",
+  "info": {
+    "singularName": "bakery-slider",
+    "pluralName": "bakery-sliders",
+    "displayName": "Bakery_Slider",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::pet-bakery.pet-bakery",
+      "inversedBy": "bakery_sliders"
+    },
+    "isPetShop": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::petshop.petshop",
+      "inversedBy": "bakery_sliders"
+    },
+    "isPetShopProduct": {
+      "type": "boolean",
+      "required": false
+    },
+    "pet_shop_category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::pet-shop-category.pet-shop-category",
+      "inversedBy": "bakery_sliders"
+    },
+    "isLab": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "isVacination": {
+      "type": "boolean"
+    },
+    "isPhysiotherapy": {
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pet_shop_products",
+  "info": {
+    "singularName": "pet-shop-product",
+    "pluralName": "pet-shop-products",
+    "displayName": "Pet_Shop_Product",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Title": {
+      "type": "string"
+    },
+    "Tag": {
+      "type": "string"
+    },
+    "which_company_food": {
+      "type": "string"
+    },
+    "category_foods": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::pet-shop-category.pet-shop-category",
+      "inversedBy": "pet_shop_products"
+    },
+    "Images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Variants_price": {
+      "type": "component",
+      "repeatable": true,
+      "component": "variants.variants"
+    },
+    "isVarient": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "isAnyDeliveryFee": {
+      "type": "boolean"
+    },
+    "Free_Delivery": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "Exchange_policy": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "COD_AVAILABLE": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "Delivery_fee": {
+      "type": "biginteger"
+    },
+    "Price": {
+      "type": "biginteger"
+    },
+    "Disc_Price": {
+      "type": "biginteger"
+    },
+    "Discount_Percentage": {
+      "type": "biginteger"
+    },
+    "Descrption": {
+      "type": "richtext"
+    }
+  }
+}

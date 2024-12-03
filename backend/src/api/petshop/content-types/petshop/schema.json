@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "petshops",
+  "info": {
+    "singularName": "petshop",
+    "pluralName": "petshops",
+    "displayName": "petshop",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Title": {
+      "type": "string"
+    },
+    "Image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "screen": {
+      "type": "string"
+    },
+    "pet_shop_categories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::pet-shop-category.pet-shop-category",
+      "mappedBy": "petshops"
+    },
+    "bakery_sliders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::bakery-slider.bakery-slider",
+      "mappedBy": "isPetShop"
+    },
+    "postion": {
+      "type": "integer",
+      "unique": true
+    }
+  }
+}
