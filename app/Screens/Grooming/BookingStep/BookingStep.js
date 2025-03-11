@@ -2,6 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, FlatList } from '
 import React, { useState } from 'react';
 import UpperLayout from '../../../layouts/UpperLayout';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const generateDates = () => {
     const currentDate = new Date();
@@ -50,7 +51,8 @@ export default function BookingStep() {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView>
+            <View style={styles.container}>
             <UpperLayout isBellShow={false} title={'Choose a Date and Time'} />
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 <Text style={styles.instructionText}>Select the Date you want the grooming service for:</Text>
@@ -98,12 +100,13 @@ export default function BookingStep() {
                 )}
             </ScrollView>
         </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        // flex: 1,
         backgroundColor: '#f5f5f5',
     },
     scrollViewContainer: {

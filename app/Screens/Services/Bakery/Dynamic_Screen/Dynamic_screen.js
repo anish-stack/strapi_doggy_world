@@ -5,6 +5,7 @@ import UpperLayout from '../../../../layouts/UpperLayout';
 import axios from 'axios';
 import DynmaicSlider from './DynamicSlider';
 import Card from '../Categories/Card';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window'); // Get screen width
 
@@ -23,13 +24,13 @@ export default function DynamicScreen({ Product, isSliderShow = true }) {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get('https://admindoggy.adsdigitalmedia.com/api/products?populate=*');
-                const fetchSliderData = await axios.get('https://admindoggy.adsdigitalmedia.com/api/bakery-sliders?populate=*');
+                const res = await axios.get('http://192.168.1.3:1337/api/products?populate=*');
+                const fetchSliderData = await axios.get('http://192.168.1.3:1337/api/bakery-sliders?populate=*');
                 const fetchedData = res.data.data;
                 const fetchSlider = fetchSliderData.data.data;
                 let filteredData
                 if (title) {
-                 
+
                     filteredData = fetchedData.filter(
                         (item) => item.catgory?.titile === title
                     );
@@ -81,29 +82,31 @@ export default function DynamicScreen({ Product, isSliderShow = true }) {
     }
 
     return (
-        <View style={styles.container}>
-            {isSliderShow && (
-
-                <UpperLayout title={title} />
-            )}
-            <ScrollView>
+        <SafeAreaView style={{ flex: 1 }}>
+            <View style={styles.container}>
                 {isSliderShow && (
 
-                    <DynmaicSlider navigationShow={true} autoPlay={true} Dealy={3000} isUri={true} imagesByProp={images} />
+                    <UpperLayout title={title} />
                 )}
-                {data && data.length > 0 ? (
-                    <FlatList
-                        data={data}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item }) => <Card data={item} cardWidth={width * 0.45} />}
-                        numColumns={2}
-                        contentContainerStyle={styles.cardList}
-                    />
-                ) : (
-                    <Text style={styles.noData}>No products found in {title} category.</Text>
-                )}
-            </ScrollView>
-        </View>
+                <ScrollView>
+                    {isSliderShow && (
+
+                        <DynmaicSlider navigationShow={true} autoPlay={true} Dealy={3000} isUri={true} imagesByProp={images} />
+                    )}
+                    {data && data.length > 0 ? (
+                        <FlatList
+                            data={data}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item }) => <Card data={item} cardWidth={width * 0.45} />}
+                            numColumns={2}
+                            contentContainerStyle={styles.cardList}
+                        />
+                    ) : (
+                        <Text style={styles.noData}>No products found in {title} category.</Text>
+                    )}
+                </ScrollView>
+            </View>
+        </SafeAreaView>
     );
 }
 

@@ -46,10 +46,10 @@ const CartSlice = createSlice({
                 if (existingItem) {
                     // If the product already exists, increase the quantity
                     existingItem.quantity += newItem.quantity;
-                    Toast.show({
-                        type: 'success',
-                        text1: 'Quantity updated in cart!',
-                    });
+                    // Toast.show({
+                    //     type: 'success',
+                    //     text1: 'Quantity updated in cart!',
+                    // });
                 } else {
                     // If the product is new, add it to the cart
                     state.CartItems.push(newItem);
@@ -59,10 +59,10 @@ const CartSlice = createSlice({
             state.CartCount = state.CartItems.length;
             storeCartItems(state.CartItems);
 
-            Toast.show({
-                type: 'success',
-                text1: 'Item added to cart!',
-            });
+            // Toast.show({
+            //     type: 'success',
+            //     text1: 'Item added to cart!',
+            // });
         },
 
 

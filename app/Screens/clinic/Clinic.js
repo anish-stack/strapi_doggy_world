@@ -2,10 +2,11 @@ import { View, Text, Dimensions, Image, TouchableOpacity, ScrollView, Animated, 
 import React, { useRef, useState, useEffect } from 'react';
 import UpperLayout from '../../layouts/UpperLayout';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
-export default function Clinic({isUpperLayoutShow = true}) {
+export default function Clinic({ isUpperLayoutShow = true }) {
 
 
   const ClinicsData = [
@@ -44,28 +45,30 @@ export default function Clinic({isUpperLayoutShow = true}) {
   ];
 
   return (
-    <View style={styles.container}>
-      {isUpperLayoutShow && (
+    <SafeAreaView>
+      <View style={styles.container}>
+        {isUpperLayoutShow && (
 
-      <UpperLayout title={"Choose a Clinic"} />
-      )}
+          <UpperLayout title={"Choose a Clinic"} />
+        )}
 
-      {/* Scrollable View for Clinics */}
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
-        {ClinicsData.reduce((rows, clinic, index) => {
 
-          if (index % 2 === 0) rows.push([]);
-          rows[rows.length - 1].push(clinic);
-          return rows;
-        }, []).map((row, rowIndex) => (
-          <View key={rowIndex} style={styles.row}>
-            {row.map(clinic => (
-              <ClinicCard key={clinic.id} item={clinic} />
-            ))}
-          </View>
-        ))}
-      </ScrollView>
-    </View>
+        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+          {ClinicsData.reduce((rows, clinic, index) => {
+
+            if (index % 2 === 0) rows.push([]);
+            rows[rows.length - 1].push(clinic);
+            return rows;
+          }, []).map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.row}>
+              {row.map(clinic => (
+                <ClinicCard key={clinic.id} item={clinic} />
+              ))}
+            </View>
+          ))}
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 const ClinicCard = ({ item }) => {
@@ -137,8 +140,8 @@ const ClinicCard = ({ item }) => {
           >
             <Text style={styles.mapButtonText}>View on Map</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
- activeOpacity={0.9}style={styles.selectButton} onPress={() => navigataion.navigate('Book-Grooming', { item: item })}>
+          <TouchableOpacity
+            activeOpacity={0.9} style={styles.selectButton} onPress={() => navigataion.navigate('Book-Grooming', { item: item })}>
             <Text style={styles.selectButtonText}>{selected ? 'Deselect' : 'Select Clinic'}</Text>
           </TouchableOpacity>
         </View>
@@ -151,7 +154,7 @@ const ClinicCard = ({ item }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
   },
   row: {
     marginTop: 20,

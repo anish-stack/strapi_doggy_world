@@ -1,99 +1,107 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import UpperLayout from '../../layouts/UpperLayout';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-// import { WebView } from 'react-native-webview';
+import axios from 'axios'
 import { useNavigation } from '@react-navigation/native';
 import CustomSlider from '../Services/Bakery/Slider';
+import Call_Header from '../../components/Call_header/Call_Header';
+import WebView from 'react-native-webview';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { API_END_POINT_URL } from '../../constant/constant';
 export default function Consultation() {
     const navigation = useNavigation()
-    const data = [
-        {
-            id: 1,
-            image: 'https://img.freepik.com/free-vector/doctor-examining-patient-clinic-illustrated_23-2148856559.jpg?t=st=1731062330~exp=1731065930~hmac=026cef4487bbd0fbc14a6a8323dc3c95a0568235db559380ca7a22b07a32d838&w=1380', // Add actual images if available
-            name: "General Consultation",
-            price: 750,
-            discount: 20,
-            discountPrice: 520,
-            offer_valid_upto: "Upto this diwali 💥💥",
-            description: "General consultations cover a wide range of services, including basic health checks, medication reviews, behavioral counseling, dental care, senior pet care, emergency advice, breeding guidance, dermatology, cardiology, internal medicine, oncology, pre- and post-surgical care, telemedicine, and vaccinations."
-        },
-        {
-            id: 2,
-            image: 'https://img.freepik.com/free-photo/beautiful-woman-working-as-professional-veterinarian-using-stethoscope-listen-heart-old-persian-cat-animal-clinic-little-girl-taking-her-cat-vet_662251-2363.jpg?t=st=1731062755~exp=1731066355~hmac=c430dee21542f7c20bca72ae6f48323d1168d4a1cdea8ccf5ef9ffe78dbf762e&w=1380',
-            name: "Homeopathic Consultation",
-            price: 800,
-            discount: 15,
-            discountPrice: 680,
-            offer_valid_upto: "Limited time offer 🎉",
-            description: "Homeopathic consultations offer personalized remedies for chronic illnesses, emotional well-being, and immunity boosting."
-        },
-        {
-            id: 3,
-            image: 'https://i.ibb.co/q7ynvrx/diet-bnr-img.jpg',
-            name: "Nutritional Consultation",
-            price: 900,
-            discount: 10,
-            discountPrice: 810,
-            offer_valid_upto: "Valid until year-end 🎊",
-            description: "Nutritional consultations offer expert advice on dietary needs assessment, diet formulation, portion control, and feeding techniques to promote optimal pet health."
-        }
-    ];
+    const [expandedDescriptionIds, setExpandedDescriptionIds] = useState([]);
+    const [consultation, setConsultation] = useState([])
 
+
+    useEffect(() => {
+        const fetchConsultation = async () => {
+            try {
+                const { data } = await axios.get(`${API_END_POINT_URL}/api/consultations?populate=*`)
+                setConsultation(data.data)
+            } catch (error) {
+
+                console.log("error", error)
+            }
+        }
+        fetchConsultation()
+    }, [])
+
+
+
+    const toggleDescription = (id) => {
+        if (expandedDescriptionIds.includes(id)) {
+            setExpandedDescriptionIds(expandedDescriptionIds.filter(itemId => itemId !== id));
+        } else {
+            setExpandedDescriptionIds([...expandedDescriptionIds, id]);
+        }
+    };
     const images = [
         { id: 1, src: require('./cs.png') },
         { id: 2, src: require('./con1.jpg') },
     ];
 
     return (
-        <View style={styles.container}>
-            <UpperLayout title={"Online Consultation"} />
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <CustomSlider autoPlay={true} navigationShow={true} Dealy={2500} imagesByProp={images} />
+        <SafeAreaView style={styles.safeArea}>
 
-                {data.map(item => (
-                    <View key={item.id} style={styles.card}>
-                        <Text style={styles.tag}>Tag</Text>
-                        <View style={styles.cardContent}>
-                            <View style={styles.textSection}>
-                                <Text style={styles.consultationName}>{item.name}</Text>
-                                <Text style={styles.description}>{item.description.substring(0, 120) + '......'}</Text>
-                                <Text style={styles.price}>Start at @ Rs {item.price}</Text>
-                                <Text style={styles.offer}>Offer valid: {item.offer_valid_upto}</Text>
-                            </View>
-                            <View style={styles.imageSection}>
-                                <Image source={{ uri: item.image }} style={styles.image} />
-                                <TouchableOpacity
-                                    onPress={() => navigation.navigate('next-step', { type: item.name })}
-                                    style={styles.button}
-                                >
-                                    <Text style={styles.buttonText}>Book Now</Text>
-                                </TouchableOpacity>
 
+            <View style={styles.container}>
+                <UpperLayout title={"Online Consultation"} />
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    <CustomSlider autoPlay={true} navigationShow={true} Dealy={2500} imagesByProp={images} />
+                    <Call_Header />
+                    {consultation.map(item => (
+                        <View key={item.id} style={styles.card}>
+                            <Text style={styles.tag}>Tag</Text>
+                            <View style={styles.cardContent}>
+                                <View style={styles.textSection}>
+                                    <Text style={styles.consultationName}>{item.name}</Text>
+                                    <Text style={styles.description}>
+                                        {expandedDescriptionIds.includes(item.id)
+                                            ? item.description
+                                            : `${item.description.substring(0, 100)}...`}
+                                    </Text>
+                                    <TouchableOpacity onPress={() => toggleDescription(item.id)}>
+                                        <Text style={styles.readMore}>
+                                            {expandedDescriptionIds.includes(item.id) ? "Read Less" : "Read More"}
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <Text style={styles.price}>Start at @ Rs {item.price}</Text>
+                                    <Text style={styles.offer}>Offer valid: {item.offer_valid_upto}</Text>
+                                </View>
+                                <View style={styles.imageSection}>
+                                    <Image source={{ uri: item.image?.url }} style={styles.image} />
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate('next-step', { type: item.name, id: item?.documentId })}
+                                        style={styles.button}
+                                    >
+                                        <Text style={styles.buttonText}>Book Now</Text>
+                                    </TouchableOpacity>
+
+                                </View>
                             </View>
                         </View>
+                    ))}
+                    <View style={styles.containers}>
+                        <Text style={styles.text}>
+                            <Icon name="angle-double-down" style={styles.icon} size={55} color="#000" />
+                        </Text>
                     </View>
-                ))}
-                <View style={styles.containers}>
-                    <Text style={styles.text}>
-                        <Icon name="angle-double-down" style={styles.icon} size={55} color="#000" />
-                    </Text>
-                </View>
-                {/* <View style={styles.webViewContainer}>
-                    <WebView
-                        source={{ uri: "https://e646aa95356d411688ca904e76e00491.elf.site" }}
-                        style={styles.webView}
-                    />
-                </View> */}
-            </ScrollView>
-        </View>
+                    <View style={styles.webViewContainer}>
+                        <WebView
+                            source={{ uri: "https://e646aa95356d411688ca904e76e00491.elf.site" }}
+                            style={styles.webView}
+                        />
+                    </View>
+                </ScrollView>
+            </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
 
         backgroundColor: '#ffffff',
     },
@@ -194,5 +202,10 @@ const styles = StyleSheet.create({
     icon: {
         marginTop: 10,           // Adds space above the icon
         marginBottom: 10,        // Adds space below the icon
+    },
+    readMore: {
+        color: '#0d6efd',
+        fontWeight: 'bold',
+        marginTop: 5,
     },
 });

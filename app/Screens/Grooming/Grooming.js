@@ -3,6 +3,7 @@ import React from 'react';
 import UpperLayout from '../../layouts/UpperLayout';
 import CustomSlider from '../Services/Bakery/Slider';
 import GroomingServices from './GroomingServices';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -18,26 +19,29 @@ export default function Grooming() {
     };
 
     return (
-      
+        <SafeAreaView style={{ flex: 1 }}>
+
+
             <View style={styles.container}>
                 <UpperLayout title={"Dog Grooming"} />
                 <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                <CustomSlider autoPlay={true} navigationShow={true} Dealy={3000} imagesByProp={images} />
+                    <CustomSlider autoPlay={true} navigationShow={true} Dealy={3000} imagesByProp={images} />
 
-                <View style={styles.infoContainer}>
-                    <Text style={styles.openText}>
-                        Open: <Text style={styles.timeText}>10:00 AM - 9:00 PM</Text>
-                    </Text>
-                    <TouchableOpacity 
- activeOpacity={0.9}onPress={handleCallPress} style={styles.buttonContainer}>
-                        <Text style={styles.confusedText}>Confused? Call Now</Text>
-                    </TouchableOpacity>
-                </View>
+                    <View style={styles.infoContainer}>
+                        <Text style={styles.openText}>
+                            Open: <Text style={styles.timeText}>10:00 AM - 9:00 PM</Text>
+                        </Text>
+                        <TouchableOpacity
+                            activeOpacity={0.9} onPress={handleCallPress} style={styles.buttonContainer}>
+                            <Text style={styles.confusedText}>Confused? Call Now</Text>
+                        </TouchableOpacity>
+                    </View>
 
 
-                <GroomingServices />
-        </ScrollView>
+                    <GroomingServices />
+                </ScrollView>
             </View>
+        </SafeAreaView>
     );
 }
 

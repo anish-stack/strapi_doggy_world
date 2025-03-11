@@ -4,7 +4,8 @@
   "info": {
     "singularName": "auth",
     "pluralName": "auths",
-    "displayName": "auth"
+    "displayName": "auth",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -33,10 +34,31 @@
       "type": "string"
     },
     "otpExpired": {
-      "type": "date"
+      "type": "datetime"
     },
     "password": {
       "type": "password"
+    },
+    "isVerified": {
+      "type": "boolean"
+    },
+    "pets": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::booking-consultation.booking-consultation",
+      "mappedBy": "pet"
+    },
+    "lab_and_vaccination_bookings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::lab-and-vaccination-booking.lab-and-vaccination-booking",
+      "mappedBy": "auth"
+    },
+    "physio_bookings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::physio-booking.physio-booking",
+      "mappedBy": "PetID"
     }
   }
 }

@@ -11,7 +11,7 @@ export default function Bakery() {
         { id: 2, src: require('./royalpooch.jpg') },
     ];
     return (
-        <>
+        <SafeAreaView style={{flex:1}}>
             <UpperLayout title={"Our Pet Bakery"} />
             <ScrollView>
 
@@ -19,7 +19,7 @@ export default function Bakery() {
                 <BakeryCategories />
 
             </ScrollView>
-        </>
+        </SafeAreaView>
 
 
     )

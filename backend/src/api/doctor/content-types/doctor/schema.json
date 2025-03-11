@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "doctors",
+  "info": {
+    "singularName": "doctor",
+    "pluralName": "doctors",
+    "displayName": "Doctor"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "price": {
+      "type": "biginteger"
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "discount_price": {
+      "type": "biginteger"
+    },
+    "show": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "booking_consultations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::booking-consultation.booking-consultation",
+      "mappedBy": "doctor"
+    }
+  }
+}

@@ -5,6 +5,7 @@ import UpperLayout from '../../../layouts/UpperLayout'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import DynmaicSlider from '../../Services/Bakery/Dynamic_Screen/DynamicSlider';
 import Card_Shop from './Card_Shop';
+import { SafeAreaView } from 'react-native-safe-area-context';
 export default function Dynmaic_Products_Shop() {
   const route = useRoute()
   const { heading, id } = route.params || {}
@@ -19,8 +20,8 @@ export default function Dynmaic_Products_Shop() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`https://admindoggy.adsdigitalmedia.com/api/pet-shop-products?populate=*`);
-        const fetchSliderData = await axios.get('https://admindoggy.adsdigitalmedia.com/api/bakery-sliders?populate=*');
+        const response = await axios.get(`http://192.168.1.3:1337/api/pet-shop-products?populate=*`);
+        const fetchSliderData = await axios.get('http://192.168.1.3:1337/api/bakery-sliders?populate=*');
         const resdata = response.data.data;
         const fetchSlider = fetchSliderData.data.data;
         const filterData = resdata.filter(item =>
@@ -66,7 +67,7 @@ export default function Dynmaic_Products_Shop() {
   }
 
   return (
-    <View>
+    <SafeAreaView>
       <UpperLayout title={heading} isBellShow={false} />
       <ScrollView>
         <DynmaicSlider navigationShow={true} mode={'contain'} heightPass={140} autoPlay={true} Dealy={4500} isUri={true} imagesByProp={images} />
@@ -82,7 +83,7 @@ export default function Dynmaic_Products_Shop() {
           <Text style={styles.noData}>No products found in {heading} category.</Text>
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }
 const styles = StyleSheet.create({

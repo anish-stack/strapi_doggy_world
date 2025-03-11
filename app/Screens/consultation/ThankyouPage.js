@@ -1,22 +1,24 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Button, SafeAreaView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 
 const ThankYouPage = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Image
-          source={require('./thank-you.png')} // Make sure to add an image in the assets folder
+          source={require('./thank-you.png')}
           style={styles.image}
         />
         <Text style={styles.heading}>Thank You!</Text>
         <Text style={styles.message}>
-          Your submission was successfully received. We appreciate your time and effort. We will get back to you shortly.
+          Your appointment has been successfully booked
         </Text>
-        <Button
-          title="Go Back to Home"
-          onPress={() => navigation.navigate('Home')} // Adjust 'Home' to your screen name
-        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <Text style={styles.buttonText}>Go Back to Home</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -27,36 +29,56 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f8ff', // Light background color
+    backgroundColor: '#ffe8e8', // Subtle red background shade
   },
   content: {
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 5,
+    shadowRadius: 8,
+    elevation: 8,
+    width: '90%',
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 120,
     marginBottom: 20,
+    tintColor: '#d64444', // Red tint for the image
   },
   heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2d2d2d',
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#d64444', // Vibrant red
+    marginBottom: 10,
   },
   message: {
-    marginTop: 10,
     fontSize: 16,
     color: '#555',
     textAlign: 'center',
     marginBottom: 20,
+    lineHeight: 24,
+  },
+  button: {
+    backgroundColor: '#d64444', // Main red color
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    elevation: 5,
+    shadowColor: '#d64444',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
 

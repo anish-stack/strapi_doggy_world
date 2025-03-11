@@ -19,8 +19,8 @@ export default function Lab_Test() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get('https://admindoggy.adsdigitalmedia.com/api/collection-types?populate=*');
-                const fetchSliderData = await axios.get('https://admindoggy.adsdigitalmedia.com/api/bakery-sliders?populate=*&filters[isLab][$eq]=true');
+                const res = await axios.get('http://192.168.1.3:1337/api/collection-types?populate=*');
+                const fetchSliderData = await axios.get('http://192.168.1.3:1337/api/bakery-sliders?populate=*&filters[isLab][$eq]=true');
                 setSlider(fetchSliderData.data.data);
                 setData(res.data.data);
             } catch (err) {
@@ -37,7 +37,6 @@ export default function Lab_Test() {
     if (loading) return <ActivityIndicator size="large" color="#0000ff" />;
     if (error) return <Text>{error}</Text>;
 
-    // Ensure slider data has images before mapping
     const images = slider.flatMap((item) => item.images ? item.images.map((image) => image.url) : []);
     const imagesSent = [{ id: 1, src: images }];
 

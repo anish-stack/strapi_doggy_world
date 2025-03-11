@@ -1,0 +1,70 @@
+{
+  "kind": "collectionType",
+  "collectionName": "lab_order_new_apps",
+  "info": {
+    "singularName": "lab-order-new-app",
+    "pluralName": "lab-order-new-apps",
+    "displayName": "Lab_Order_new_App",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Tests_And_Vaccine": {
+      "displayName": "Items",
+      "type": "component",
+      "repeatable": true,
+      "component": "cart-lab-items.items"
+    },
+    "applied_offer": {
+      "type": "string"
+    },
+    "isHomeCollection": {
+      "type": "boolean",
+      "default": false
+    },
+    "number": {
+      "type": "string",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "clinic_name": {
+      "type": "string",
+      "required": true
+    },
+    "time": {
+      "type": "datetime",
+      "required": true
+    },
+    "total_price": {
+      "type": "float",
+      "required": true
+    },
+    "total_discount": {
+      "type": "float"
+    },
+    "payable_amount": {
+      "type": "float",
+      "required": true
+    },
+    "offer_discount": {
+      "type": "float"
+    },
+    "home_address": {
+      "displayName": "address",
+      "type": "component",
+      "repeatable": false,
+      "component": "address.address"
+    },
+    "user_id": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::auth.auth"
+    }
+  }
+}

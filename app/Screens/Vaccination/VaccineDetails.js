@@ -1,52 +1,131 @@
-import { View, Text, Image, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView, Dimensions, ImageBackground } from 'react-native';
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+
+  TouchableOpacity,
+  ActivityIndicator,
+  Animated,
+  StatusBar,
+  SafeAreaView,
+  Modal,
+} from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import RatingStars from './RatingStars';
-import DatePicker from './DatePicker';
-const { width } = Dimensions.get('window')
+import { Ionicons } from '@expo/vector-icons';
+import styles from './Styles';
+import { useDispatch } from 'react-redux';
+import { AddingStart, AddingSuccess } from '../../redux/slice/labTestCart';
+
 export default function VaccineDetails() {
+  const dispatch = useDispatch();
   const route = useRoute();
   const { id } = route.params || {};
-  const [data, setData] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedClinic, setSelectedClinic] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [appointmentDetails, setAppointmentDetails] = useState(null);
-  const handleFormSubmit = (data) => {
-    setAppointmentDetails(data);
-    setIsModalOpen(false);
-  };
+  const [isInCart, setIsInCart] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const notificationOpacity = useRef(new Animated.Value(0)).current;
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  console.log("id", id)
+
   useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
     if (!id) {
       setError('No vaccination ID provided.');
+      setLoading(false);
       return;
     }
 
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          `https://admindoggy.adsdigitalmedia.com/api/vaccinations?filters[documentId][$eq]=${id}&populate=*`
-        );
-        setData(response.data.data[0] || {});
-      } catch (err) {
-        setError('Failed to fetch vaccination details.');
-      } finally {
-        setLoading(false);
-      }
+    try {
+      const response = await axios.get(
+        `http://192.168.1.3:1337/api/vaccinations?filters[documentId][$eq]=${id}&populate=*`
+      );
+      setData(response.data.data[0] || null);
+    } catch (err) {
+      setError('Failed to fetch vaccination details.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (data?.isPackage) {
+      setShowModal(true);
+    } else {
+      const cartItem = {
+        documentId: data.documentId,
+        test_name: data.title,
+        isUltraSound: false,
+        serviceType: selectedOption,
+        imageUrl: data.image?.url,
+        discountPrice:
+          data.discount_price,
+
+        test_price: data.price,
+      };
+
+
+      setIsInCart(true);
+      setShowModal(false);
+      showNotification();
+      dispatch(AddingStart());
+      dispatch(AddingSuccess([cartItem]));
+    }
+  };
+
+  const confirmAddToCart = () => {
+    if (!selectedOption) return;
+
+    const cartItem = {
+      documentId: data.documentId,
+      test_name: data.title,
+      isUltraSound: false,
+      serviceType: selectedOption,
+      imageUrl: data.image?.url,
+      discountPrice:
+        selectedOption === "Clinic"
+          ? data.discount_price
+          : data.HomePriceOfPackageDiscount,
+      test_price:
+        selectedOption === "Clinic" ? data.price : data.HomePriceOfPackage,
     };
 
-    fetchData();
-  }, [id]);
+
+    setIsInCart(true);
+    setShowModal(false);
+    showNotification();
+    dispatch(AddingStart());
+    dispatch(AddingSuccess([cartItem]));
+  };
+
+  const showNotification = () => {
+    Animated.sequence([
+      Animated.timing(notificationOpacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.delay(2000),
+      Animated.timing(notificationOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#6C63FF" />
       </View>
     );
   }
@@ -67,376 +146,130 @@ export default function VaccineDetails() {
     );
   }
 
-  const handleClinicSelect = (clinic) => {
-    if (selectedClinic && selectedClinic.id === clinic.id) {
-      setSelectedClinic(null);
-      
-    } else {
-      setIsModalOpen(true);
-      setSelectedClinic(clinic);
-    }
-    
-  };
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, 200],
+    outputRange: [200, 80],
+    extrapolate: 'clamp',
+  });
 
-
-  const handleBookNow = () => {
-    if (selectedClinic) {
-      console.log(`Booking at ${selectedClinic.clinic_name}`);
-    }
-  };
+  const headerTitleOpacity = scrollY.interpolate({
+    inputRange: [0, 200],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
 
   return (
-    <ScrollView scrollEventThrottle={16} overScrollMode="never" decelerationRate="normal" showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
-
-      <Image
-        source={{ uri: data.image?.url || 'https://via.placeholder.com/150' }}
-        style={styles.image}
-      />
-      <View style={styles.row}>
-        <View style={styles.details}>
-          <Text numberOfLines={1} style={styles.title}>{data.title}</Text>
-          <Text style={styles.forage}>Forage: {data.forage}</Text>
-        </View>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>
-
-            ₹{data.discount_price} <Text style={styles.strikePrice}>₹{data.price}</Text>
-          </Text>
-        </View>
-
-      </View>
-      <View style={styles.containerTest}>
-        <Text style={styles.title}>These Vaccinations Include:</Text>
-        {data.name && data.name.length > 0 && (
-          data.name.map((item, index) => (
-            <View key={index} style={styles.vaccineItem}>
-              <Icon name="check-circle" style={styles.iconTest} />
-              <Text style={styles.vaccineName}>{item.vaccine_name}</Text>
-            </View>
-          ))
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      <Animated.View style={[styles.header, { height: headerHeight }]}>
+        <Animated.Image
+          source={{ uri: data.image?.url || 'https://via.placeholder.com/150' }}
+          style={[styles.headerImage, {
+            opacity: headerTitleOpacity.interpolate({
+              inputRange: [0, 1],
+              outputRange: [1, 0],
+            })
+          }]}
+        />
+        <Animated.Text style={[styles.headerTitle, { opacity: headerTitleOpacity }]}>
+          {data.title}
+        </Animated.Text>
+      </Animated.View>
+      <Animated.ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
         )}
-      </View>
-      {/* {selectedDate && (
-        <Text style={{ marginTop: 20 }}>Selected Date: {selectedDate.toDateString()}</Text>
-      )} */}
-      <View style={styles.Homecontainer}>
-        <ImageBackground
-          style={styles.homeSample}
-          source={require('./dodo.png')}
-          imageStyle={styles.imageStyle} // Rounded corners for the image
-        >
-
-          <View style={styles.overlay} />
-
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={() => setIsModalOpen(true)} style={styles.bookNowButton}>
-              <Text style={styles.bookNow}>Book Now Test At Your Home</Text>
-              <Icon name="long-arrow-alt-right" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </ImageBackground>
-      </View>
-
-      <Text style={styles.subTitle}>Available Clinics (Choose any one) </Text>
-      <View style={styles.clinicContainer}>
-        {data.clinics?.map((clinic) => (
-          <TouchableOpacity
-            key={clinic.id}
-            style={[
-              styles.clinicCard,
-              selectedClinic?.id === clinic.id && styles.selectedClinic,
-            ]}
-            onPress={() => handleClinicSelect(clinic)}
-          >
-            <Text style={styles.clinicName}>{clinic.clinic_name}</Text>
-            <Text style={styles.clinicDetails}>{clinic.Address}</Text>
-
-            <View style={styles.clinicFooter}>
-              <Text style={styles.clinicTime}>🕒 {clinic.time}</Text>
-              <RatingStars rating={clinic.Rating} />
+        scrollEventThrottle={16}
+      >
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>{data.title}</Text>
+          <Text style={styles.forage}>For age: {data.forage}</Text>
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>₹{data.discount_price}</Text>
+            <Text style={styles.strikePrice}>₹{data.price}</Text>
+            <View style={styles.discountBadge}>
+              <Text style={styles.discountText}>
+                {Math.round((1 - data.discount_price / data.price) * 100)}% OFF
+              </Text>
             </View>
+          </View>
 
+          <View style={styles.vaccineListContainer}>
+            <Text style={styles.sectionTitle}>Vaccinations Included:</Text>
+            {data.name && data.name.map((item, index) => (
+              <View key={index} style={styles.vaccineItem}>
+                <Ionicons name="checkmark-circle" size={24} color="#ff6b6b" style={styles.vaccineIcon} />
+                <Text style={styles.vaccineName}>{item.vaccine_name}</Text>
+              </View>
+            ))}
+          </View>
 
-            {/* <Text > {clinic.Rating} <Icon name='star'/></Text> */}
-          </TouchableOpacity>
-        ))}
-      </View>
-      <View style={styles.descriptionContainer}>
-        <Text style={styles.info}>Information</Text>
-        <Text style={styles.description}>{data.small_dsec}</Text>
-      </View>
-      <DatePicker
-        isOpen={isModalOpen}
-        vaccineItem={data}
-        TypeOfBooking={selectedClinic ? 'Clinic' : 'Home'}
-        Clinic={selectedClinic}
-        onClosed={() => setIsModalOpen(false)}
-        onFormSubmit={handleFormSubmit}
-      />
-    </ScrollView>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.sectionTitle}>Information</Text>
+            <Text style={styles.description}>{data.small_dsec}</Text>
+          </View>
+        </View>
+      </Animated.ScrollView>
+
+      <TouchableOpacity
+        style={[styles.addToCartButton, isInCart && styles.addedToCartButton]}
+        onPress={() => handleAddToCart(data)}
+        disabled={isInCart}
+      >
+        <Text style={styles.addToCartText}>
+          {isInCart ? 'Added to Cart' : 'Add to Cart'}
+        </Text>
+        <Ionicons name={isInCart ? "checkmark-circle" : "cart-outline"} size={24} color="white" />
+      </TouchableOpacity>
+      {data?.isPackage && (
+        <Modal transparent visible={showModal} animationType="fade">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalContainers}>
+                <Text style={styles.modalTitle}>Select Service Type</Text>
+                <TouchableOpacity onPress={() => setShowModal(false)} style={styles.closeButton}>
+                  <Text style={styles.closeText}>X</Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                style={[
+                  styles.optionButton,
+                  selectedOption === "Clinic" && styles.selectedOption,
+                ]}
+                onPress={() => setSelectedOption("Clinic")}
+              >
+                <Text style={styles.optionText}>Clinic - ₹{data.discount_price}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.optionButton,
+                  selectedOption === "Home Vaccination" && styles.selectedOption,
+                ]}
+                onPress={() => setSelectedOption("Home Vaccination")}
+              >
+                <Text style={styles.optionText}>
+                  Home Vaccination - ₹{data.HomePriceOfPackageDiscount}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={confirmAddToCart}
+              >
+                <Text style={styles.confirmText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      <Animated.View style={[styles.notification, { opacity: notificationOpacity }]}>
+        <Text style={styles.notificationText}>Added to cart successfully!</Text>
+      </Animated.View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-    backgroundColor: '#f5f5f5',
-    flexGrow: 1, // Ensures the container stretches to fill the screen
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  image: {
-    width: '100%',
-    height: 180,
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-
-    color: '#B32113',
-  },
-  forage: {
-    fontSize: 13,
-    color: '#111',
-    marginBottom: 8,
-  },
-  price: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    display: 'flex',
-    color: '#B32113',
-    marginBottom: 10,
-    marginTop: 10
-
-
-  },
-  strikePrice: {
-    textDecorationLine: 'line-through',
-    fontSize: 16,
-    color: '#111',
-    marginLeft: 8,
-  },
-  descriptionContainer: {
-    backgroundColor: '#f9f9f9', // Light gray background for a clean look
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 1, // For Android shadow
-  },
-  info: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#B32113',
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 14,
-    color: '#555',
-    lineHeight: 20,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 18,
-    textAlign: 'center',
-  },
-  subTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginHorizontal: 10,
-    marginTop: 24,
-
-    color: '#333',
-  },
-  vaccineList: {
-    marginLeft: 16,
-  },
-  vaccineItem: {
-    fontSize: 16,
-    color: '#333',
-  },
-  clinicContainer: {
-    padding: 4,
-  },
-  clinicCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 15,
-    marginVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 1,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-  },
-  selectedClinic: {
-    borderColor: '#B32113',
-    borderWidth: 2,
-    shadowOpacity: 0.3,
-    elevation: 5,
-  },
-  clinicName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#B32113',
-    marginTop: 5,
-
-    marginBottom: 5,
-  },
-  clinicDetails: {
-    fontSize: 14,
-    color: '#555', // Neutral gray for address
-    marginBottom: 10,
-  },
-  clinicFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  clinicTime: {
-    fontSize: 13,
-    color: '#003873',
-  },
-  clinicRating: {
-    // position: 'absolute',
-
-    right: 2,
-    marginBottom: 12,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#f44336',
-  },
-  bookButton: {
-    width: width,
-    backgroundColor: '#0d6efd',
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 24,
-    alignItems: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#d1d1d1',
-  },
-  bookButtonText: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-
-    paddingHorizontal: 2,
-    alignItems: 'center'
-  },
-  details: {
-    width: width / 2.2,
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    borderRadius: 8,
-
-    backgroundColor: '#f2dada',
-
-  },
-  priceContainer: {
-    width: width / 2.2,
-
-    textAlign: 'center',
-    backgroundColor: '#f2dada',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-  },
-  Homecontainer: {
-    flex: 1,
-    justifyContent: 'center', // Center content vertically
-    alignItems: 'center', // Center content horizontally
-    backgroundColor: '#f9f9f9', // Light background color
-  },
-  homeSample: {
-    width: '100%',
-    height: 120,
-    borderRadius: 12, // Rounded corners
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  imageStyle: {
-    borderRadius: 12,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(179, 33, 49,0.2)',
-  },
-  buttonContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  bookNowButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#B32123',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 50,
-  },
-  bookNow: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 10,
-  },
-  bookNow: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 10,
-  },
-  icon: {
-    marginLeft: 5, // Optional spacing for the icon
-  },
-  containerTest: {
-    padding: 16,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-
-  vaccineItem: {
-
-    flexDirection: 'row',
-    alignItems: 'start',
-    marginBottom: 8,
-    marginTop: 5,
-  },
-  iconTest: {
-    color: '#B32113',
-    fontSize: 18,
-    marginRight: 8,
-  },
-  vaccineName: {
-    fontSize: 14,
-    color: '#212529',
-  },
-});

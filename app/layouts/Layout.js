@@ -4,8 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from './Header';
 import Tabs from './Tabs';
 import Popup from '../components/PopUp/Popup';
+import { useNavigation } from '@react-navigation/native';
+import { useToken } from '../hooks/useToken';
+
 
 export default function Layout({ children }) {
+    const navigation = useNavigation()
+    const { isLoggedIn } = useToken()
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.container}>
@@ -15,7 +21,9 @@ export default function Layout({ children }) {
                 </ScrollView>
                 <Tabs />
             </View>
-            <Popup />
+            {!isLoggedIn && (
+                <Popup navigation={navigation} />
+            )}
         </SafeAreaView>
     );
 }

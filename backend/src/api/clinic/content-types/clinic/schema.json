@@ -72,6 +72,12 @@
       "relation": "manyToMany",
       "target": "api::vaccination.vaccination",
       "mappedBy": "clinics"
+    },
+    "lab_and_vaccination_bookings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::lab-and-vaccination-booking.lab-and-vaccination-booking",
+      "mappedBy": "clinic"
     }
   }
 }

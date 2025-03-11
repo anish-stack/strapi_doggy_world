@@ -8,7 +8,7 @@ export default function BakeryCategories() {
     const navigation = useNavigation()
     const fetchData = async () => {
         try {
-            const res = await axios.get(`https://admindoggy.adsdigitalmedia.com/api/pet-bakeries?populate=*`)
+            const res = await axios.get(`http://192.168.1.3:1337/api/pet-bakeries?populate=*`)
             if (res.data) {
                 // console.log(res.data)
                 setData(res.data.data)
@@ -27,7 +27,7 @@ export default function BakeryCategories() {
     return (
         <>
 
-            <Text style={styles.text}>Items in Bakery</Text>
+            {/* <Text style={styles.text}>Items in Bakery</Text> */}
 
 
             <View style={styles.container}>
@@ -62,9 +62,9 @@ export default function BakeryCategories() {
 
             </View>
 
-            <View>
+            {/* <View>
                 <Image source={{ uri: 'https://i.ibb.co/MMKYWCJ/op.jpg' }} resizeMode='contain' style={styles.images} />
-            </View>
+            </View> */}
         </>
     );
 }

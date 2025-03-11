@@ -57,13 +57,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#B32113',
         elevation: 2,
-        position: 'absolute', // This keeps it positioned absolutely
-        bottom: 0, // Aligns it to the bottom of the screen
-        left: 0, // Aligns it to the left side of the screen
-        right: 0, // Aligns it to the right side of the screen
+        position: 'absolute',
+        bottom: 0,
+        left: 0, 
+        right: 0,
         paddingVertical: 10,
-        borderTopRightRadius: 40,
-        borderTopLeftRadius: 40,
+        borderTopRightRadius: 0,
+        borderTopLeftRadius: 0,
         paddingHorizontal: 20,
         borderTopWidth: 1,
         borderTopColor: '#ddd',
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         backgroundColor: '#B32113',
-        paddingVertical: 10,
+        paddingVertical: 5,
         top: -15,
         position: 'relative',
     },
@@ -94,13 +94,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#B32113',
         flex: 1,
         alignItems: 'center',
-        paddingVertical: 10,
+        paddingVertical: 4,
         top: -15,
         position: 'relative',
         backgroundColor: '#B32113',
     },
     icon: {
-        fontSize: 24,
+        fontSize: 14,
         color: '#fff', // Change icon color for better visibility
     },
     tabText: {

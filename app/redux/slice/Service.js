@@ -11,11 +11,11 @@ const initialState = {
 export const fetchService = createAsyncThunk(
     'service/fetchService',
     async (_, thunkApi) => {
-        console.log("i am hit server")
+
 
         try {
-            const { data } = await axios.get('http://localhost:7000/api/v1/Doctors/Get-Services');
-           
+            const { data } = await axios.get('http://192.168.1.3:1337/api/v1/Doctors/Get-Services');
+
             return data.data;
         } catch (error) {
             return thunkApi.rejectWithValue(error);
@@ -34,7 +34,7 @@ const serviceSlice = createSlice({
                 state.error = null;
             })
             .addCase(fetchService.fulfilled, (state, action) => {
-                console.log("i am action",action)
+                console.log("i am action", action)
                 state.loading = false;
                 state.service = action.payload;
                 state.serviceCount = action.payload.length;

@@ -18,13 +18,12 @@ export default function Cart() {
 
   const route = useRoute();
   const { offerClick } = route.params || {};
-  console.log(offerClick)
+  
   const { CartItems } = useSelector((state) => state.cart)
   const dispatch = useDispatch()
 
   const handleIncrease = (pastQunatity = 1, ProductId) => {
-    console.log(ProductId)
-
+  
     dispatch(UpdateCartItem({ ProductId, quantity: pastQunatity + 1 }));
 
   };

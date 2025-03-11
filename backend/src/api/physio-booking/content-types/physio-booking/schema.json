@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "physio_bookings",
+  "info": {
+    "singularName": "physio-booking",
+    "pluralName": "physio-bookings",
+    "displayName": "Physio_booking"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Date_of_appoinment": {
+      "type": "date"
+    },
+    "Petname": {
+      "type": "string"
+    },
+    "contactNumber": {
+      "type": "biginteger"
+    },
+    "PetID": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::auth.auth",
+      "inversedBy": "physio_bookings"
+    },
+    "physiotherapy": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::physiotherapy.physiotherapy",
+      "inversedBy": "physio_bookings"
+    },
+    "Clinic": {
+      "type": "string",
+      "default": "Branch"
+    },
+    "is_cancel": {
+      "type": "boolean",
+      "default": false
+    },
+    "cancel_reason": {
+      "type": "string"
+    },
+    "service_done": {
+      "type": "boolean",
+      "default": false
+    },
+    "rate": {
+      "type": "integer"
+    }
+  }
+}

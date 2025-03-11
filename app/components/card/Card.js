@@ -14,7 +14,7 @@ export default function Card({ data }) {
     }
 
     const handlePress = () => {
-
+        console.log("data",data.title)
         if (data.title === "Pet Bakery") {
             navigation.navigate('Bakery');
         } else if (data.title === 'Consultation') {
@@ -22,7 +22,7 @@ export default function Card({ data }) {
 
         } else if (data.title === 'Pet Shop') {
             navigation.navigate('Pet_Shop');
-        } else if (data.title === 'Grooming') {
+        } else if (data.title === 'Dog Grooming') {
 
             navigation.navigate('Grooming');
 
@@ -30,10 +30,10 @@ export default function Card({ data }) {
             navigation.navigate('Physiotherapy');
         }
         else if (data.title === 'Vaccination') {
-            navigation.navigate('vaccination_home');
+            navigation.navigate('vaccination');
         }
         else if (data.title === 'Lab Test') {
-            navigation.navigate('Lab_Test');
+            navigation.navigate('Lab');
         } else if (data.title === 'Coming soon') {
             navigation.navigate('Coming_soon');
         } else {

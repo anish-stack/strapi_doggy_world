@@ -17,8 +17,8 @@ export default function Physiotherapy() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await axios.get('https://admindoggy.adsdigitalmedia.com/api/physiotherapies?populate=*');
-        const fetchSliderData = await axios.get('https://admindoggy.adsdigitalmedia.com/api/bakery-sliders?populate=*');
+        const res = await axios.get('http://192.168.1.3:1337/api/physiotherapies?populate=*');
+        const fetchSliderData = await axios.get('http://192.168.1.3:1337/api/bakery-sliders?populate=*');
 
         const fetchedData = res.data.data;
         const fetchSlider = fetchSliderData.data.data;

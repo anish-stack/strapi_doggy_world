@@ -13,7 +13,7 @@ export default function AdOns() {
     const fetchAddons = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('https://admindoggy.adsdigitalmedia.com/api/ad-ons?populate=*');
+            const response = await axios.get('http://192.168.1.3:1337/api/ad-ons?populate=*');
             setAddons(response.data.data);
         } catch (error) {
             Alert.alert('Error', 'Failed to fetch add-ons.');
@@ -25,44 +25,41 @@ export default function AdOns() {
     useEffect(() => {
         fetchAddons();
     }, []);
-    
+
     const handleAddToCart = async (item) => {
+        console.log(item);
+
+
         const price = {};
-        const isVarientTrue = item.varient_stauts;
-    
-        if (isVarientTrue) {
-          price.price = selectedvariants.price;
-          price.disc_price = selectedvariants.disc_price;
-          price.off_dis_percentage = selectedvariants.off_dis_percentage;
-        } else {
-          price.price = item.price;
-          price.disc_price = item.disc_price;
-          price.off_dis_percentage = item.off_dis_percentage;
-        }
-        // console.log(price);
-    
+        price.price = item.Price;
+        price.disc_price = item.Discount_price;
+        price.off_dis_percentage = item.off_dis_percentage;
+
+
+        console.log(price);
+
         try {
-          dispatch(AddingStart());
-          const newItem = {
-            ProductId: item.documentId,
-            title: item.title,
-            quantity: 1,
-            Pricing: price,
-            image: item.images?.url,
-            isVarientTrue: isVarientTrue,
-    
-          };
-    
-    
-          dispatch(AddingSuccess({
-            Cart: [newItem],
-          }));
-    
+            dispatch(AddingStart());
+            const newItem = {
+                ProductId: item.documentId,
+                title: item.title,
+                quantity: 1,
+                Pricing: price,
+                image: item.image?.url || 'https://your-default-image-url.com/default-image.jpg',
+
+                isVarientTrue: false,
+            };
+
+            dispatch(AddingSuccess({
+                Cart: [newItem],
+            }));
+
         } catch (error) {
-          dispatch(AddingFailure(error.message));  
+            dispatch(AddingFailure(error.message));
         }
-      };
-    
+    };
+
+
 
 
     return (
@@ -85,8 +82,8 @@ export default function AdOns() {
                                     <Text style={styles.discountPrice}>₹{item.Discount_price}</Text>
                                     <Text style={styles.price}>₹{item.Price}</Text>
                                 </View>
-                                <TouchableOpacity 
- activeOpacity={0.9}style={styles.addToCartButton} onPress={() => handleAddToCart(item)}>
+                                <TouchableOpacity
+                                    activeOpacity={0.9} style={styles.addToCartButton} onPress={() => handleAddToCart(item)}>
                                     <Text style={styles.addToCartText}>Add to Cart</Text>
                                 </TouchableOpacity>
                             </View>

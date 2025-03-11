@@ -1,113 +1,66 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Dimensions } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
+import { scale, verticalScale } from 'react-native-size-matters';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import UpperLayout from '../../layouts/UpperLayout';
 import Product_Slider from '../Pet_Shop/_Shop/Product_Slider';
 import { useDispatch } from 'react-redux';
-import { AddingStart, AddingSuccess, AddingFailure } from '../../redux/slice/labTestCart';
-
+import { AddingStart, AddingSuccess } from '../../redux/slice/labTestCart';
+import { SafeAreaView } from 'react-native-safe-area-context';
 export default function Single_Test() {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const navigation = useNavigation();
-    const Route = useRoute();
-    const { Test, typeOfTest, isUltraSound = false, ClinicId } = Route.params || {};
-    
-    const [data, setData] = useState({});
-    const [slots, setSlots] = useState([]);
-    const [timeSlots, setTimeSlots] = useState([]);
+    const route = useRoute();
+    const { Test, typeOfTest, isUltraSound = false, ClinicId } = route.params || {};
+
+    const [data, setData] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedTime, setSelectedTime] = useState(null);
 
     useEffect(() => {
         fetchTestDetails();
     }, [Test]);
-// console.log(typeOfTest)
+
     const fetchTestDetails = async () => {
         try {
             setLoading(true);
-            const { data } = await axios.get(`https://admindoggy.adsdigitalmedia.com/api/lab-tests?populate[clinics][populate]=*&populate=OtherImages&filters[documentId][$eq]=${Test}`);
-            setData(data.data[0] || {});
-            setLoading(false);
+            const response = await axios.get(
+                `http://192.168.1.3:1337/api/lab-tests?populate[clinics][populate]=*&populate=OtherImages&filters[documentId][$eq]=${Test}`
+            );
+            setData(response.data.data[0] || null);
         } catch (error) {
-            setError(error.message);
+            setError('Failed to load test details. Please try again.');
+            console.error('Error fetching test details:', error);
+        } finally {
             setLoading(false);
         }
     };
-
-    const generateSlots = () => {
-        const currentDate = new Date();
-        const newSlots = [];
-        for (let i = 0; i < 8; i++) {
-            const newSlotDate = new Date(currentDate);
-            newSlotDate.setDate(newSlotDate.getDate() + i);
-            newSlots.push({
-                date: newSlotDate.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                }),
-            });
-        }
-        setTimeSlots(newSlots);
-    };
-
-    useEffect(() => {
-        generateSlots();
-    }, [slots]);
-
-    useEffect(() => {
-        const clinicData = data?.clinics?.find((clinic) => clinic.documentId === ClinicId);
-        setSlots(clinicData?.Slots || []);
-    }, [data, ClinicId]);
-
-    const formatTime = (time) => {
-        const [hours, minutes] = time.split(":").map((item) => parseInt(item, 10));
-        const date = new Date();
-        date.setHours(hours, minutes, 0);
-        const options = { hour: '2-digit', minute: '2-digit', hour12: true };
-        return date.toLocaleTimeString([], options);
-    };
-
-    const handleDateSelection = (date) => {
-
-        setSelectedDate(prevDate => prevDate === date ? null : date);
-    };
-
-    const handleTimeSelection = (time) => {
-
-        setSelectedTime(prevTime => prevTime === time ? null : time);
-    };
-
-
-    const isAddToCartVisible = selectedDate && selectedTime;
 
     const handleAddtoCart = (item) => {
-        const { documentId, test_name, discountPrice, test_price, OtherImages } = item
-        const CartItem = {
+        if (!item) return;
+
+        const { documentId, test_name, discountPrice, test_price, OtherImages } = item;
+        const cartItem = {
             documentId,
             test_name,
+            isUltraSound: isUltraSound,
             discountPrice,
             test_price,
             typeOfTest,
             imageUrl: OtherImages?.[0]?.url || null,
-            selectedDate,
-            selectedTime,
-            ClinicId
-        }
-        dispatch(AddingStart())
-        console.log(CartItem)
-        if(item){
-            dispatch(AddingSuccess([CartItem]))
-           
-        }
-    }
+        };
+
+        dispatch(AddingStart());
+        dispatch(AddingSuccess([cartItem]));
+    };
 
     if (loading) {
         return (
             <View style={styles.centered}>
-                <ActivityIndicator size="large" />
+                <ActivityIndicator size="large" color="#B32113" />
+                <Text style={styles.loadingText}>Loading test details...</Text>
             </View>
         );
     }
@@ -115,261 +68,243 @@ export default function Single_Test() {
     if (error) {
         return (
             <View style={styles.centered}>
-                <Text>{error}</Text>
+                <Icon name="error-outline" size={scale(50)} color="#B32113" />
+                <Text style={styles.errorText}>{error}</Text>
+                <TouchableOpacity
+                    style={styles.retryButton}
+                    onPress={fetchTestDetails}
+                >
+                    <Text style={styles.retryButtonText}>Retry</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    if (!data) {
+        return (
+            <View style={styles.centered}>
+                <Icon name="info-outline" size={scale(50)} color="#666" />
+                <Text style={styles.noDataText}>No test details available</Text>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <UpperLayout isBellShow={false} title={data?.test_name} />
-            <ScrollView style={styles.scrollContainer}>
-                {data?.OtherImages?.length > 0 && (
+     <SafeAreaView style={{flex:1,paddingBottom:40}}>
+           <View style={styles.container}>
+            <UpperLayout isBellShow={false} title={data.test_name} />
+
+            <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+                {data.OtherImages?.length > 0 && (
                     <View style={styles.sliderContainer}>
-                        <Product_Slider isNavigation={false} PassHeight={250} images={data.OtherImages} />
+                        <Product_Slider
+                            isNavigation={false}
+                            PassHeight={verticalScale(250)}
+                            images={data.OtherImages}
+                        />
                     </View>
                 )}
-                <View style={styles.productDetails}>
-                    <Text style={styles.title}>{data?.test_name}</Text>
-                    <Text style={styles.text}>Test For {data?.PetType}</Text>
-                    <View style={styles.priceContainer}>
-                        <Text style={styles.discountPrice}>₹{data?.discountPrice}</Text>
-                        <Text style={styles.testPrice}>₹{data?.test_price}</Text>
+
+                <View style={styles.contentContainer}>
+                    <View style={styles.headerSection}>
+                        <Text style={styles.title}>{data.test_name}</Text>
+                        <View style={styles.petTypeContainer}>
+                            <Icon name="pets" size={scale(20)} color="#666" />
+                            <Text style={styles.petTypeText}>Test For {data.PetType}</Text>
+                        </View>
                     </View>
-                    <Text style={styles.dateLabel}>📅 Choose Your Suitable Date </Text>
-                    <ScrollView horizontal={true} style={styles.scrollDateContainer}>
-                        {timeSlots.map((item, index) => (
-                            <TouchableOpacity
-                                key={index}
-                                style={[styles.dateSlot, selectedDate === item.date && styles.selectedDateSlot]}
-                                onPress={() => handleDateSelection(item.date)}
-                            >
-                                <Text style={[styles.dateText, selectedDate === item.date && styles.selectedText]}>{item.date}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </ScrollView>
 
-                    <Text style={styles.timeLabel}>⏲️ Choose Your Suitable Time </Text>
-                    <ScrollView horizontal={true} style={styles.scrollTimeContainer}>
-                        {slots.map((item, index) => (
-                            <>
-                                {isUltraSound && item.Slot_title === 'ultrasound slot' ? (
+                    <View style={styles.priceSection}>
+                        <View style={styles.priceContainer}>
+                            <Text style={styles.discountPrice}>₹{data.discountPrice}</Text>
+                            <Text style={styles.originalPrice}>₹{data.test_price}</Text>
+                        </View>
+                        <View style={styles.savingsContainer}>
+                            <Text style={styles.savingsText}>
+                                Save ₹{data.test_price - data.discountPrice}
+                            </Text>
+                        </View>
+                    </View>
 
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={[
-                                            styles.timeSlot,
-                                            selectedTime === `${item.Slot_start} - ${item.slot_end}` && styles.selectedTimeSlot,
-                                        ]}
-                                        onPress={() => handleTimeSelection(`${item.Slot_start} - ${item.slot_end}`)}
-                                    >
-                                        <Text
-                                            style={[
-                                                styles.timeText,
-                                                selectedTime === `${item.Slot_start} - ${item.slot_end}` && styles.selectedText,
-                                            ]}
-                                        >
-                                            I am {formatTime(item.Slot_start)} - {formatTime(item.slot_end)}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ) : item.Slot_title === 'ultrasound slot' ? null : (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={[
-                                            styles.timeSlot,
-                                            selectedTime === `${item.Slot_start} - ${item.slot_end}` && styles.selectedTimeSlot,
-                                        ]}
-                                        onPress={() => handleTimeSelection(`${item.Slot_start} - ${item.slot_end}`)}
-                                    >
-                                        <Text
-                                            style={[
-                                                styles.timeText,
-                                                selectedTime === `${item.Slot_start} - ${item.slot_end}` && styles.selectedText,
-                                            ]}
-                                        >
-                                     {formatTime(item.Slot_start)} - {formatTime(item.slot_end)}
-                                        </Text>
-                                    </TouchableOpacity>
-                                )}
-                            </>
-
-                        ))}
-                    </ScrollView>
-
-
-
-
-                    <Text style={styles.availability}>
-                        {data?.TestAvailability ? 'Test Available at Center' : 'Test Not Available'}
-                    </Text>
-                    <Text style={styles.details}>{data?.Details}</Text>
+                    <View style={styles.detailsSection}>
+                        <Text style={styles.sectionTitle}>Test Details</Text>
+                        <Text style={styles.detailsText}>{data.Details}</Text>
+                    </View>
                 </View>
-
             </ScrollView>
-            {isAddToCartVisible && (
-                <View style={styles.addToCartButtonContainer}>
-                    <TouchableOpacity onPress={() => handleAddtoCart(data)} style={styles.addToCartButton}>
-                        <Text style={styles.addToCartButtonText}>Add to Cart</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
+
+            <View style={styles.bottomContainer}>
+                <TouchableOpacity
+                    style={styles.addToCartButton}
+                    onPress={() => handleAddtoCart(data)}
+                    activeOpacity={0.9}
+                >
+                    <Icon name="shopping-cart" size={scale(24)} color="#fff" />
+                    <Text style={styles.addToCartText}>Add to Cart</Text>
+                </TouchableOpacity>
+            </View>
         </View>
+     </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-    },
-
-    sliderContainer: {
-        marginBottom: 16,
-    },
-    productDetails: {
-        padding: 8,
-        backgroundColor: '#ffffff',
-        marginHorizontal: 8,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#212529',
-    },
-    text: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#000',
-        marginTop: 7,
-    },
-    dateLabel: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#D32113',
-        marginTop: 16,
-    },
-    timeLabel: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#D32113',
-        marginTop: 16,
-    },
-    selectedText: {
-        color: '#fff'
-    },
-    dateSlot: {
-        backgroundColor: '#fff',
-        marginRight: 12,
-        marginLeft: 4,
-        borderRadius: 4,
-        paddingVertical: 10,
-        paddingHorizontal: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        marginTop: 8,
-        marginBottom: 16,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 3,
-    },
-    selectedDateSlot: {
-        backgroundColor: '#B32113',
-    },
-    dateText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#c23429',
-    },
-    scrollTimeContainer: {
-        marginBottom: 16,
-    },
-    timeSlot: {
-        backgroundColor: '#fff',
-        marginRight: 12,
-        marginLeft: 4,
-        borderRadius: 4,
-        paddingVertical: 10,
-        paddingHorizontal: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        marginTop: 8,
-        marginBottom: 16,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 3,
-    },
-    selectedTimeSlot: {
-        backgroundColor: '#B32113',
-    },
-    timeText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#c23429',
-    },
-    addToCartButtonContainer: {
-        position: 'absolute',
-        bottom: -15.5,
-
-        width: '100%',
-
-        marginTop: 16,
-        marginBottom: 16,
-    },
-    addToCartButton: {
-        backgroundColor: '#B32113',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-    
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    addToCartButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    priceContainer: {
-        marginTop: 8,
-        flexDirection: 'row',
-        gap: 12,
-    },
-    discountPrice: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#B32113',
-    },
-    testPrice: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        textDecorationLine: 'line-through',
-        color: '#808080',
-    },
-    availability: {
-        fontSize: 16,
-        color: '#111111',
-
-    },
-    details: {
-        fontSize: 14,
-        color: '#111111',
-
+        backgroundColor: '#f5f5f5',
     },
     centered: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#f5f5f5',
+    },
+    loadingText: {
+        marginTop: verticalScale(10),
+        color: '#666',
+        fontSize: scale(14),
+    },
+    errorText: {
+        color: '#B32113',
+        fontSize: scale(16),
+        marginTop: verticalScale(10),
+        textAlign: 'center',
+        paddingHorizontal: scale(20),
+    },
+    noDataText: {
+        color: '#666',
+        fontSize: scale(16),
+        marginTop: verticalScale(10),
+    },
+    retryButton: {
+        marginTop: verticalScale(20),
+        paddingHorizontal: scale(30),
+        paddingVertical: verticalScale(10),
+        backgroundColor: '#B32113',
+        borderRadius: scale(25),
+    },
+    retryButtonText: {
+        color: '#fff',
+        fontSize: scale(14),
+        fontWeight: '600',
+    },
+    scrollContainer: {
+        flex: 1,
+    },
+    sliderContainer: {
+        backgroundColor: '#fff',
+        marginBottom: verticalScale(10),
+    },
+    contentContainer: {
+        padding: scale(15),
+    },
+    headerSection: {
+        backgroundColor: '#fff',
+        padding: scale(15),
+        borderRadius: scale(10),
+        marginBottom: verticalScale(10),
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+    },
+    title: {
+        fontSize: scale(20),
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: verticalScale(8),
+    },
+    petTypeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    petTypeText: {
+        fontSize: scale(14),
+        color: '#666',
+        marginLeft: scale(5),
+    },
+    priceSection: {
+        backgroundColor: '#fff',
+        padding: scale(15),
+        borderRadius: scale(10),
+        marginBottom: verticalScale(10),
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+    },
+    priceContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    discountPrice: {
+        fontSize: scale(24),
+        fontWeight: 'bold',
+        color: '#B32113',
+    },
+    originalPrice: {
+        fontSize: scale(18),
+        color: '#666',
+        textDecorationLine: 'line-through',
+        marginLeft: scale(10),
+    },
+    savingsContainer: {
+        backgroundColor: '#e8f5e9',
+        paddingHorizontal: scale(10),
+        paddingVertical: verticalScale(5),
+        borderRadius: scale(5),
+        marginTop: verticalScale(8),
+        alignSelf: 'flex-start',
+    },
+    savingsText: {
+        color: '#2e7d32',
+        fontSize: scale(12),
+        fontWeight: '600',
+    },
+    detailsSection: {
+        backgroundColor: '#fff',
+        padding: scale(15),
+        borderRadius: scale(10),
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+    },
+    sectionTitle: {
+        fontSize: scale(16),
+        fontWeight: '600',
+        color: '#333',
+        marginBottom: verticalScale(8),
+    },
+    detailsText: {
+        fontSize: scale(14),
+        color: '#666',
+        lineHeight: scale(20),
+    },
+    bottomContainer: {
+        backgroundColor: '#fff',
+        padding: scale(15),
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -3 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+    },
+    addToCartButton: {
+        backgroundColor: '#B32113',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: verticalScale(12),
+        borderRadius: scale(10),
+    },
+    addToCartText: {
+        color: '#fff',
+        fontSize: scale(16),
+        fontWeight: 'bold',
+        marginLeft: scale(10),
     },
 });

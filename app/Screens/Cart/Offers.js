@@ -13,6 +13,7 @@ import {
 import axios from 'axios';
 import UpperLayout from '../../layouts/UpperLayout';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Offers() {
     const navigation = useNavigation()
@@ -38,7 +39,7 @@ export default function Offers() {
         setLoading(true);
         setError('');
         try {
-            const { data } = await axios.get('https://admindoggy.adsdigitalmedia.com/api/offers?populate=*');
+            const { data } = await axios.get('http://192.168.1.3:1337/api/offers?populate=*');
             if (data && data.data.length) {
                 setOffers(data.data);
             } else {
@@ -56,86 +57,91 @@ export default function Offers() {
     }, []);
 
     return (
-        <View style={styles.container}>
-            <UpperLayout title="Apply Coupon" isBellShow={false} />
-            <ScrollView>
+        <SafeAreaView
+            style={{ backgroundColor: '#fff', flex: 1 }}
+        >
+
+            <View style={styles.container}>
+                <UpperLayout title="Apply Coupon" isBellShow={false} />
+                <ScrollView>
 
 
-                <View style={styles.couponContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter Coupon Code"
-                        value={coupon}
-                        onChangeText={setCoupon}
-                    />
-                    <TouchableOpacity 
- activeOpacity={0.9}style={styles.button} onPress={handleApplyCoupon}>
-                        <Text style={styles.buttonText}>APPLY</Text>
-                    </TouchableOpacity>
-                </View>
-
-
-                {error ? (
-                    <View style={styles.errorBanner}>
-                        <Text style={styles.errorText}>{error}</Text>
+                    <View style={styles.couponContainer}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter Coupon Code"
+                            value={coupon}
+                            onChangeText={setCoupon}
+                        />
+                        <TouchableOpacity
+                            activeOpacity={0.9} style={styles.button} onPress={handleApplyCoupon}>
+                            <Text style={styles.buttonText}>APPLY</Text>
+                        </TouchableOpacity>
                     </View>
-                ) : null}
 
 
-                <View style={styles.availableContainer}>
-                    <Text style={styles.availableText}>Available Coupons</Text>
-                    {loading ? (
-                        <ActivityIndicator size="large" color="#0d6efd" />
-                    ) : (
-                        <View style={styles.offersList}>
-                            {offers && offers.map((offer, index) => (
-                                <View key={offer.id} style={styles.offerCard}>
-                                    <View style={styles.row}>
-                                        <View style={[styles.row, { gap: 15 }]}>
-                                            <Image source={{ uri: offer?.icon?.url }} style={styles.image} />
-                                            <Text style={styles.offerTitle}>{offer.Code}</Text>
+                    {error ? (
+                        <View style={styles.errorBanner}>
+                            <Text style={styles.errorText}>{error}</Text>
+                        </View>
+                    ) : null}
+
+
+                    <View style={styles.availableContainer}>
+                        <Text style={styles.availableText}>Available Coupons</Text>
+                        {loading ? (
+                            <ActivityIndicator size="large" color="#0d6efd" />
+                        ) : (
+                            <View style={styles.offersList}>
+                                {offers && offers.map((offer, index) => (
+                                    <View key={offer.id} style={styles.offerCard}>
+                                        <View style={styles.row}>
+                                            <View style={[styles.row, { gap: 15 }]}>
+                                                <Image source={{ uri: offer?.icon?.url }} style={styles.image} />
+                                                <Text style={styles.offerTitle}>{offer.Code}</Text>
+                                            </View>
+
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    navigation.navigate('cart', { offerClick: offer });
+                                                }}
+                                            >
+                                                <Text style={styles.ApplyText}>
+                                                    Apply
+                                                </Text>
+                                            </TouchableOpacity>
+
+                                        </View>
+                                        <Text style={styles.offerDescription}>{offer.desc}</Text>
+
+                                        <View key={index} style={styles.expandContainer}>
+                                            <TouchableOpacity
+                                                style={styles.expandButton}
+                                                onPress={() => handleExpand(index)}
+                                            >
+                                                <Text style={styles.buttonExpandText}>
+                                                    {expand === index ? '- Less' : '+ More'}
+                                                </Text>
+                                            </TouchableOpacity>
+
+                                            {expand === index && (
+                                                <View style={styles.termsContainer}>
+                                                    <Text style={styles.termsText}>
+                                                        {offer.TermAndCondition}
+                                                    </Text>
+                                                </View>
+                                            )}
                                         </View>
 
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                navigation.navigate('cart', { offerClick: offer });
-                                            }}
-                                        >
-                                            <Text style={styles.ApplyText}>
-                                                Apply
-                                            </Text>
-                                        </TouchableOpacity>
-
                                     </View>
-                                    <Text style={styles.offerDescription}>{offer.desc}</Text>
+                                ))}
+                            </View>
+                        )}
+                    </View>
+                </ScrollView>
 
-                                    <View key={index} style={styles.expandContainer}>
-                                        <TouchableOpacity
-                                            style={styles.expandButton}
-                                            onPress={() => handleExpand(index)}
-                                        >
-                                            <Text style={styles.buttonExpandText}>
-                                                {expand === index ? '- Less' : '+ More'}
-                                            </Text>
-                                        </TouchableOpacity>
-
-                                        {expand === index && (
-                                            <View style={styles.termsContainer}>
-                                                <Text style={styles.termsText}>
-                                                    {offer.TermAndCondition}
-                                                </Text>
-                                            </View>
-                                        )}
-                                    </View>
-
-                                </View>
-                            ))}
-                        </View>
-                    )}
-                </View>
-            </ScrollView>
-
-        </View>
+            </View>
+        </SafeAreaView>
     );
 }
 

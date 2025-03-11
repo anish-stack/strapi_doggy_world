@@ -41,6 +41,12 @@
       ],
       "type": "media",
       "multiple": true
+    },
+    "physio_bookings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::physio-booking.physio-booking",
+      "mappedBy": "physiotherapy"
     }
   }
 }

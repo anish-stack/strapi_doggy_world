@@ -1,20 +1,21 @@
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Vibration, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import UpperLayout from '../../../layouts/UpperLayout';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import Product_Slider from './Product_Slider';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { AddingFailure, AddingStart, AddingSuccess } from '../../../redux/slice/cartSlice';
 import PolicyCards from './Policy_cards';
+import { SafeAreaView } from 'react-native-safe-area-context';
 const { width, height } = Dimensions.get('window');
 
 export default function Dynamic_Details_Shop() {
     const route = useRoute();
     const { title, id } = route.params || {};
     const dispatch = useDispatch()
-    const { CartItems, CartCount } = useSelector((state) => state.cart);
+    // const { CartItems, CartCount } = useSelector((state) => state.cart);
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -23,10 +24,11 @@ export default function Dynamic_Details_Shop() {
         disc_price: 0,
         off_dis_percentage: 0,
     });
+    const navigataion = useNavigation()
 
     const fetchProduct = async () => {
         try {
-            const res = await axios.get(`https://admindoggy.adsdigitalmedia.com/api/pet-shop-products/${id}?populate=*`);
+            const res = await axios.get(`http://192.168.1.3:1337/api/pet-shop-products/${id}?populate=*`);
             setProduct(res.data.data);
             console.log(res.data);
         } catch (error) {
@@ -84,6 +86,8 @@ export default function Dynamic_Details_Shop() {
                 Cart: [newItem],
             }));
 
+            Vibration.vibrate(150)
+            navigataion.navigate('cart')
         } catch (error) {
             dispatch(AddingFailure(error.message));
         }
@@ -115,13 +119,13 @@ export default function Dynamic_Details_Shop() {
     }
 
     return (
-        <>
+        <SafeAreaView style={{ flex: 1, paddingBottom: 20 }}>
             <UpperLayout title={title?.substring(0, 15) + '...'} isBellShow={false} />
 
             <ScrollView contentContainerStyle={styles.container}>
 
                 {product?.Images?.length > 0 && <Product_Slider images={product.Images} />}
-              
+
                 <Text style={styles.title} numberOfLines={2}>
                     {product?.Title}
                 </Text>
@@ -206,7 +210,7 @@ export default function Dynamic_Details_Shop() {
                 </View>
             </ScrollView>
 
-        </>
+        </SafeAreaView>
     );
 }
 

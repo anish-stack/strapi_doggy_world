@@ -1,0 +1,36 @@
+{
+  "collectionName": "components_cart_lab_items_items",
+  "info": {
+    "displayName": "Items",
+    "icon": "archive"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "price": {
+      "type": "decimal",
+      "required": true
+    },
+    "discountPrice": {
+      "type": "decimal"
+    },
+    "images": {
+      "type": "json"
+    },
+    "isPackage": {
+      "type": "boolean",
+      "default": false
+    },
+    "isTest": {
+      "type": "boolean",
+      "default": false
+    },
+    "typeId": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

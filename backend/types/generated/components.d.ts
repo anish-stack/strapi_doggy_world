@@ -1,5 +1,22 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface AddressAddress extends Struct.ComponentSchema {
+  collectionName: 'components_address_addresses';
+  info: {
+    displayName: 'address';
+    icon: 'cloud';
+  };
+  attributes: {
+    city: Schema.Attribute.String & Schema.Attribute.Required;
+    country: Schema.Attribute.String & Schema.Attribute.DefaultTo<'USA'>;
+    latitude: Schema.Attribute.Decimal;
+    longitude: Schema.Attribute.Decimal;
+    state: Schema.Attribute.String;
+    street: Schema.Attribute.String & Schema.Attribute.Required;
+    zipCode: Schema.Attribute.String;
+  };
+}
+
 export interface CartItemCartItems extends Struct.ComponentSchema {
   collectionName: 'components_cart_item_cart_items';
   info: {
@@ -24,6 +41,23 @@ export interface CartItemItems extends Struct.ComponentSchema {
     displayName: 'items';
   };
   attributes: {};
+}
+
+export interface CartLabItemsItems extends Struct.ComponentSchema {
+  collectionName: 'components_cart_lab_items_items';
+  info: {
+    displayName: 'Items';
+    icon: 'archive';
+  };
+  attributes: {
+    discountPrice: Schema.Attribute.Decimal;
+    images: Schema.Attribute.JSON;
+    isPackage: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    isTest: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    price: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    typeId: Schema.Attribute.String & Schema.Attribute.Required;
+  };
 }
 
 export interface ListList extends Struct.ComponentSchema {
@@ -51,6 +85,23 @@ export interface SlotsSlots extends Struct.ComponentSchema {
     slot_end: Schema.Attribute.Time;
     Slot_start: Schema.Attribute.Time;
     Slot_title: Schema.Attribute.String;
+  };
+}
+
+export interface TestBooksTest extends Struct.ComponentSchema {
+  collectionName: 'components_test_books_tests';
+  info: {
+    description: '';
+    displayName: 'Test';
+    icon: 'check';
+  };
+  attributes: {
+    Discount_Price: Schema.Attribute.BigInteger;
+    Is_Ultarasound: Schema.Attribute.Boolean;
+    Test_id: Schema.Attribute.String;
+    Test_Name: Schema.Attribute.String;
+    Test_Price: Schema.Attribute.String;
+    Type_Of_Test: Schema.Attribute.String;
   };
 }
 
@@ -98,10 +149,13 @@ export interface VariantsVariants extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'address.address': AddressAddress;
       'cart-item.cart-items': CartItemCartItems;
       'cart-item.items': CartItemItems;
+      'cart-lab-items.items': CartLabItemsItems;
       'list.list': ListList;
       'slots.slots': SlotsSlots;
+      'test-books.test': TestBooksTest;
       'variants.product-variant': VariantsProductVariant;
       'variants.variants': VariantsVariants;
     }

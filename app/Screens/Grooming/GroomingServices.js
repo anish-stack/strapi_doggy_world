@@ -72,8 +72,8 @@ export default function GroomingServices() {
                 <View style={styles.infoContainer}>
                     <Text style={styles.type}>{item.type}</Text>
                     <Text style={styles.desc} numberOfLines={isExpanded ? 0 : 2}>{item.desc}</Text>
-                    <TouchableOpacity 
- activeOpacity={0.9}onPress={() => handleReadMore(item.id)}>
+                    <TouchableOpacity
+                        activeOpacity={0.9} onPress={() => handleReadMore(item.id)}>
                         <Text style={styles.readMore}>{isExpanded ? 'Read Less' : 'Read More'}</Text>
                     </TouchableOpacity>
                     <Text style={styles.price}>Start From {item.startPrice} - {item.endPrice}</Text>
@@ -86,8 +86,8 @@ export default function GroomingServices() {
                 </View>
                 <View style={styles.imageContainer}>
                     <Image source={{ uri: item.image }} style={styles.image} />
-                    <TouchableOpacity 
- activeOpacity={0.9}onPress={() => navigation.navigate('clinic', { id: item._id })}  style={styles.bookButton}>
+                    <TouchableOpacity
+                        activeOpacity={0.9} onPress={() => navigation.navigate('clinic', { id: item.id })} style={styles.bookButton}>
                         <Text style={styles.bookButtonText}>Book Now</Text>
                     </TouchableOpacity>
                 </View>
@@ -111,12 +111,12 @@ export default function GroomingServices() {
                         </Text>
                     </View>
                     <View style={styles.box}>
-                        <TouchableOpacity 
- activeOpacity={0.9}onPress={() => navigation.navigate('Gromming_More_service',{item:services})} style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            activeOpacity={0.9} onPress={() => navigation.navigate('Gromming_More_service', { item: services })} style={styles.buttonContainer}>
                             <Text style={styles.viewMoreText}>View More Services</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity 
- activeOpacity={0.9}onPress={() => navigation.navigate('Create_Custom_Service')} style={styles.buttonContainer} >
+                        <TouchableOpacity
+                            activeOpacity={0.9} onPress={() => navigation.navigate('Create_Custom_Service')} style={styles.buttonContainer} >
                             <Text style={styles.customText}>Create Custom Package</Text>
                         </TouchableOpacity>
 
@@ -130,6 +130,8 @@ export default function GroomingServices() {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        // backgroundColor: '#f5f5f5',
         padding: 8,
         backgroundColor: '#fff',
     },

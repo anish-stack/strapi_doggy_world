@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import logo from '../assets/logo/dogy-world-logo-b.webp';
+import logo from '../assets/logo/dogy-world-logo-b.jpg';
 import SideBar from './SideBar';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
@@ -23,10 +23,10 @@ export default function Header() {
             <View style={styles.header}>
                 <TouchableOpacity
                     activeOpacity={0.9} onPress={handleSideBarToggle} style={styles.iconContainer}>
-                    <Icon name="bars" style={styles.Weight} size={24} color="#000" />
+                   <Image source={logo} style={styles.logo} />
                 </TouchableOpacity>
 
-                <Image source={logo} style={styles.logo} />
+                
 
                 <View style={styles.iconsContainer}>
                     <TouchableOpacity
@@ -56,7 +56,7 @@ export default function Header() {
 
 const styles = StyleSheet.create({
     header: {
-        padding: 10,
+        padding: 5,
         flexDirection: 'row',
         alignItems: 'center',
         borderBottomWidth: 1,
@@ -65,8 +65,8 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     logo: {
-        width: 100,
-        height: 40,
+        width: 50,
+        height: 50,
         resizeMode: 'contain',
 
     },

@@ -1,11 +1,12 @@
-import { View, Text, ActivityIndicator, Image, Dimensions, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, ActivityIndicator, Image, Dimensions, StyleSheet, Vibration, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import UpperLayout from '../../../../layouts/UpperLayout';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { AddingStart, AddingSuccess, AddingFailure, AddItemInCart } from '../../../../redux/slice/cartSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,7 +14,6 @@ export default function ProductDetails() {
   const route = useRoute();
   const { id, title } = route.params;
   const dispatch = useDispatch()
-  const { CartItems, CartCount } = useSelector((state) => state.cart)
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,10 +22,11 @@ export default function ProductDetails() {
     disc_price: 0,
     off_dis_percentage: 0
   })
+  const navigation = useNavigation()
 
   const fetchProduct = async () => {
     try {
-      const res = await axios.get(`https://admindoggy.adsdigitalmedia.com/api/products/${id}?populate=*`);
+      const res = await axios.get(`http://192.168.1.3:1337/api/products/${id}?populate=*`);
       setProduct(res.data.data);
     } catch (error) {
       setError('Failed to load product details.');
@@ -33,7 +34,7 @@ export default function ProductDetails() {
       setLoading(false);
     }
   };
-  console.log("i am cart", CartCount)
+
 
   useEffect(() => {
     if (product?.variant?.length > 0) {
@@ -57,7 +58,7 @@ export default function ProductDetails() {
       off_dis_percentage,
     })
   }
-  
+
   const handleAddToCart = async (item) => {
     const price = {};
     const isVarientTrue = item.varient_stauts;
@@ -89,9 +90,10 @@ export default function ProductDetails() {
       dispatch(AddingSuccess({
         Cart: [newItem],
       }));
-
+      Vibration.vibrate(150)
+      navigation.navigate('cart')
     } catch (error) {
-      dispatch(AddingFailure(error.message));  
+      dispatch(AddingFailure(error.message));
     }
   };
 
@@ -119,12 +121,9 @@ export default function ProductDetails() {
 
   return (
 
-    <>
+    <SafeAreaView style={{ flex: 1 }}>
       <UpperLayout title={title.substring(0, 15) + '...'} />
       <ScrollView style={styles.bg}>
-
-
-
         <View style={styles.imageContainer}>
           <Image style={styles.image} source={{ uri: product?.images?.url }} />
         </View>
@@ -143,7 +142,7 @@ export default function ProductDetails() {
             </Text>
           </TouchableOpacity>
 
-          <Text style={styles.gram}>200 g</Text>
+          {/* <Text style={styles.gram}>200 g</Text> */}
 
           <View style={styles.priceAndButton}>
             <View style={styles.priceInfo}>
@@ -180,6 +179,7 @@ export default function ProductDetails() {
               </TouchableOpacity>
             </View>
           </View>
+          {console.log(product?.varient_stauts)}
           {product?.varient_stauts === true && (
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
               <View style={styles.variantSection}>
@@ -210,11 +210,11 @@ export default function ProductDetails() {
           )}
 
           <View style={styles.bt}></View>
-          <View style={styles.container}>
+          {/* <View style={styles.container}>
 
 
-          </View>
-          <View style={styles.bt}></View>
+          </View> */}
+          {/* <View style={styles.bt}></View> */}
           {product.content && product.content.length > 0 && (
             product.content.map((item, index) => {
               // Handle headings
@@ -316,7 +316,7 @@ export default function ProductDetails() {
 
         </View>
       </ScrollView>
-    </>
+    </SafeAreaView>
 
 
   );

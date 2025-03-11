@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import UpperLayout from '../../../layouts/UpperLayout';
 import { TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -18,7 +19,7 @@ export default function Dynamic_Shop() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`https://admindoggy.adsdigitalmedia.com/api/pet-shop-categories?populate=*`);
+                const response = await axios.get(`http://192.168.1.3:1337/api/pet-shop-categories?populate=*`);
                 const resdata = response.data.data;
 
                 const filterData = resdata.filter(item =>
@@ -54,10 +55,11 @@ export default function Dynamic_Shop() {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={{flex:1 ,paddingBottom:40}}>
+            <View style={styles.container}>
             <UpperLayout title={title} isBellShow={false} />
             <Text style={styles.heading}>Shop By <Text style={styles.headingTwo}>Categories</Text></Text>
-            <ScrollView contentContainerStyle={styles.scrollViewContent}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
                 {data.length > 0 ? (
                     <View style={styles.gridContainer}>
                         {data.sort((a, b) => a.postion - b.postion).map((item, index) => (
@@ -80,6 +82,7 @@ export default function Dynamic_Shop() {
                 )}
             </ScrollView>
         </View>
+        </SafeAreaView>
     );
 }
 

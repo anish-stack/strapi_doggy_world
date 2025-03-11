@@ -1,0 +1,69 @@
+{
+  "kind": "collectionType",
+  "collectionName": "lab_and_vaccination_bookings",
+  "info": {
+    "singularName": "lab-and-vaccination-booking",
+    "pluralName": "lab-and-vaccination-bookings",
+    "displayName": "Lab_And_Vaccination_Booking",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "clinic": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::clinic.clinic",
+      "inversedBy": "lab_and_vaccination_bookings"
+    },
+    "offer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::offer.offer",
+      "inversedBy": "lab_and_vaccination_bookings"
+    },
+    "Payable_Amount": {
+      "type": "biginteger"
+    },
+    "Test": {
+      "displayName": "Test",
+      "type": "component",
+      "repeatable": true,
+      "component": "test-books.test"
+    },
+    "Time_Of_Test": {
+      "type": "string"
+    },
+    "Total_Discount": {
+      "type": "biginteger"
+    },
+    "Total_Price": {
+      "type": "biginteger"
+    },
+    "Booking_Date": {
+      "type": "date"
+    },
+    "auth": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::auth.auth",
+      "inversedBy": "lab_and_vaccination_bookings"
+    },
+    "is_order_complete": {
+      "type": "boolean",
+      "default": false
+    },
+    "isBookingCancel": {
+      "type": "boolean",
+      "default": false
+    },
+    "whatsapp_notification_done": {
+      "type": "boolean"
+    },
+    "cancel_reason": {
+      "type": "string"
+    }
+  }
+}

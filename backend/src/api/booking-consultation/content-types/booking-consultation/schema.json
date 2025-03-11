@@ -1,0 +1,72 @@
+{
+  "kind": "collectionType",
+  "collectionName": "booking_consultations",
+  "info": {
+    "singularName": "booking-consultation",
+    "pluralName": "booking-consultations",
+    "displayName": "Booking-Consultation",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "consultation": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::consultation.consultation",
+      "inversedBy": "booking_consultations"
+    },
+    "pet": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::auth.auth",
+      "inversedBy": "pets"
+    },
+    "Time": {
+      "type": "time"
+    },
+    "Date": {
+      "type": "date"
+    },
+    "isBookingCancel": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "Cancel_Reason": {
+      "type": "text"
+    },
+    "consulation_rate": {
+      "type": "integer"
+    },
+    "is_rate_done": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_consultation_complete": {
+      "type": "boolean",
+      "default": false
+    },
+    "whatsapp_notification_done": {
+      "type": "boolean"
+    },
+    "reminder_done": {
+      "type": "boolean",
+      "default": false
+    },
+    "remineder_time": {
+      "type": "time"
+    },
+    "period": {
+      "type": "string"
+    },
+    "doctor": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::doctor.doctor",
+      "inversedBy": "booking_consultations"
+    }
+  }
+}

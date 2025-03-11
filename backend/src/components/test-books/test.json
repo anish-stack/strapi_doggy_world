@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_test_books_tests",
+  "info": {
+    "displayName": "Test",
+    "icon": "check",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "Test_Name": {
+      "type": "string"
+    },
+    "Test_id": {
+      "type": "string"
+    },
+    "Is_Ultarasound": {
+      "type": "boolean"
+    },
+    "Test_Price":{
+      "type": "string"
+    },
+    "Discount_Price": {
+      "type": "biginteger"
+    },
+    "Type_Of_Test": {
+      "type": "string"
+    }
+  }
+}

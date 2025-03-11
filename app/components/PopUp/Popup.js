@@ -1,130 +1,219 @@
-import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated, Dimensions } from 'react-native';
+import { scale, verticalScale } from 'react-native-size-matters';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-export default function Popup() {
-    const [show, setShow] = useState(false);
-    const navigation  = useNavigation()
+const { width, height } = Dimensions.get('window');
+
+export default function Popup({ navigation }) {
+    const [show, setShow] = useState(true);
+    const slideAnim = new Animated.Value(height);
+    const fadeAnim = new Animated.Value(0);
     useEffect(() => {
         setShow(true);
+        Animated.parallel([
+            Animated.timing(slideAnim, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+            }),
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+            }),
+        ]).start();
     }, []);
 
+    const handleClose = () => {
+        Animated.parallel([
+            Animated.timing(slideAnim, {
+                toValue: height,
+                duration: 500,
+                useNativeDriver: true,
+            }),
+            Animated.timing(fadeAnim, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+            }),
+        ]).start(() => {
+            setShow(false); // Hide the component after animation
+        });
+    };
+
     const handleLogin = () => {
-        console.log('Login pressed');
-        navigation.navigate('login')
-        setShow(false);
+        handleClose();
+        navigation.navigate('login');
     };
 
     const handleRegister = () => {
-        console.log('Register pressed');
-        navigation.navigate('register')
-        setShow(false);
+        handleClose();
+        navigation.navigate('register');
     };
 
-    const handleClose = () => {
-        setShow(false);
-    };
+    if (!show) return null; // Avoid rendering when show is false
 
     return (
         <>
             {show && (
-                <View style={styles.container}>
-                    <TouchableOpacity 
- activeOpacity={0.9}style={styles.closeButton} onPress={handleClose}>
-                        <Text style={styles.closeButtonText}>✕</Text>
-                    </TouchableOpacity>
-                    <View style={styles.popup}>
-                        <Text style={styles.popupText}>Would You Like To ?</Text>
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity 
- activeOpacity={0.9}style={styles.button} onPress={handleLogin}>
-                                <Text style={styles.buttonText}>Login</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity 
- activeOpacity={0.9}style={styles.button} onPress={handleRegister}>
-                                <Text style={styles.buttonText}>Register</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
+
+                <Animated.View
+                    style={[
+                        styles.container,
+                        {
+                            opacity: fadeAnim,
+                        }
+                    ]}
+                >
+                    <SafeAreaView style={styles.safeArea}>
+                        <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={handleClose}
+                            activeOpacity={0.9}
+                        >
+                            <Icon name="close" size={scale(24)} color="#EC4C3C" />
+                        </TouchableOpacity>
+
+                        <Animated.View
+                            style={[
+                                styles.popup,
+                                {
+                                    transform: [{ translateY: slideAnim }]
+                                }
+                            ]}
+                        >
+                            <View style={styles.semicircle} />
+                            <Icon
+                                name="account-circle"
+                                size={scale(50)}
+                                color="#fff"
+                                style={styles.headerIcon}
+                            />
+                            <Text style={styles.popupText}>Welcome!</Text>
+                            <Text style={styles.subText}>Would you like to...</Text>
+
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity
+                                    style={[styles.button, styles.loginButton]}
+                                    onPress={handleLogin}
+                                    activeOpacity={0.9}
+                                >
+                                    <Icon name="login" size={scale(20)} color="#EC4C3C" />
+                                    <Text style={styles.buttonText}>Login</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={[styles.button, styles.registerButton]}
+                                    onPress={handleRegister}
+                                    activeOpacity={0.9}
+                                >
+                                    <Icon name="person-add" size={scale(20)} color="#EC4C3C" />
+                                    <Text style={styles.buttonText}>Register</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </Animated.View>
+                    </SafeAreaView>
+                </Animated.View>
             )}
         </>
     );
 }
 
-const { width, height } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        position: 'absolute',
         width: width,
         height: height,
-        zIndex: 999,
         bottom: 0,
-        position: 'absolute',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         justifyContent: 'flex-end',
-        alignItems: 'center',
-        // paddingBottom: 20
+        zIndex: 999,
+    },
+    safeArea: {
+        flex: 1,
+        justifyContent: 'flex-end',
     },
     closeButton: {
         position: 'absolute',
-        bottom: 150,
-        right: width / 2.5,
+        bottom: verticalScale(180),
+        alignSelf: 'center',
         backgroundColor: '#fff',
-        width: 60,
-        height: 60,
-        borderRadius: 50,
+        width: scale(50),
+        height: scale(50),
+        borderRadius: scale(25),
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1000,
-    },
-    closeButtonText: {
-        color: '#EC4C3C',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    popup: {
-        width: width * 1,
-        height: width * 0.5,
-        backgroundColor: '#EC4C3C',
-        borderTopLeftRadius: width * 0.45,
-        borderTopRightRadius: width * 0.45,
-        justifyContent: 'center',
-        alignItems: 'center',
+        elevation: 5,
+        right:0,
+        // top: ,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 10,
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+    popup: {
+        backgroundColor: '#EC4C3C',
+        height: verticalScale(240),
+        borderTopLeftRadius: scale(40),
+        borderTopRightRadius: scale(40),
+        alignItems: 'center',
+        paddingTop: verticalScale(20),
+        position: 'relative',
+    },
+    semicircle: {
+        position: 'absolute',
+        top: -scale(20),
+        width: scale(200),
+        height: scale(40),
+        borderTopLeftRadius: scale(100),
+        borderTopRightRadius: scale(100),
+    },
+    headerIcon: {
+        marginBottom: verticalScale(10),
     },
     popupText: {
-        fontSize: 24,
+        fontSize: scale(24),
         fontWeight: 'bold',
         color: '#fff',
-        marginLeft: 22,
-        textAlign: 'center',
-        marginBottom: 19,
+        marginBottom: verticalScale(5),
+    },
+    subText: {
+        fontSize: scale(16),
+        color: '#fff',
+        marginBottom: verticalScale(20),
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '80%',
+        paddingHorizontal: scale(10),
     },
     button: {
-        flex: 1,
-        marginHorizontal: 10,
-        paddingVertical: 8,
-        borderRadius: 25,
-        backgroundColor: '#fff',
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
+        width: '45%',
+        paddingVertical: verticalScale(12),
+        borderRadius: scale(25),
+        backgroundColor: '#fff',
+        elevation: 3,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+    loginButton: {
+        marginRight: scale(10),
+    },
+    registerButton: {
+        marginLeft: scale(10),
     },
     buttonText: {
         color: '#EC4C3C',
-        fontSize: 16,
+        fontSize: scale(16),
         fontWeight: 'bold',
+        marginLeft: scale(8),
     },
 });

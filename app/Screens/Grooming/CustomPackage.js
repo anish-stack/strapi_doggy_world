@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import React, { useState } from 'react';
 import UpperLayout from '../../layouts/UpperLayout'
 import data from './custom.json'
+import { SafeAreaView } from 'react-native-safe-area-context';
 export default function CustomPackage() {
   const [selectedItems, setSelectedItems] = useState([]);
 
@@ -13,7 +14,8 @@ export default function CustomPackage() {
     }
   };
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={{flex:1 , paddingBottom:40}}>
+      <View style={styles.container}>
       <UpperLayout title={"Customized Package"} />
       <ScrollView style={styles.scrollContainer}>
         {data.map((category) => (
@@ -44,11 +46,13 @@ export default function CustomPackage() {
         ))}
       </ScrollView>
     </View>
+    </SafeAreaView>
   )
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
+    // paddingBottom:80,
     backgroundColor: '#fff',
   },
 

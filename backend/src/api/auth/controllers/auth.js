@@ -1,9 +1,11 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');  // For OTP generation
 const bcrypt = require('bcrypt');
+const sendOtp = require('../../../utils/Sendotp');
+const sendRegisterComplete = require('../../../utils/sendRegisterComplete');
 
 module.exports = {
-  
+
     async register(ctx) {
         try {
             const {
@@ -15,26 +17,26 @@ module.exports = {
                 Age,
                 password,
             } = ctx.request.body;
-    
+
             console.log(ctx.request.body);
-    
+
             const existingUser = await strapi.query('api::auth.auth').findOne({
                 where: { contact_number }
             });
-    
+
             if (existingUser) {
-             
+
                 return ctx.badRequest('Contact number is already in use.');
             }
-    
+
             const hashedPassword = await bcrypt.hash(password, 10);
-    
+
             const Generateotp = crypto.randomInt(100000, 999999);
-    
+
             const otpExpired = new Date();
             otpExpired.setMinutes(otpExpired.getMinutes() + 2);
-    
-          
+
+
             const newUser1 = await strapi.query('api::auth.auth').create({
                 data: {
                     password: hashedPassword,
@@ -44,24 +46,22 @@ module.exports = {
                     Breed,
                     DOB,
                     Age,
-                    created_by_id:1.,
-                    updated_by_id:1,
-                    published_at:null,
+                    created_by_id: 1.,
+                    updated_by_id: 1,
+                    published_at: null,
                     otp: Generateotp,
-                    otpExpiration: otpExpired,
+                    otpExpired: otpExpired,
                 },
             });
-    
-        
-    
-            // Generate JWT token for the first user (You could also generate one for the second user)
-            const token = jwt.sign(
-                { id: newUser1.id },
-                strapi.config.get('plugin::users-permissions.jwtSecret'),
-                { expiresIn: '7d' }
-            );
-    
-            // Send the response with the user data and token
+
+
+            const otp = await sendOtp(contact_number, Generateotp)
+            if (otp) {
+                console.log('OTP sent successfully');
+            } else {
+                console.log('Failed to send OTP');
+            }
+
             return ctx.send({
                 message: 'User registered successfully! Two entries created.',
                 users: [
@@ -74,15 +74,123 @@ module.exports = {
                         DOB: newUser1.DOB,
                         Age: newUser1.Age,
                     }
-                ],
-                token,
+                ]
+
             });
         } catch (error) {
             console.error('Registration Error:', error);
             return ctx.internalServerError('An error occurred during registration.');
         }
     },
-    
+    async resendOtp(ctx) {
+        try {
+            const { number } = ctx.request.body || {};
+            console.log(number);
+            if (!number) {
+                return ctx.badRequest('Missing contact number.');
+            }
+
+            // Check if number exists
+            const user = await strapi.entityService.findMany('api::auth.auth', {
+                filters: { contact_number: number },
+                limit: 1
+            });
+
+            if (!user.length) {
+                return ctx.badRequest('Invalid contact number.');
+            }
+
+            const userData = user[0];
+
+            // Generate a new OTP (6-digit random number)
+            const newOtp = crypto.randomInt(100000, 999999).toString();
+
+            // Set OTP expiration (5 minutes from now)
+            const otpExpiration = new Date();
+            otpExpiration.setMinutes(otpExpiration.getMinutes() + 5);
+
+            // Update OTP in the database
+            await strapi.entityService.update('api::auth.auth', userData.id, {
+                data: {
+                    otp: newOtp,
+                    otpExpiration
+                }
+            });
+
+            // Send OTP via external API
+            await sendOtp(number, newOtp);
+
+            return ctx.send({
+                message: 'OTP resent successfully.'
+            });
+
+        } catch (error) {
+            console.error('Error resending OTP:', error);
+            return ctx.internalServerError('Something went wrong.');
+        }
+    },
+
+    async verifyOtp(ctx) {
+        try {
+            const { otp, number } = ctx.request.body || {};
+            console.log(ctx.request.body)
+
+            if (!otp || !number) {
+                return ctx.badRequest('Missing OTP or contact number.');
+            }
+
+            const checkNumberisValid = await strapi.entityService.findMany('api::auth.auth', {
+                filters: { contact_number: number },
+                limit: 1
+            });
+
+            if (!checkNumberisValid.length) {
+                return ctx.badRequest('Invalid contact number.');
+            }
+
+            const user = checkNumberisValid[0];
+            console.log("user", user)
+
+            if (otp !== user.otp) {
+                return ctx.badRequest('Invalid OTP.');
+            }
+
+            // Check if OTP is expired
+            const otpExpired = new Date(user.otpExpiration);
+            const currentDate = new Date();
+
+            if (currentDate > otpExpired) {
+                return ctx.badRequest('OTP expired.');
+            }
+
+            // Update OTP status to used
+            await strapi.entityService.update('api::auth.auth', user.id, {
+                data: {
+                    otp: null,
+                    otpExpiration: null,
+                    isVerified: true
+                }
+            });
+
+            // Generate JWT token
+            const token = jwt.sign(
+                { id: user.id },
+                strapi.config.get('plugin::users-permissions.jwtSecret'),
+                { expiresIn: '7d' }
+            );
+            await sendRegisterComplete(user?.contact_number)
+            return ctx.send({
+                message: 'OTP verified successfully.',
+                token
+            });
+
+        } catch (error) {
+            console.error('Error verifying OTP:', error);
+            return ctx.internalServerError('Something went wrong.');
+        }
+    },
+
+
     async findAll(ctx) {
         try {
             // Fetch all users
@@ -180,11 +288,11 @@ module.exports = {
     async login(ctx) {
         try {
             const { contact_number, password } = ctx.request.body;
-          
+
             if (!contact_number || !password) {
                 return ctx.badRequest('Contact number and password are required.');
             }
-    
+
             // Check if the user exists
             const user = await strapi.query('api::auth.auth').findOne({
                 where: { contact_number },
@@ -193,21 +301,21 @@ module.exports = {
             if (!user) {
                 return ctx.notFound('User not found.');
             }
-    
+
             // Verify the password
             const isPasswordValid = await bcrypt.compare(password, user.password);
-    
+
             if (!isPasswordValid) {
                 return ctx.unauthorized('Invalid password.');
             }
-    
+
             // Generate JWT token
             const token = jwt.sign(
                 { id: user.id },
                 strapi.config.get('plugin::users-permissions.jwtSecret'),
                 { expiresIn: '7d' } // Token validity period
             );
-    
+
             // Send the response with the user data and token
             return ctx.send({
                 message: 'Login successful!',
@@ -226,6 +334,58 @@ module.exports = {
             console.error('Login Error:', error);
             return ctx.internalServerError('An error occurred during login.');
         }
+    },
+    async findMe(ctx) {
+        try {
+
+            const authHeader = ctx.request.headers.authorization;
+            console.log("authHeader", authHeader)
+
+            if (!authHeader) {
+                return ctx.unauthorized("Missing Authorization header.");
+            }
+
+            const token = authHeader.split(" ")[1];
+            if (!token) {
+                return ctx.unauthorized("Invalid Authorization header format.");
+            }
+
+            const decoded = jwt.verify(token, strapi.config.get("plugin::users-permissions.jwtSecret"))
+            if (!decoded || !decoded?.id) {
+                return ctx.unauthorized("Invalid or expired token.");
+            }
+
+
+            const user = await strapi.query("api::auth.auth").findOne({
+                where: { id: decoded.id }
+            });
+
+
+            const sendUser = {
+                id: user.documentId,
+                PetType: user.PetType,
+                petName: user.petName,
+                contact_number: user.contact_number,
+                Breed: user.Breed,
+                DOB: user.DOB,
+                Verified: user?.isVerified,
+                Age: user.Age,
+            }
+            if (!user) {
+                return ctx.notFound("User not found.");
+            }
+
+
+            return ctx.send({
+                success: true,
+                data: sendUser
+            });
+
+        } catch (error) {
+            console.error("Error in findMe:", error);
+            return ctx.badRequest("An error occurred while fetching user data.");
+        }
     }
-    
+
+
 };

@@ -1,0 +1,30 @@
+{
+  "kind": "singleType",
+  "collectionName": "home_addresses",
+  "info": {
+    "singularName": "home-address",
+    "pluralName": "home-addresses",
+    "displayName": "home_address"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "House_no": {
+      "type": "string"
+    },
+    "street_address": {
+      "type": "text"
+    },
+    "Pincode": {
+      "type": "string"
+    },
+    "landmark": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    }
+  }
+}

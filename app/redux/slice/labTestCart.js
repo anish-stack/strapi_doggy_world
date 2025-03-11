@@ -17,6 +17,15 @@ const storeLabTests = async (labTests) => {
     }
 };
 
+const deleteTests = async () => {
+    console.log("Hey i am calling delete")
+    try {
+        await AsyncStorage.removeItem('labTests');
+    } catch (error) {
+        console.log('Error storing lab test items:', error);
+    }
+};
+
 const loadLabTests = async () => {
     try {
         const storedLabTests = await AsyncStorage.getItem('labTests');
@@ -46,20 +55,20 @@ const LabTestsSlice = createSlice({
                 if (existingTest) {
 
                     existingTest.quantity += newTest.quantity;
-                    
+
                 } else {
                     state.labTests.push(newTest);
-                   
+
                 }
             });
 
             state.labTestsCount = state.labTests.length;
             storeLabTests(state.labTests);
 
-            Toast.show({
-                type: 'success',
-                text1: 'Lab test added successfully!',
-            });
+            // Toast.show({
+            //     type: 'success',
+            //     text1: 'Lab test added successfully!',
+            // });
         },
         AddingFailure: (state, action) => {
             state.loading = false;

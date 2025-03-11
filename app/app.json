@@ -1,34 +1,38 @@
 {
   "expo": {
-    "name": "gateway",
-    "slug": "gateway",
+    "name": "Doggy World Care",
+    "slug": "Doggy World Care",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/Doggy.png",
+    "icon": "./assets/Doggy_.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/SpashScreen",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/Doggy_.png",
+      "resizeMode": "cover",
+      "imageWidth": 500,
+      "backgroundColor": "#d17a72"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/Doggy.png",
+        "foregroundImage": "./assets/Doggy_.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.happy_coding.gateway"
     },
     "web": {
-      "favicon": "./assets/Doggy.png"
+      "favicon": "./assets/Doggy_.png"
     },
     "extra": {
       "eas": {
         "projectId": "f0248ecc-28be-491a-b25d-c81f8f89235f"
       }
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
