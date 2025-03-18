@@ -189,8 +189,6 @@ module.exports = {
             return ctx.internalServerError('Something went wrong.');
         }
     },
-
-
     async findAll(ctx) {
         try {
             // Fetch all users
@@ -293,30 +291,30 @@ module.exports = {
                 return ctx.badRequest('Contact number and password are required.');
             }
 
-            // Check if the user exists
+
             const user = await strapi.query('api::auth.auth').findOne({
                 where: { contact_number },
             });
-            console.log(user)
+
             if (!user) {
                 return ctx.notFound('User not found.');
             }
 
-            // Verify the password
+
             const isPasswordValid = await bcrypt.compare(password, user.password);
 
             if (!isPasswordValid) {
                 return ctx.unauthorized('Invalid password.');
             }
 
-            // Generate JWT token
+
             const token = jwt.sign(
                 { id: user.id },
                 strapi.config.get('plugin::users-permissions.jwtSecret'),
                 { expiresIn: '7d' } // Token validity period
             );
 
-            // Send the response with the user data and token
+
             return ctx.send({
                 message: 'Login successful!',
                 user: {
@@ -335,6 +333,151 @@ module.exports = {
             return ctx.internalServerError('An error occurred during login.');
         }
     },
+
+    async loginThroughOtp(ctx) {
+        try {
+            const { contact_number } = ctx.request.body;
+
+
+            if (!contact_number) {
+                return ctx.badRequest('Please provide a valid contact number.');
+            }
+
+
+            const user = await strapi.query('api::auth.auth').findOne({
+                where: { contact_number },
+            });
+
+            if (!user) {
+                return ctx.notFound('No account found with this contact number. Please sign up first.');
+            }
+
+            const generatedOtp = crypto.randomInt(100000, 999999);
+            const otpExpiryTime = new Date();
+            otpExpiryTime.setMinutes(otpExpiryTime.getMinutes() + 2);
+            await sendOtp(contact_number, generatedOtp);
+
+
+            await strapi.query('api::auth.auth').update({
+                where: { id: user.id },
+                data: {
+                    loginOtp: generatedOtp,
+                    otpExpiry: otpExpiryTime,
+                },
+            });
+
+            return ctx.send({
+                message: 'An OTP has been sent to your WhatsApp. It will expire in 2 minutes.',
+                success: true,
+                status: 201,
+            });
+
+        } catch (error) {
+            console.error('Error during OTP login:', error);
+            return ctx.internalServerError('Something went wrong. Please try again later.');
+        }
+    },
+    async verifyLoginOtp(ctx) {
+        try {
+            const { contact_number, otp } = ctx.request.body;
+
+            // Validate inputs
+            if (!contact_number || !otp) {
+                return ctx.badRequest('Please provide a contact number and OTP.');
+            }
+
+            // Find user
+            const user = await strapi.query('api::auth.auth').findOne({
+                where: { contact_number },
+            });
+
+            if (!user) {
+                return ctx.notFound('No account found with this contact number.');
+            }
+
+            // Check OTP and expiration
+            if (user.loginOtp !== otp) {
+                return ctx.badRequest('Invalid OTP. Please enter the correct code.');
+            }
+
+            if (new Date() > new Date(user.otpExpiry)) {
+                return ctx.badRequest('OTP has expired. Please request a new one.');
+            }
+
+
+            await strapi.query('api::auth.auth').update({
+                where: { id: user.id },
+                data: { loginOtp: null, otpExpiry: null },
+            });
+            const token = jwt.sign(
+                { id: user.id },
+                strapi.config.get('plugin::users-permissions.jwtSecret'),
+                { expiresIn: '7d' } // Token validity period
+            );
+
+
+
+            return ctx.send({
+                message: 'OTP verified successfully. You are now logged in!',
+                success: true,
+                token: token,
+                status: 200,
+            });
+
+        } catch (error) {
+            console.error('Error during OTP verification:', error);
+            return ctx.internalServerError('Something went wrong. Please try again later.');
+        }
+    },
+
+    async resendLoginOtp(ctx) {
+        try {
+            const { contact_number } = ctx.request.body;
+
+            // Validate contact number
+            if (!contact_number) {
+                return ctx.badRequest('Please provide a valid contact number.');
+            }
+
+            // Find user
+            const user = await strapi.query('api::auth.auth').findOne({
+                where: { contact_number },
+            });
+
+            if (!user) {
+                return ctx.notFound('No account found with this contact number.');
+            }
+
+            // Generate new OTP
+            const newOtp = crypto.randomInt(100000, 999999);
+            const newOtpExpiry = new Date();
+            newOtpExpiry.setMinutes(newOtpExpiry.getMinutes() + 2); // Expires in 2 minutes
+
+            // Send new OTP
+            await sendOtp(contact_number, newOtp);
+
+            // Update OTP in database
+            await strapi.query('api::auth.auth').update({
+                where: { id: user.id },
+                data: {
+                    loginOtp: newOtp,
+                    otpExpiry: newOtpExpiry,
+                },
+            });
+
+            return ctx.send({
+                message: 'A new OTP has been sent to your WhatsApp. It will expire in 2 minutes.',
+                success: true,
+                status: 201,
+            });
+
+        } catch (error) {
+            console.error('Error during OTP resend:', error);
+            return ctx.internalServerError('Something went wrong. Please try again later.');
+        }
+    },
+
+
     async findMe(ctx) {
         try {
 

@@ -1,178 +1,237 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
-import doctorbharat from '../../assets/Doctor/dr-bharat-bandhu.webp';
-import doctornaman from '../../assets/Doctor/dr-naman-gupta.webp';
-import doctorsaurabh from '../../assets/Doctor/dr-saurabh-gupta.webp';
-import doctorsweta from '../../assets/Doctor/dr-sweta.webp';
-import doctorneha from '../../assets/Doctor/dr.neha-chaudhary.webp';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  ActivityIndicator,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
+import axios from 'axios';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const Doctors = () => {
-  const data = [
-    {
-      id: 1,
-      doctorName: 'Dr. Bharat Bandhu',
-      specialization: 'B.V.Sc. & A.H., M.V.Sc.',
-      experience: '10 years',
-      description: 'Expert in heart diseases',
-      isBest: true,
-      image: doctorbharat,
-    },
-    {
-      id: 2,
-      doctorName: 'Dr. Naman Gupta',
-      specialization: 'B.V.Sc. & A.H., M.V.Sc.',
-      experience: '8 years',
-      description: 'Specialist in brain disorders',
-      isBest: true,
-      image: doctornaman,
-    },
-    {
-      id: 3,
-      doctorName: 'Dr. Saurabh Gupta',
-      specialization: 'B.V.Sc. & A.H.',
-      experience: '12 years',
-      description: 'Expert in bone and joint issues',
-      isBest: false,
-      image: doctorsaurabh,
-    },
-    {
-      id: 4,
-      doctorName: 'Dr. Sweta',
-      specialization: 'B.V.Sc. & A.H.',
-      experience: '7 years',
-      description: 'Skin care specialist',
-      isBest: true,
-      image: doctorsweta,
-    },
-    {
-      id: 5,
-      doctorName: 'Dr. Neha Chaudhary',
-      specialization: 'B.V.Sc. & A.H., M.V.Sc.',
-      experience: '5 years',
-      description: 'Child care expert',
-      isBest: false,
-      image: doctorneha,
-    },
-  ];
+import { BlurView } from 'expo-blur';
+import SectionTitle from '../../components/PartHeader.js/SectionTitle';
+
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = width * 0.8;
+const SPACING = 20;
+
+export default function Doctors() {
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  const fetchDoctors = async () => {
+    try {
+      const response = await axios.get('http://192.168.1.3:1337/api/display-doctors?populate=*');
+      setDoctors(response.data.data);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to fetch doctors');
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF6B6B" />
+        <Text style={styles.loadingText}>Loading doctors...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  const BlurComponent = Platform.OS === 'ios' ? BlurView : View;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>#Doctors</Text>
+
+      <View style={{ padding: 20 }}>
+        <SectionTitle
+          title="Our Specialists"
+          subtitle="Find the best pet doctors near you"
+          variant="primary"
+        />
+
+      </View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.cardContainer}
+        contentContainerStyle={styles.scrollContent}
+        decelerationRate="fast"
+        snapToInterval={CARD_WIDTH + SPACING}
       >
-        {data.map((doctor) => (
-          <View key={doctor.id} style={styles.card}>
-            <Image source={doctor.image} style={styles.image} />
-            <Text style={styles.name}>{doctor.doctorName}</Text>
-            <Text style={styles.specialization}>{doctor.specialization}</Text>
-            <Text style={styles.experience}>{doctor.experience}</Text>
-            <Text style={styles.description}>{doctor.description}</Text>
-            {doctor.isBest && <Text style={styles.best}>Best</Text>}
-          </View>
+        {doctors.map((doctor) => (
+          <TouchableOpacity
+            key={doctor.id}
+            style={styles.card}
+            activeOpacity={0.95}
+          >
+            <Image
+              source={{ uri: doctor.image.url }}
+              style={styles.doctorImage}
+            />
+
+            <BlurComponent
+              intensity={Platform.OS === 'ios' ? 70 : undefined}
+              style={styles.infoContainer}
+              tint="light"
+            >
+              <View style={styles.nameContainer}>
+                <Text style={styles.doctorName}>{doctor.Name}</Text>
+                {doctor.isBest && (
+                  <View style={styles.bestDoctorBadge}>
+
+                    <Text style={styles.bestDoctorText}>Top Rated</Text>
+                  </View>
+                )}
+              </View>
+
+              <Text style={styles.specialization}>{doctor.specialization}</Text>
+
+              <View style={styles.statsContainer}>
+                <View style={styles.statItem}>
+                  <Text style={styles.statText}>{doctor.experience}</Text>
+                  <Text style={styles.statText}>{doctor.description}</Text>
+                </View>
+
+              </View>
+
+
+            </BlurComponent>
+          </TouchableOpacity>
         ))}
       </ScrollView>
-    
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-
-    // padding: 20,
-    marginBottom: 70,
-    borderRadius: 10,
-    // elevation: 5,
-
+    flex: 1,
+    backgroundColor: '#F8F9FA',
   },
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
-    textAlign: 'center',
-  },
-  cardContainer: {
-    paddingHorizontal: 10,
-  },
-  card: {
-    display: 'flex',
-    // flexDirection: 'row',
-    justifyContent: 'space-between',
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    elevation: 4,
-    shadowColor: '#000',
-   
-    marginBottom: 20,
-
-
-   
-    borderRadius: 15,
-    padding: 20,
-    width: 250,
-    height: 250,
+  },
+  loadingText: {
     marginTop: 10,
-
-    marginRight: 10,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
-    borderWidth: 3,
-    borderColor: '#B32113',
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#B32113',
-  },
-  specialization: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 5,
   },
-  experience: {
-    fontSize: 14,
-    color: '#999',
-    marginBottom: 5,
-  },
-  description: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-  },
-  best: {
-    position: 'absolute',
-    right: 5,
-    marginTop: 10,
-    backgroundColor: '#B32113',
-    color: '#fff',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    textAlign: 'center',
-  },
-  pagination: {
-    flexDirection: 'row',
+  errorContainer: {
+    flex: 1,
     justifyContent: 'center',
-    marginTop: 10,
+    alignItems: 'center',
+    padding: 20,
   },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#ccc',
-    margin: 5,
+  errorText: {
+    fontSize: 16,
+    color: '#FF6B6B',
+    textAlign: 'center',
   },
-  activeDot: {
-    backgroundColor: '#B32113',
+  header: {
+    padding: 24,
+    paddingTop: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
-});
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.8)',
+  },
+  scrollContent: {
+    padding: SPACING,
+    paddingRight: SPACING / 2,
+  },
+  card: {
+    width: CARD_WIDTH,
+    marginRight: SPACING,
+    borderRadius: 24,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
+    overflow: 'hidden',
+  },
+  doctorImage: {
+    width: '100%',
+    height: 320,
+    resizeMode: 'cover',
+  },
+  infoContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 14,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    backgroundColor: Platform.OS === 'ios' ? 'transparent' : 'rgba(255, 255, 255, 0.95)',
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    // marginBottom: 8,
+  },
+  doctorName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1A1A1A',
+  },
+  bestDoctorBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  bestDoctorText: {
+    fontSize: 12,
+    color: '#FFD700',
+    marginLeft: 0,
+    fontWeight: '600',
+  },
+  specialization: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+  },
 
-export default Doctors;
+  statText: {
+    marginLeft: 0,
+    fontSize: 14,
+    color: '#666',
+  }
+});

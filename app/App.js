@@ -18,7 +18,7 @@ import CustomPackage from './Screens/Grooming/CustomPackage';
 import Clinic from './Screens/clinic/Clinic';
 import BookingStep from './Screens/Grooming/BookingStep/BookingStep';
 import CakesScreen from './Screens/Services/Bakery/Categories/Cakes.Screen';
-import CakeType from './Screens/Services/Bakery/Categories/Cake.Type';
+import CakeDelivery from './Screens/Services/Bakery/Categories/Cake.Type';
 import Dynamicscreen from './Screens/Services/Bakery/Dynamic_Screen/Dynamic_screen';
 import ProductDetails from './Screens/Services/Bakery/Dynamic_Screen/ProductDetails';
 import { Provider, useDispatch, useSelector } from 'react-redux';
@@ -53,6 +53,10 @@ import PhysiotherapyDetails from './Screens/Physiotherapy/PhysiotherapyDetails';
 import New_Tests from './Labs/New_Tests';
 import Booking_Test_Confirm from './Screens/SuperficialCart/Booking_Test_Confirm';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Address from './Screens/Cart/Address';
+import SingleBlog from './components/Blogs/SingleBlog';
+import Order_Confirmation from './Screens/Services/Bakery/Categories/Order_Confirmation';
+import Orderconfirm from './Screens/Cart/Orderconfirm';
 const Stack = createNativeStackNavigator();
 
 SplashScreen.preventAutoHideAsync();
@@ -120,7 +124,7 @@ const App = () => {
           {/* <Stack.Screen name="Home" options={{ headerShown: false }} component={Home} /> */}
           {/* Auth Screens */}
           <Stack.Screen name="register" options={{ headerShown: true, title: "Register Your Pet" }} component={register} />
-          <Stack.Screen name="login" options={{ headerShown: true, title: "Welcome back" }} component={login} />
+          <Stack.Screen name="login" options={{ headerShown: false, title: "Welcome back" }} component={login} />
           <Stack.Screen name="otp" options={{ headerShown: false }} component={otp} />
           <Stack.Screen name="forget-password" options={{ headerShown: false }} component={ForgetPassword} />
 
@@ -144,7 +148,8 @@ const App = () => {
 
           {/* Pet Bakery Screens ===> Bakery */}
           <Stack.Screen name="Cake-Screen" options={{ headerShown: false, title: "Dog Grong" }} component={CakesScreen} />
-          <Stack.Screen name="Cake-Delivery" options={{ headerShown: false, title: "Dog Grooming" }} component={CakeType} />
+          <Stack.Screen name="Cake-Delivery" options={{ headerShown: false, title: "Dog Grooming" }} component={CakeDelivery} />
+          <Stack.Screen name="Order_Confirmation" options={{ headerShown: false, title: "Dog Grooming" }} component={Order_Confirmation} />
 
           {/* dynamic_screen */}
           <Stack.Screen name="dynamic_screen" options={{ headerShown: false, title: "Dog Grooming" }} component={Dynamicscreen} />
@@ -152,13 +157,19 @@ const App = () => {
 
           {/* cart screen */}
           <Stack.Screen name="cart" options={{ headerShown: true, title: "Cart" }} component={Cart} />
+          <Stack.Screen name="Order-confirm" options={{ headerShown: false }} component={Orderconfirm} />
           <Stack.Screen name="Available_Offer" options={{ headerShown: false, title: "AvailableOffer" }} component={Offers} />
+          <Stack.Screen name="single-blog" options={{ headerShown: false, }} component={SingleBlog} />
+
 
           {/* Pet Shop Screen */}
           <Stack.Screen name="Pet_Shop" options={{ headerShown: true, title: "Pet Shop" }} component={PetShop} />
           <Stack.Screen name="Dynamic_Shop" options={{ headerShown: false, title: "Pet Shop" }} component={Dynamic_Shop} />
           <Stack.Screen name="Dynamic_Products_Shop" options={{ headerShown: false, title: "Pet Shop" }} component={Dynmaic_Products_Shop} />
           <Stack.Screen name="Dynamic_Details_Shop" options={{ headerShown: false, title: "Pet Shop" }} component={Dynamic_Details_Shop} />
+
+          {/* select_address_and_order */}
+          <Stack.Screen name="select_address_and_order" options={{ headerShown: false }} component={Address} />
 
           {/* Lab Test Screen */}
           <Stack.Screen name="Lab_Test" options={{ headerShown: false }} component={Lab_Test} />

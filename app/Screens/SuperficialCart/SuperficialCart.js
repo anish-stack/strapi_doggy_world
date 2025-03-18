@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  ActivityIndicator,
 
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -31,7 +32,7 @@ export default function SuperficialCart() {
   const dispatch = useDispatch();
   const [isChecked, setChecked] = useState(false);
   const { user, getUserFnc } = getUser()
-
+  const [loading, setLoading] = useState(false)
   const navigation = useNavigation()
   const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
@@ -89,6 +90,7 @@ export default function SuperficialCart() {
       Alert.alert('Error', 'Please select a time slot');
       return;
     }
+    setLoading(true)
     const Booking_data = {
       clinic: selectedClinic,
       time: selectedTime,
@@ -105,9 +107,12 @@ export default function SuperficialCart() {
 
     try {
       const { data } = await axios.post('http://192.168.1.3:1337/api/make-order-lab-vacination', Booking_data)
-      console.log(data)
+      Alert.alert("Booking Complete", "Thankyou For Booking From Doggy World ...")
+      setLoading(false)
     } catch (error) {
       console.log(error.response.data)
+      Alert.alert("Booking failed", error.response.data.message)
+      setLoading(false)
     }
 
 
@@ -126,6 +131,11 @@ export default function SuperficialCart() {
 
   if (!labTests?.length) {
     return <EmpetyCart />
+  }
+  if (loading) {
+    return <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator size="large" color="#D92D20" />
+    </View>
   }
 
   const isAnyTestUltrasound = labTests.some(test => test.isUltraSound);

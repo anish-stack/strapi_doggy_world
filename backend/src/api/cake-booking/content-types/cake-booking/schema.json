@@ -1,0 +1,81 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cake_bookings",
+  "info": {
+    "singularName": "cake-booking",
+    "pluralName": "cake-bookings",
+    "displayName": "Cake-booking",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Caketitle": {
+      "type": "string"
+    },
+    "Design": {
+      "type": "string"
+    },
+    "size": {
+      "type": "string"
+    },
+    "price": {
+      "type": "biginteger"
+    },
+    "clinic": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::clinic.clinic",
+      "inversedBy": "cake_bookings"
+    },
+    "Delivery_Date": {
+      "type": "datetime"
+    },
+    "Same_Day_delivery": {
+      "type": "boolean"
+    },
+    "Order_Cancel_by_user": {
+      "type": "boolean",
+      "default": false
+    },
+    "Order_Cancel_by_user_reason": {
+      "type": "string"
+    },
+    "Is_Paid": {
+      "type": "boolean",
+      "default": false
+    },
+    "Order_Stauts": {
+      "type": "string",
+      "default": "Pending"
+    },
+    "Admin_Cancel_order": {
+      "type": "boolean"
+    },
+    "Admin_Cancel_order_reason": {
+      "type": "string"
+    },
+    "Billing_details": {
+      "type": "component",
+      "repeatable": false,
+      "component": "billing-details.billing-details"
+    },
+    "Delivery_Fee_Aplicable": {
+      "type": "boolean"
+    },
+    "Delivery_Fee": {
+      "type": "biginteger"
+    },
+    "flavour": {
+      "type": "string"
+    },
+    "pet_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::auth.auth",
+      "inversedBy": "cake_bookings"
+    }
+  }
+}

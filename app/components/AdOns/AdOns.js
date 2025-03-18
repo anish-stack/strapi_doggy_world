@@ -35,8 +35,7 @@ export default function AdOns() {
         price.disc_price = item.Discount_price;
         price.off_dis_percentage = item.off_dis_percentage;
 
-
-        console.log(price);
+    
 
         try {
             dispatch(AddingStart());
@@ -46,7 +45,7 @@ export default function AdOns() {
                 quantity: 1,
                 Pricing: price,
                 image: item.image?.url || 'https://your-default-image-url.com/default-image.jpg',
-
+                isBakeryProduct: true,
                 isVarientTrue: false,
             };
 

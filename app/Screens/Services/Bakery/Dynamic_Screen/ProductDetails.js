@@ -20,6 +20,7 @@ export default function ProductDetails() {
   const [selectedvariants, setSelectedVariants] = useState({
     price: 0,
     disc_price: 0,
+    size: '',
     off_dis_percentage: 0
   })
   const navigation = useNavigation()
@@ -41,19 +42,25 @@ export default function ProductDetails() {
       setSelectedVariants({
         price: product.variant[0].price,
         disc_price: product.variant[0].disc_price,
+        size: product.variant[0].size,
         off_dis_percentage: product.variant[0].off_perce,
       });
     }
   }, [product]);
+
+  const allOutOfStock = product?.isVarient
+    ? product?.Variants_price?.every(item => !item?.in_stock)
+    : (product?.isOutOfStock ?? false);
 
   useEffect(() => {
     fetchProduct();
   }, [id]);
 
 
-  const handleSelect = (price, discount_price, off_dis_percentage) => {
+  const handleSelect = (price, size, discount_price, off_dis_percentage) => {
     setSelectedVariants({
       price,
+      size,
       disc_price: discount_price,
       off_dis_percentage,
     })
@@ -80,6 +87,8 @@ export default function ProductDetails() {
         ProductId: item.documentId,
         title: item.title,
         quantity: 1,
+        isBakeryProduct: true,
+        varientSize: selectedvariants?.size,
         Pricing: price,
         image: item.images?.url,
         isVarientTrue: isVarientTrue,
@@ -174,34 +183,62 @@ export default function ProductDetails() {
             </View>
             <View style={styles.addButton}>
               <TouchableOpacity
-                activeOpacity={0.9} onPress={() => handleAddToCart(product)} style={styles.btn}>
-                <Text style={styles.addCartText}>Add </Text>
+                activeOpacity={0.9}
+                onPress={() => handleAddToCart(product)}
+                style={[styles.btn, allOutOfStock && styles.disabledButton]}
+                disabled={allOutOfStock}
+              >
+                <Text style={[styles.addCartText, allOutOfStock && styles.disabledText]}>
+                  {allOutOfStock ? 'Out Of Stock' : 'Buy Now'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
-          {console.log(product?.varient_stauts)}
+
+
           {product?.varient_stauts === true && (
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
               <View style={styles.variantSection}>
                 {product?.variant?.map((item, index) => {
                   const isSelected = selectedvariants?.price === item.price;
+                  const isOutOfStock = !item.in_stock;
 
                   return (
                     <TouchableOpacity
-                      onPress={() => handleSelect(item.price, item.disc_price, item.off_perce)}
+                      onPress={() => !isOutOfStock && handleSelect(item.price, item.size, item.disc_price, item.off_perce)}
                       key={index}
                       style={[
                         styles.variantButton,
                         isSelected && styles.selectedVariant,
+                        isOutOfStock && styles.disabledVariant, // Apply disabled style
                       ]}
+                      disabled={isOutOfStock} // Disable if out of stock
                     >
-                      <Text style={[styles.variantText, isSelected && styles.selectedVariantText]}>
-                        {item.size} - {item.flavour} - {item.price ? `₹${item.price}` : 'Price Unavailable'}
+                      <Text
+                        style={[
+                          styles.variantText,
+                          isSelected && styles.selectedVariantText,
+                          isOutOfStock && styles.outOfStockText, // Change text color for out of stock
+                        ]}
+                      >
+                        {item.size} - {item.flavour || "No Flavour"} - {item.price ? `₹${item.price}` : 'Price Unavailable'}
                       </Text>
-                      <Text style={[styles.variantDiscount, isSelected && styles.selectedVariantDiscount]}>
+                      <Text
+                        style={[
+                          styles.variantDiscount,
+                          isSelected && styles.selectedVariantDiscount,
+                        ]}
+                      >
                         {item.disc_price ? `Discounted Price: ₹${item.disc_price}` : 'No Discount'}
                       </Text>
-                      {isSelected && <Text style={styles.selectedTag}>Selected</Text>}
+
+                      {isOutOfStock && (
+                        <View style={styles.outOfStockBadge}>
+                          <Text style={styles.outOfStockBadgeText}>Out of Stock</Text>
+                        </View>
+                      )}
+
+                      {isSelected && !isOutOfStock && <Text style={styles.selectedTag}>Selected</Text>}
                     </TouchableOpacity>
                   );
                 })}
@@ -293,13 +330,13 @@ export default function ProductDetails() {
                         );
                       }
 
-                      return null;  // Return null if no recognized type
+                      return null;
                     })}
                   </Text>
                 );
               }
 
-              // Handle code blocks
+
               if (item.type === 'code') {
                 const codeText = item.children.find(child => child.type === 'text')?.text || '';
                 return (
@@ -309,7 +346,7 @@ export default function ProductDetails() {
                 );
               }
 
-              return null;  // Return null if item type is not recognized
+              return null;
             })
           )}
 
@@ -552,8 +589,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F6F7',
     marginTop: 20,
     height: 10,
-
     width: '100%',
+  },
 
+  outOfStockText: {
+    color: "#aaa",
+  },
+  outOfStockBadge: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    backgroundColor: "#f44336",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+  },
+  outOfStockBadgeText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  disabledVariant: {
+    backgroundColor: "#f0f0f0",
+    borderColor: "#ccc",
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
+  },
+  disabledText: {
+    fontSize: 14,
+    color: "#888",
   }
 });

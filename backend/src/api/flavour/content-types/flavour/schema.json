@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "flavours",
+  "info": {
+    "singularName": "flavour",
+    "pluralName": "flavours",
+    "displayName": "flavour"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "tag_title": {
+      "type": "string"
+    },
+    "any_tag": {
+      "type": "boolean"
+    }
+  }
+}

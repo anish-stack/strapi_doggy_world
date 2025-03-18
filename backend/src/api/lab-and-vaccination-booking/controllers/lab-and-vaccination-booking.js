@@ -22,7 +22,7 @@ module.exports = {
                 return ctx.badRequest("Missing required fields: booking_date, clinic, user_id, payableAmount, and test are mandatory.");
             }
 
-            // ✅ 2. Validate test data
+
             const arrayOftest = test.map((item) => {
                 if (!item.test_name || !item.documentId || !item.test_price) {
                     throw new Error("Invalid test data: Each test must have a name, ID, service type, and price.");
@@ -36,10 +36,7 @@ module.exports = {
                     Test_Price: item.test_price,
                 };
             });
-            // console
-            //     .log("arrayOftest", arrayOftest)
-
-            // // ✅ 3. Validate amount values
+        
             if (isNaN(payableAmount) || payableAmount < 0) {
                 return ctx.badRequest("Invalid payable amount.");
             }
@@ -49,12 +46,12 @@ module.exports = {
             }
 
 
-            // console.log("clinic have", clinic)
+           
 
             const clinicExists = await strapi.entityService.findMany("api::clinic.clinic");
             const userExists = await strapi.entityService.findMany("api::auth.auth");
 
-            // console.log("clinicExists", clinicExists)
+          
             const findUser = userExists.find((item) => item.documentId === user_id?.id)
             const Clinic = clinicExists.find((item) => item.documentId === clinic?.documentId)
 

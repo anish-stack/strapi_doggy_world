@@ -419,6 +419,10 @@ export interface ApiAuthAuth extends Struct.CollectionTypeSchema {
   attributes: {
     Age: Schema.Attribute.String;
     Breed: Schema.Attribute.String;
+    cake_bookings: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::cake-booking.cake-booking'
+    >;
     contact_number: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -432,9 +436,15 @@ export interface ApiAuthAuth extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::auth.auth'> &
       Schema.Attribute.Private;
+    loginOtp: Schema.Attribute.BigInteger;
     otp: Schema.Attribute.String;
     otpExpired: Schema.Attribute.DateTime;
+    otpExpiry: Schema.Attribute.DateTime;
     password: Schema.Attribute.Password;
+    pet_shop_and_bakery_orders: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::pet-shop-and-bakery-order.pet-shop-and-bakery-order'
+    >;
     petName: Schema.Attribute.String;
     pets: Schema.Attribute.Relation<
       'oneToMany',
@@ -501,6 +511,7 @@ export interface ApiBakerySliderBakerySlider
 export interface ApiBlogBlog extends Struct.CollectionTypeSchema {
   collectionName: 'blogs';
   info: {
+    description: '';
     displayName: 'Blog';
     pluralName: 'blogs';
     singularName: 'blog';
@@ -509,15 +520,23 @@ export interface ApiBlogBlog extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    Blog_second_image: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     blogImage: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
-    content: Schema.Attribute.Blocks;
+    content: Schema.Attribute.Text;
+    content_2: Schema.Attribute.Text;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::blog.blog'> &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    show: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -573,6 +592,57 @@ export interface ApiBookingConsultationBookingConsultation
   };
 }
 
+export interface ApiCakeBookingCakeBooking extends Struct.CollectionTypeSchema {
+  collectionName: 'cake_bookings';
+  info: {
+    description: '';
+    displayName: 'Cake-booking';
+    pluralName: 'cake-bookings';
+    singularName: 'cake-booking';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Admin_Cancel_order: Schema.Attribute.Boolean;
+    Admin_Cancel_order_reason: Schema.Attribute.String;
+    Billing_details: Schema.Attribute.Component<
+      'billing-details.billing-details',
+      false
+    >;
+    Caketitle: Schema.Attribute.String;
+    clinic: Schema.Attribute.Relation<'manyToOne', 'api::clinic.clinic'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Delivery_Date: Schema.Attribute.DateTime;
+    Delivery_Fee: Schema.Attribute.BigInteger;
+    Delivery_Fee_Aplicable: Schema.Attribute.Boolean;
+    Design: Schema.Attribute.String;
+    flavour: Schema.Attribute.String;
+    Is_Paid: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::cake-booking.cake-booking'
+    > &
+      Schema.Attribute.Private;
+    Order_Cancel_by_user: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    Order_Cancel_by_user_reason: Schema.Attribute.String;
+    Order_Stauts: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Pending'>;
+    pet_id: Schema.Attribute.Relation<'manyToOne', 'api::auth.auth'>;
+    price: Schema.Attribute.BigInteger;
+    publishedAt: Schema.Attribute.DateTime;
+    Same_Day_delivery: Schema.Attribute.Boolean;
+    size: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiClinicClinic extends Struct.CollectionTypeSchema {
   collectionName: 'clinics';
   info: {
@@ -586,6 +656,10 @@ export interface ApiClinicClinic extends Struct.CollectionTypeSchema {
   };
   attributes: {
     Address: Schema.Attribute.Text;
+    cake_bookings: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::cake-booking.cake-booking'
+    >;
     clinic_name: Schema.Attribute.String;
     contact_details: Schema.Attribute.BigInteger;
     createdAt: Schema.Attribute.DateTime;
@@ -714,6 +788,72 @@ export interface ApiConsultationConsultation
   };
 }
 
+export interface ApiDesignDataDesignData extends Struct.CollectionTypeSchema {
+  collectionName: 'design_datas';
+  info: {
+    displayName: 'Design-Data';
+    pluralName: 'design-datas';
+    singularName: 'design-data';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    is_active: Schema.Attribute.Boolean;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::design-data.design-data'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    position: Schema.Attribute.Integer;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiDisplayDoctorDisplayDoctor
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'display_doctors';
+  info: {
+    displayName: 'Display_Doctor';
+    pluralName: 'display-doctors';
+    singularName: 'display-doctor';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.String;
+    experience: Schema.Attribute.String;
+    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    isBest: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::display-doctor.display-doctor'
+    > &
+      Schema.Attribute.Private;
+    Name: Schema.Attribute.String;
+    position: Schema.Attribute.Integer;
+    publishedAt: Schema.Attribute.DateTime;
+    specialization: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiDoctorDoctor extends Struct.CollectionTypeSchema {
   collectionName: 'doctors';
   info: {
@@ -744,6 +884,38 @@ export interface ApiDoctorDoctor extends Struct.CollectionTypeSchema {
     price: Schema.Attribute.BigInteger;
     publishedAt: Schema.Attribute.DateTime;
     show: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiFlavourFlavour extends Struct.CollectionTypeSchema {
+  collectionName: 'flavours';
+  info: {
+    displayName: 'flavour';
+    pluralName: 'flavours';
+    singularName: 'flavour';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    active: Schema.Attribute.Boolean;
+    any_tag: Schema.Attribute.Boolean;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::flavour.flavour'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    tag_title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1065,6 +1237,34 @@ export interface ApiOfferOffer extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiPackagejsonPackagejson extends Struct.CollectionTypeSchema {
+  collectionName: 'packagejsons';
+  info: {
+    displayName: 'Packagejson';
+    pluralName: 'packagejsons';
+    singularName: 'packagejson';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    json: Schema.Attribute.JSON;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::packagejson.packagejson'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPetBakeryPetBakery extends Struct.CollectionTypeSchema {
   collectionName: 'pet_bakeries';
   info: {
@@ -1098,6 +1298,51 @@ export interface ApiPetBakeryPetBakery extends Struct.CollectionTypeSchema {
     screen_name: Schema.Attribute.String;
     tag: Schema.Attribute.String;
     titile: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPetShopAndBakeryOrderPetShopAndBakeryOrder
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'pet_shop_and_bakery_orders';
+  info: {
+    description: '';
+    displayName: 'Pet_Shop_And_bakery_order';
+    pluralName: 'pet-shop-and-bakery-orders';
+    singularName: 'pet-shop-and-bakery-order';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    admin_cancel_reason: Schema.Attribute.String;
+    auth: Schema.Attribute.Relation<'manyToOne', 'api::auth.auth'>;
+    Billing_Details: Schema.Attribute.Component<
+      'billing-details.billing-details',
+      false
+    >;
+    Cancel_user_reason: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    isCancelbyAdmin: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    isCancelbyUser: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::pet-shop-and-bakery-order.pet-shop-and-bakery-order'
+    > &
+      Schema.Attribute.Private;
+    Order_Status: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    Shop_bakery_cart_items: Schema.Attribute.Component<
+      'shop-cart.shop-bakery-cart-items',
+      true
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1251,6 +1496,7 @@ export interface ApiPhysioBookingPhysioBooking
   extends Struct.CollectionTypeSchema {
   collectionName: 'physio_bookings';
   info: {
+    description: '';
     displayName: 'Physio_booking';
     pluralName: 'physio-bookings';
     singularName: 'physio-booking';
@@ -1259,6 +1505,7 @@ export interface ApiPhysioBookingPhysioBooking
     draftAndPublish: true;
   };
   attributes: {
+    BookingID: Schema.Attribute.String;
     cancel_reason: Schema.Attribute.String;
     Clinic: Schema.Attribute.String & Schema.Attribute.DefaultTo<'Branch'>;
     contactNumber: Schema.Attribute.BigInteger;
@@ -1267,6 +1514,7 @@ export interface ApiPhysioBookingPhysioBooking
       Schema.Attribute.Private;
     Date_of_appoinment: Schema.Attribute.Date;
     is_cancel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    isPhysio: Schema.Attribute.Boolean;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1282,6 +1530,7 @@ export interface ApiPhysioBookingPhysioBooking
     publishedAt: Schema.Attribute.DateTime;
     rate: Schema.Attribute.Integer;
     service_done: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    TypeOfBooking: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1372,6 +1621,37 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     varient_stauts: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<true>;
+  };
+}
+
+export interface ApiQuantityQuantity extends Struct.CollectionTypeSchema {
+  collectionName: 'quantities';
+  info: {
+    displayName: 'quantity';
+    pluralName: 'quantities';
+    singularName: 'quantity';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    label: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::quantity.quantity'
+    > &
+      Schema.Attribute.Private;
+    price: Schema.Attribute.BigInteger;
+    publishedAt: Schema.Attribute.DateTime;
+    type_of_qunatity: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -1977,10 +2257,14 @@ declare module '@strapi/strapi' {
       'api::bakery-slider.bakery-slider': ApiBakerySliderBakerySlider;
       'api::blog.blog': ApiBlogBlog;
       'api::booking-consultation.booking-consultation': ApiBookingConsultationBookingConsultation;
+      'api::cake-booking.cake-booking': ApiCakeBookingCakeBooking;
       'api::clinic.clinic': ApiClinicClinic;
       'api::collection-type.collection-type': ApiCollectionTypeCollectionType;
       'api::consultation.consultation': ApiConsultationConsultation;
+      'api::design-data.design-data': ApiDesignDataDesignData;
+      'api::display-doctor.display-doctor': ApiDisplayDoctorDisplayDoctor;
       'api::doctor.doctor': ApiDoctorDoctor;
+      'api::flavour.flavour': ApiFlavourFlavour;
       'api::grooming-package.grooming-package': ApiGroomingPackageGroomingPackage;
       'api::home-address.home-address': ApiHomeAddressHomeAddress;
       'api::home-page-slider.home-page-slider': ApiHomePageSliderHomePageSlider;
@@ -1989,13 +2273,16 @@ declare module '@strapi/strapi' {
       'api::lab-test.lab-test': ApiLabTestLabTest;
       'api::main-category.main-category': ApiMainCategoryMainCategory;
       'api::offer.offer': ApiOfferOffer;
+      'api::packagejson.packagejson': ApiPackagejsonPackagejson;
       'api::pet-bakery.pet-bakery': ApiPetBakeryPetBakery;
+      'api::pet-shop-and-bakery-order.pet-shop-and-bakery-order': ApiPetShopAndBakeryOrderPetShopAndBakeryOrder;
       'api::pet-shop-category.pet-shop-category': ApiPetShopCategoryPetShopCategory;
       'api::pet-shop-product.pet-shop-product': ApiPetShopProductPetShopProduct;
       'api::petshop.petshop': ApiPetshopPetshop;
       'api::physio-booking.physio-booking': ApiPhysioBookingPhysioBooking;
       'api::physiotherapy.physiotherapy': ApiPhysiotherapyPhysiotherapy;
       'api::product.product': ApiProductProduct;
+      'api::quantity.quantity': ApiQuantityQuantity;
       'api::setting.setting': ApiSettingSetting;
       'api::vaccination.vaccination': ApiVaccinationVaccination;
       'plugin::content-releases.release': PluginContentReleasesRelease;

@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 export default function Header() {
     const [showSideBar, setShowSideBar] = useState(false)
     const { CartCount } = useSelector((state) => state.cart)
-    console.log("count",CartCount)
+
     const navigation = useNavigation()
     const handleSideBarToggle = () => {
         setShowSideBar(!showSideBar);

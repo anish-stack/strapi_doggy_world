@@ -8,7 +8,7 @@ export default function LocationTab({ data }) {
         <View style={styles.container}>
             <View style={styles.locationInfo}>
                 <Icon name="location-outline" size={24} color="#fff" />
-                {/* <Text style={styles.locationText}>{data?.address?.city}, {data?.address?.postalCode}</Text> */}
+                <Text style={styles.locationText}>{data?.address?.area},{data?.address?.city}, {data?.address?.postalCode} , {data?.address?.district}</Text>
             </View>
         </View>
     );

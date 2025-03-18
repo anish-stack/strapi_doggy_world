@@ -74,5 +74,32 @@ module.exports = {
         middlewares: [],
       },
     },
+    {
+      method: 'POST',
+      path: '/user-login-through-otp',
+      handler: 'auth.loginThroughOtp',
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
+    {
+      method: 'POST',
+      path: '/user-login-verify-otp',
+      handler: 'auth.verifyLoginOtp',
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
+    {
+      method: 'POST',
+      path: '/user-login-resend-otp',
+      handler: 'auth.resendLoginOtp',
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
   ],
 };

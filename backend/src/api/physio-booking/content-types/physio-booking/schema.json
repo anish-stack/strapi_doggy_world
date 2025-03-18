@@ -4,7 +4,8 @@
   "info": {
     "singularName": "physio-booking",
     "pluralName": "physio-bookings",
-    "displayName": "Physio_booking"
+    "displayName": "Physio_booking",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -49,6 +50,15 @@
     },
     "rate": {
       "type": "integer"
+    },
+    "isPhysio": {
+      "type": "boolean"
+    },
+    "TypeOfBooking": {
+      "type": "string"
+    },
+    "BookingID": {
+      "type": "string"
     }
   }
 }

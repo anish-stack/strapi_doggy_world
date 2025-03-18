@@ -1,9 +1,14 @@
-'use strict';
 
-/**
- * physio-booking router
- */
-
-const { createCoreRouter } = require('@strapi/strapi').factories;
-
-module.exports = createCoreRouter('api::physio-booking.physio-booking');
+module.exports = {
+    routes: [
+        {
+            method: 'POST',
+            path: '/make-order-physio-booking',
+            handler: 'physio-booking.physio_booking',
+            config: {
+                policies: [],
+                middlewares: [],
+            },
+        }
+    ]
+}

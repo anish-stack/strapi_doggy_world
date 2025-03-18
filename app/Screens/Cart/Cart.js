@@ -14,16 +14,17 @@ const { width, height } = Dimensions.get('window')
 export default function Cart() {
 
   const navigation = useNavigation()
-  const [Quantity, setQuantity] = useState(1)
+
 
   const route = useRoute();
   const { offerClick } = route.params || {};
-  
+
   const { CartItems } = useSelector((state) => state.cart)
+
   const dispatch = useDispatch()
 
   const handleIncrease = (pastQunatity = 1, ProductId) => {
-  
+
     dispatch(UpdateCartItem({ ProductId, quantity: pastQunatity + 1 }));
 
   };
@@ -32,10 +33,9 @@ export default function Cart() {
   };
 
   const handleDecrease = (pastQunatity, ProductId) => {
-
-
     dispatch(UpdateCartItem({ ProductId, quantity: pastQunatity - 1 }));
   };
+  console.log("CartItems",CartItems)
 
   return (
     <ScrollView>
@@ -63,7 +63,12 @@ export default function Cart() {
               <View key={index} style={styles.product}>
                 <Image source={{ uri: item.image }} style={styles.productImage} />
                 <View style={styles.productContent}>
-                  <Text numberOfLines={2} style={styles.productTitle}>{item.title}</Text>
+                  <View>
+                    <Text numberOfLines={2} style={styles.productTitle}>{item.title} </Text>
+                    {item.varientSize && (
+                      <Text numberOfLines={2} style={styles.productSize}>{item.varientSize} </Text>
+                    )}
+                  </View>
                   <View style={styles.quantityControl}>
                     <TouchableOpacity
                       style={styles.quantityButton}
@@ -85,22 +90,20 @@ export default function Cart() {
                   <Text style={styles.productPrice}><Ts size={18} name='rupee' /> {item.Pricing.disc_price * item.quantity}</Text>
                   <Text style={styles.originalPrice}><Ts size={15} name='rupee' /> {item.Pricing.price}</Text>
                 </View>
-                {/* <View style={styles.priceContainer}>
-                  <Text style={styles.removeBtn} onPress={() => dispatch(RemoveCartItem({ productIdToRemove: item.ProductId }))}> <Icon name="minus" size={12} color="#000" /></Text>
-                </View> */}
+           
               </View>
             ))
           ) : (
             <View style={styles.imageContainer}>
-            <Image 
-              source={require('./rb_27558.png')} 
-              style={styles.image} 
-            />
-            <Text  style={styles.textOne}>
-             🚫 No items in your cart. Please add some items to proceed.
-            </Text>
-          </View>
-          
+              <Image
+                source={require('./rb_27558.png')}
+                style={styles.image}
+              />
+              <Text style={styles.textOne}>
+                🚫 No items in your cart. Please add some items to proceed.
+              </Text>
+            </View>
+
           )}
         </View>
         <View style={styles.MissingContainer}>
@@ -209,11 +212,17 @@ const styles = StyleSheet.create({
   productTitle: {
     fontSize: 12,
     width: width / 4.7,
-
     overflow: 'hidden',
     fontWeight: '600',
     color: '#212529',
-    marginBottom: 8,
+
+  },
+  productSize: {
+    fontSize: 10,
+    overflow: 'hidden',
+    fontWeight: '600',
+    color: '#654345',
+
   },
   quantityControl: {
     marginHorizontal: 15,
@@ -265,16 +274,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   imageContainer: {
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    backgroundColor: '#fff', 
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
     borderRadius: 10,
 
-    margin: 10, 
+    margin: 10,
   },
   image: {
-    width: 200, 
-    height: 200, 
+    width: 200,
+    height: 200,
     resizeMode: 'contain',
   },
 

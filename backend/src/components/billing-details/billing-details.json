@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_billing_details_billing_details",
+  "info": {
+    "displayName": "Billing_Details",
+    "icon": "chartPie",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "fullName": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "street": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "HouseNo": {
+      "type": "string"
+    },
+    "landmark": {
+      "type": "string"
+    },
+    "zipCode": {
+      "type": "string"
+    }
+  }
+}

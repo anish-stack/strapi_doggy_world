@@ -15,22 +15,27 @@ export default function Dynamic_Details_Shop() {
     const route = useRoute();
     const { title, id } = route.params || {};
     const dispatch = useDispatch()
-    // const { CartItems, CartCount } = useSelector((state) => state.cart);
+
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedVariants, setSelectedVariants] = useState({
         price: 0,
         disc_price: 0,
+        size: '',
         off_dis_percentage: 0,
     });
     const navigataion = useNavigation()
+
+    const allOutOfStock = product?.isVarient
+        ? product?.Variants_price?.every(item => !item?.in_stock)
+        : (product?.isOutOfStock ?? false);
 
     const fetchProduct = async () => {
         try {
             const res = await axios.get(`http://192.168.1.3:1337/api/pet-shop-products/${id}?populate=*`);
             setProduct(res.data.data);
-            console.log(res.data);
+
         } catch (error) {
             setError('Failed to load product details.');
         } finally {
@@ -47,14 +52,14 @@ export default function Dynamic_Details_Shop() {
             setSelectedVariants({
                 price: product.Variants_price[0].price,
                 disc_price: product.Variants_price[0].disc_price,
+                size: product.Variants_price[0].size,
                 off_dis_percentage: product.Variants_price[0].off_perce,
             });
         }
     }, [product]);
 
     const handleAddToCart = async (item) => {
-        console.log(item)
-        console.log(selectedVariants)
+
         const price = {};
         const isVarientTrue = item.isVarient;
 
@@ -74,7 +79,9 @@ export default function Dynamic_Details_Shop() {
             const newItem = {
                 ProductId: item.documentId,
                 title: item.Title,
+                isPetShopProduct: true,
                 quantity: 1,
+                varientSize: selectedVariants?.size,
                 Pricing: price,
                 image: item.Images[0]?.url,
                 isVarientTrue: isVarientTrue,
@@ -94,9 +101,10 @@ export default function Dynamic_Details_Shop() {
     };
 
 
-    const handleSelect = (price, discount_price, off_dis_percentage) => {
+    const handleSelect = (price, size, discount_price, off_dis_percentage) => {
         setSelectedVariants({
             price,
+            size,
             disc_price: discount_price,
             off_dis_percentage,
         })
@@ -122,7 +130,7 @@ export default function Dynamic_Details_Shop() {
         <SafeAreaView style={{ flex: 1, paddingBottom: 20 }}>
             <UpperLayout title={title?.substring(0, 15) + '...'} isBellShow={false} />
 
-            <ScrollView contentContainerStyle={styles.container}>
+            <ScrollView showsVerticalScrollIndicator={false} scrollEventThrottle={16} contentContainerStyle={styles.container}>
 
                 {product?.Images?.length > 0 && <Product_Slider images={product.Images} />}
 
@@ -166,8 +174,14 @@ export default function Dynamic_Details_Shop() {
                     </View>
                     <View style={styles.addButton}>
                         <TouchableOpacity
-                            activeOpacity={0.9} onPress={() => handleAddToCart(product)} style={styles.btn}>
-                            <Text style={styles.addCartText}>Add </Text>
+                            activeOpacity={0.9}
+                            onPress={() => handleAddToCart(product)}
+                            style={[styles.btn, allOutOfStock && styles.disabledButton]}
+                            disabled={allOutOfStock}
+                        >
+                            <Text style={[styles.addCartText, allOutOfStock && styles.disabledText]}>
+                                {allOutOfStock ? 'Out Of Stock' : 'Buy Now'}
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -176,29 +190,51 @@ export default function Dynamic_Details_Shop() {
                         <View style={styles.variantSection}>
                             {product?.Variants_price?.map((item, index) => {
                                 const isSelected = selectedVariants?.price === item.price;
+                                const isOutOfStock = !item.in_stock;
 
                                 return (
                                     <TouchableOpacity
-                                        onPress={() => handleSelect(item.price, item.disc_price, item.off_perce)}
+                                        onPress={() => !isOutOfStock && handleSelect(item.price, item.size, item.disc_price, item.off_perce)}
                                         key={index}
                                         style={[
                                             styles.variantButton,
                                             isSelected && styles.selectedVariant,
+                                            isOutOfStock && styles.disabledVariant, // Apply disabled style
                                         ]}
+                                        disabled={isOutOfStock} // Disable if out of stock
                                     >
-                                        <Text style={[styles.variantText, isSelected && styles.selectedVariantText]}>
-                                            {item.size} - {item.flavour} - {item.price ? `₹${item.price}` : 'Price Unavailable'}
+                                        <Text
+                                            style={[
+                                                styles.variantText,
+                                                isSelected && styles.selectedVariantText,
+                                                isOutOfStock && styles.outOfStockText, // Change text color for out of stock
+                                            ]}
+                                        >
+                                            {item.size} - {item.flavour || "No Flavour"} - {item.price ? `₹${item.price}` : 'Price Unavailable'}
                                         </Text>
-                                        <Text style={[styles.variantDiscount, isSelected && styles.selectedVariantDiscount]}>
+                                        <Text
+                                            style={[
+                                                styles.variantDiscount,
+                                                isSelected && styles.selectedVariantDiscount,
+                                            ]}
+                                        >
                                             {item.disc_price ? `Discounted Price: ₹${item.disc_price}` : 'No Discount'}
                                         </Text>
-                                        {isSelected && <Text style={styles.selectedTag}>Selected</Text>}
+
+                                        {isOutOfStock && (
+                                            <View style={styles.outOfStockBadge}>
+                                                <Text style={styles.outOfStockBadgeText}>Out of Stock</Text>
+                                            </View>
+                                        )}
+
+                                        {isSelected && !isOutOfStock && <Text style={styles.selectedTag}>Selected</Text>}
                                     </TouchableOpacity>
                                 );
                             })}
                         </View>
                     </ScrollView>
                 )}
+
                 <PolicyCards Free_Delivery={product?.Free_Delivery} Exchange_policy={product?.Exchange_policy} COD_AVAILABLE={product?.COD_AVAILABLE} />
 
 
@@ -483,4 +519,33 @@ const styles = StyleSheet.create({
         lineHeight: 22,
         textAlign: 'justify',
     },
+    outOfStockText: {
+        color: "#aaa",
+    },
+    outOfStockBadge: {
+        position: "absolute",
+        top: 5,
+        right: 5,
+        backgroundColor: "#f44336",
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 5,
+    },
+    outOfStockBadgeText: {
+        color: "#fff",
+        fontSize: 10,
+        fontWeight: "bold",
+    },
+    disabledVariant: {
+        backgroundColor: "#f0f0f0",
+        borderColor: "#ccc",
+    },
+    disabledButton: {
+        backgroundColor: "#ccc",
+    },
+    disabledText: {
+        fontSize: 14,
+        color: "#888",
+    },
+
 });

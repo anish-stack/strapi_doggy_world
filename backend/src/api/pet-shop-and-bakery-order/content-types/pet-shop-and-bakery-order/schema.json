@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pet_shop_and_bakery_orders",
+  "info": {
+    "singularName": "pet-shop-and-bakery-order",
+    "pluralName": "pet-shop-and-bakery-orders",
+    "displayName": "Pet_Shop_And_bakery_order",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "auth": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::auth.auth",
+      "inversedBy": "pet_shop_and_bakery_orders"
+    },
+    "Order_Status": {
+      "type": "string"
+    },
+    "isCancelbyUser": {
+      "type": "boolean",
+      "default": false
+    },
+    "Cancel_user_reason": {
+      "type": "string"
+    },
+    "isCancelbyAdmin": {
+      "type": "boolean",
+      "default": false
+    },
+    "admin_cancel_reason": {
+      "type": "string"
+    },
+    "Shop_bakery_cart_items": {
+      "displayName": "Shop_bakery_cart_items",
+      "type": "component",
+      "repeatable": true,
+      "component": "shop-cart.shop-bakery-cart-items"
+    },
+    "Billing_Details": {
+      "displayName": "Billing_Details",
+      "type": "component",
+      "repeatable": false,
+      "component": "billing-details.billing-details"
+    }
+  }
+}

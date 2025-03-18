@@ -59,6 +59,24 @@
       "relation": "oneToMany",
       "target": "api::physio-booking.physio-booking",
       "mappedBy": "PetID"
+    },
+    "pet_shop_and_bakery_orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::pet-shop-and-bakery-order.pet-shop-and-bakery-order",
+      "mappedBy": "auth"
+    },
+    "loginOtp": {
+      "type": "biginteger"
+    },
+    "otpExpiry": {
+      "type": "datetime"
+    },
+    "cake_bookings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::cake-booking.cake-booking",
+      "mappedBy": "pet_id"
     }
   }
 }

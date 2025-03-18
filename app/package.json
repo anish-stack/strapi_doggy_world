@@ -19,8 +19,10 @@
     "app": "file:",
     "axios": "^1.7.8",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "doogywordcare": "file:",
     "expo": "~52.0.11",
+    "expo-blur": "~14.0.3",
     "expo-checkbox": "~4.0.1",
     "expo-dev-client": "~5.0.4",
     "expo-font": "^13.0.1",
@@ -41,6 +43,7 @@
     "react-native-gesture-handler": "^2.20.2",
     "react-native-ionicons": "^4.6.5",
     "react-native-linear-gradient": "^2.8.3",
+    "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-razorpay": "^2.3.0",
     "react-native-reanimated": "^3.16.7",
     "react-native-reanimated-carousel": "^3.5.1",
@@ -53,8 +56,7 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-webview": "^13.12.4",
     "react-redux": "^9.1.2",
-    "tailwindcss": "^3.3.2",
-    "expo-blur": "~14.0.3"
+    "tailwindcss": "^3.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

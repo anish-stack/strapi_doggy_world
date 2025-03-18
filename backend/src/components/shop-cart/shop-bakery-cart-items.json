@@ -1,0 +1,52 @@
+{
+  "collectionName": "components_shop_cart_shop_bakery_cart_items",
+  "info": {
+    "displayName": "Shop_bakery_cart_items",
+    "icon": "archive",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "Bakery_ProductIds": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product"
+    },
+    "pet_shop_product_ids": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::pet-shop-product.pet-shop-product"
+    },
+    "title": {
+      "type": "string"
+    },
+    "isPetShopProduct": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "quantity": {
+      "type": "integer"
+    },
+    "varientSize": {
+      "type": "string"
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "isVarientTrue": {
+      "type": "boolean"
+    },
+    "isBakeryProduct": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput, Pressable, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
-
+import axios from 'axios'
+import { getUser } from '../../hooks/getUserHook';
 export default function DatePicker({ isPhysiotherapy = false, isOpen, onClosed, Clinic, onFormSubmit, vaccineItem, TypeOfBooking }) {
     const [date, setDate] = useState(new Date());
     const [showPicker, setShowPicker] = useState(false);
+    const { user, getUserFnc } = getUser()
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({ petName: '', contactNumber: '', date: new Date() });
     const navigation = useNavigation()
     const today = new Date();
@@ -18,12 +21,16 @@ export default function DatePicker({ isPhysiotherapy = false, isOpen, onClosed, 
             setFormData((prev) => ({ ...prev, date: currentDate }));
         }
     };
+    useEffect(() => {
+        getUserFnc()
+    }, [])
+
 
     const handleInputChange = (field, value) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         if (formData.petName.trim() === '' || formData.contactNumber.trim() === '') {
             alert('Please fill all fields');
             return;
@@ -31,15 +38,24 @@ export default function DatePicker({ isPhysiotherapy = false, isOpen, onClosed, 
         const sendingItem = {
             petName: formData.petName,
             contactNumber: formData.contactNumber,
-            date: date.toISOString(), // Convert date to a serializable string
+            date: date.toISOString(),
             ServiceTitle: vaccineItem?.title || '',
             ServiceId: vaccineItem?.documentId || '',
+            isPhysiotherapy,
+            user: user,
             ClinicPrice: vaccineItem?.discount_price || 0,
             HomePriceOfPackageDiscount: vaccineItem?.homePriceOfPackageDiscount || 0,
             clinicId: Clinic?.documentId || '',
-            clinicName: Clinic?.clinic_name || '',
+            clinicName: Clinic?.clinic_name || 'Doggy World Sector 8 , Rohini',
             TypeOfBooking: TypeOfBooking,
         };
+
+        if (isPhysiotherapy) {
+            console.log("sendingItem has bookings");
+            await handleBookPhysio(sendingItem)
+        } else {
+            console.log("sendingItem", sendingItem)
+        }
 
         navigation.navigate('vaccination_booked', { details: sendingItem });
         setFormData({ petName: '', contactNumber: '' });
@@ -47,6 +63,21 @@ export default function DatePicker({ isPhysiotherapy = false, isOpen, onClosed, 
         onClosed();
     };
 
+    const handleBookPhysio = async (data) => {
+        setLoading(true)
+        try {
+            const response = await axios.post(`http://192.168.1.3:1337/api/make-order-physio-booking`, data)
+            console.log(response.data)
+            Alert.alert("Booking success", `Your's bookings have been successfully done`)
+            setLoading(false)
+
+        } catch (error) {
+            setLoading(false)
+            console.log(error?.response?.data?.message)
+            Alert.alert("Booking Failed", error?.response?.data?.message)
+
+        }
+    }
 
     return (
         <Modal
@@ -131,7 +162,7 @@ export default function DatePicker({ isPhysiotherapy = false, isOpen, onClosed, 
                             style={[styles.button, styles.confirmButton]}
                             onPress={handleConfirm}
                         >
-                            <Text style={styles.buttonText}>Confirm</Text>
+                            <Text style={styles.buttonText}> {loading ? 'Please Wait  .... ' : 'Confirm'} </Text>
                         </Pressable>
                     </View>
                 </View>

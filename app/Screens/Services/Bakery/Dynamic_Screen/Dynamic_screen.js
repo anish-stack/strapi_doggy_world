@@ -16,7 +16,7 @@ export default function DynamicScreen({ Product, isSliderShow = true }) {
     const { title } = route.params;
     const [data, setData] = useState([]);
     const [slider, setSlider] = useState([]);
-    console.log("I am  title", title)
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -35,12 +35,12 @@ export default function DynamicScreen({ Product, isSliderShow = true }) {
                         (item) => item.catgory?.titile === title
                     );
                 } else {
-                    console.log("search by title", title)
+       
                     filteredData = fetchedData.filter(
                         (item) => item.catgory?.titile === Product
                     );
                 }
-                console.log("i am filter data", filteredData.length)
+
                 const filteredSliderData = fetchSlider.filter(
                     (item) => item.category?.titile === title || Product
                 );

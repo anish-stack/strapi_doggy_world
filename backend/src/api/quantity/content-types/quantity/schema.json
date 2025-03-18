@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "quantities",
+  "info": {
+    "singularName": "quantity",
+    "pluralName": "quantities",
+    "displayName": "quantity"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "label": {
+      "type": "string"
+    },
+    "price": {
+      "type": "biginteger"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": false
+    },
+    "type_of_qunatity": {
+      "type": "string"
+    }
+  }
+}

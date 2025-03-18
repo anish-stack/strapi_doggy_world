@@ -1,8 +1,13 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { useToken } from '../../hooks/useToken';
+import { useNavigation } from '@react-navigation/native';
 
 export default function PaymentInfos({ cartItems, offer }) {
+    const { isLoggedIn } = useToken()
+    const navigation = useNavigation()
+
     const { Code, minimum_amount, upto_off, active } = offer || {};
 
     const calculateTotalPrice = () => {
@@ -20,16 +25,16 @@ export default function PaymentInfos({ cartItems, offer }) {
     const calculateAfterAppliedCode = () => {
         const payable = calculatePayablePrice();
         if (active && payable >= minimum_amount) {
-            return Math.max(0, payable - upto_off); 
+            return Math.max(0, payable - upto_off);
         }
         return payable;
     };
 
     return (
         <View style={styles.container}>
-            {/* Delivery Instructions Section */}
+
             <View style={styles.deliverySection}>
-             
+
                 <View style={styles.deliveryText}>
                     <Text style={styles.title}>Delivery Instructions</Text>
                     <TextInput
@@ -69,7 +74,7 @@ export default function PaymentInfos({ cartItems, offer }) {
 
                     {active && calculatePayablePrice() >= minimum_amount && (
                         <View style={styles.totalContainer}>
-                             
+
                             <Text style={styles.totalText}>
                                 <Icon name="tag" size={14} color="#B32113" /> ({Code})
                             </Text>
@@ -79,10 +84,23 @@ export default function PaymentInfos({ cartItems, offer }) {
                 </View>
             </View>
 
-            <TouchableOpacity 
- activeOpacity={0.9}style={styles.selectAddressButton}>
-                <Text style={styles.selectAddressText}>Please Login</Text>
-            </TouchableOpacity>
+            {isLoggedIn ? (
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('select_address_and_order', {
+                        data: { ...cartItems, Code, minimum_amount, upto_off, active }
+                    })}
+
+                    activeOpacity={0.9} style={styles.selectAddressButton}>
+                    <Text style={styles.selectAddressText}>Select Address</Text>
+                </TouchableOpacity>
+            ) : (
+                <TouchableOpacity
+                    onPress={()=> navigation.navigate('login')}
+                    activeOpacity={0.9} style={styles.selectAddressButton}>
+                    <Text style={styles.selectAddressText}>Please Login</Text>
+                </TouchableOpacity>
+            )}
+
         </View>
     );
 }

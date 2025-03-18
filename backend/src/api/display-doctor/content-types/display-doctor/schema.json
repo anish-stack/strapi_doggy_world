@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "display_doctors",
+  "info": {
+    "singularName": "display-doctor",
+    "pluralName": "display-doctors",
+    "displayName": "Display_Doctor"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Name": {
+      "type": "string"
+    },
+    "specialization": {
+      "type": "string"
+    },
+    "experience": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "isBest": {
+      "type": "boolean",
+      "default": false
+    },
+    "position": {
+      "type": "integer"
+    }
+  }
+}

@@ -17,6 +17,24 @@ export interface AddressAddress extends Struct.ComponentSchema {
   };
 }
 
+export interface BillingDetailsBillingDetails extends Struct.ComponentSchema {
+  collectionName: 'components_billing_details_billing_details';
+  info: {
+    description: '';
+    displayName: 'Billing_Details';
+    icon: 'chartPie';
+  };
+  attributes: {
+    city: Schema.Attribute.String;
+    fullName: Schema.Attribute.String;
+    HouseNo: Schema.Attribute.String;
+    landmark: Schema.Attribute.String;
+    phone: Schema.Attribute.String;
+    street: Schema.Attribute.String;
+    zipCode: Schema.Attribute.String;
+  };
+}
+
 export interface CartItemCartItems extends Struct.ComponentSchema {
   collectionName: 'components_cart_item_cart_items';
   info: {
@@ -68,6 +86,34 @@ export interface ListList extends Struct.ComponentSchema {
   };
   attributes: {
     vaccine_name: Schema.Attribute.String;
+  };
+}
+
+export interface ShopCartShopBakeryCartItems extends Struct.ComponentSchema {
+  collectionName: 'components_shop_cart_shop_bakery_cart_items';
+  info: {
+    description: '';
+    displayName: 'Shop_bakery_cart_items';
+    icon: 'archive';
+  };
+  attributes: {
+    Bakery_ProductIds: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::product.product'
+    >;
+    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    isBakeryProduct: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    isPetShopProduct: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    isVarientTrue: Schema.Attribute.Boolean;
+    pet_shop_product_ids: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::pet-shop-product.pet-shop-product'
+    >;
+    quantity: Schema.Attribute.Integer;
+    title: Schema.Attribute.String;
+    varientSize: Schema.Attribute.String;
   };
 }
 
@@ -150,10 +196,12 @@ declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
       'address.address': AddressAddress;
+      'billing-details.billing-details': BillingDetailsBillingDetails;
       'cart-item.cart-items': CartItemCartItems;
       'cart-item.items': CartItemItems;
       'cart-lab-items.items': CartLabItemsItems;
       'list.list': ListList;
+      'shop-cart.shop-bakery-cart-items': ShopCartShopBakeryCartItems;
       'slots.slots': SlotsSlots;
       'test-books.test': TestBooksTest;
       'variants.product-variant': VariantsProductVariant;

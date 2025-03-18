@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "packagejsons",
+  "info": {
+    "singularName": "packagejson",
+    "pluralName": "packagejsons",
+    "displayName": "Packagejson"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "json": {
+      "type": "json"
+    }
+  }
+}
