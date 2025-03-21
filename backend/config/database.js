@@ -8,9 +8,9 @@ module.exports = ({ env }) => {
       connection: {
         host: env('DATABASE_HOST', '193.203.184.146'), // Default host to 127.0.0.1 if undefined
         port: env.int('DATABASE_PORT', 3306),
-        database: env('DATABASE_NAME', 'u905431022_doogy_world'),
-        user: env('DATABASE_USERNAME', 'u905431022_doogy_world'),
-        password: env('DATABASE_PASSWORD', 'Doggy_8526'),
+        database: env('DATABASE_NAME', 'u905431022_doogyworld2025'),
+        user: env('DATABASE_USERNAME', 'u905431022_doogyworld'),
+        password: env('DATABASE_PASSWORD', 'Doogy_world@112'),
         ssl: env.bool('DATABASE_SSL', false) && {
           key: env('DATABASE_SSL_KEY', undefined),
           cert: env('DATABASE_SSL_CERT', undefined),
