@@ -34,6 +34,12 @@
     },
     "title": {
       "type": "string"
+    },
+    "grooming_bookings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::grooming-booking.grooming-booking",
+      "mappedBy": "Package"
     }
   }
 }

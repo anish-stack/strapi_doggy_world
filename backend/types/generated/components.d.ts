@@ -78,6 +78,22 @@ export interface CartLabItemsItems extends Struct.ComponentSchema {
   };
 }
 
+export interface CustomizePackageBookingCustomizePackageBooking
+  extends Struct.ComponentSchema {
+  collectionName: 'components_customize_package_booking_customize_package_bookings';
+  info: {
+    description: '';
+    displayName: 'Customize-Package-booking';
+    icon: 'apps';
+  };
+  attributes: {
+    Details: Schema.Attribute.Text;
+    Price: Schema.Attribute.String;
+    ServiceName: Schema.Attribute.String;
+    ServiceType: Schema.Attribute.String;
+  };
+}
+
 export interface ListList extends Struct.ComponentSchema {
   collectionName: 'components_list_lists';
   info: {
@@ -151,6 +167,20 @@ export interface TestBooksTest extends Struct.ComponentSchema {
   };
 }
 
+export interface TimesTimeBlock extends Struct.ComponentSchema {
+  collectionName: 'components_times_time_blocks';
+  info: {
+    description: '';
+    displayName: 'Time_Block';
+    icon: 'clock';
+  };
+  attributes: {
+    Is_Booking_Closed: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    Time: Schema.Attribute.Time;
+  };
+}
+
 export interface VariantsProductVariant extends Struct.ComponentSchema {
   collectionName: 'components_variants_product_variants';
   info: {
@@ -200,10 +230,12 @@ declare module '@strapi/strapi' {
       'cart-item.cart-items': CartItemCartItems;
       'cart-item.items': CartItemItems;
       'cart-lab-items.items': CartLabItemsItems;
+      'customize-package-booking.customize-package-booking': CustomizePackageBookingCustomizePackageBooking;
       'list.list': ListList;
       'shop-cart.shop-bakery-cart-items': ShopCartShopBakeryCartItems;
       'slots.slots': SlotsSlots;
       'test-books.test': TestBooksTest;
+      'times.time-block': TimesTimeBlock;
       'variants.product-variant': VariantsProductVariant;
       'variants.variants': VariantsVariants;
     }

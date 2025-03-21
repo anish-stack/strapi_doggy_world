@@ -1,0 +1,92 @@
+{
+  "kind": "collectionType",
+  "collectionName": "grooming_bookings",
+  "info": {
+    "singularName": "grooming-booking",
+    "pluralName": "grooming-bookings",
+    "displayName": "Grooming_Booking",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "General_Booking": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "Type": {
+      "type": "string"
+    },
+    "pet": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::auth.auth",
+      "inversedBy": "grooming_bookings"
+    },
+    "clinic": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::clinic.clinic",
+      "inversedBy": "grooming_bookings"
+    },
+    "grooming_service": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::grooming-service.grooming-service",
+      "inversedBy": "grooming_bookings"
+    },
+    "Customize": {
+      "displayName": "Customize-Package-booking",
+      "type": "component",
+      "repeatable": true,
+      "component": "customize-package-booking.customize-package-booking"
+    },
+    "Date_of_Service": {
+      "type": "date"
+    },
+    "Time": {
+      "type": "string"
+    },
+    "Is_Cancel_By_User": {
+      "type": "boolean",
+      "default": false
+    },
+    "Is_Cancel_user_reason": {
+      "type": "text"
+    },
+    "Is_Cancel_admin_reason": {
+      "type": "text"
+    },
+    "Is_Cancel_admin": {
+      "type": "boolean"
+    },
+    "service_complete": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "feedback": {
+      "type": "text"
+    },
+    "is_rate": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "rate": {
+      "type": "integer"
+    },
+    "booking_status": {
+      "type": "string"
+    },
+    "Package": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::grooming-package.grooming-package",
+      "inversedBy": "grooming_bookings"
+    }
+  }
+}

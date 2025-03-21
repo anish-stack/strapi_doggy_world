@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_times_time_blocks",
+  "info": {
+    "displayName": "Time_Block",
+    "icon": "clock",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "Time": {
+      "type": "time"
+    },
+    "Is_Booking_Closed": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

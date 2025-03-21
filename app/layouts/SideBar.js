@@ -1,161 +1,289 @@
-import { View, Text, StyleSheet, Dimensions, Image, ImageBackground, ScrollView, TouchableOpacity, Animated } from 'react-native';
-import React, { useEffect, useState, useRef } from 'react';
-import user from '../assets/user.png';
-import bg from '../assets/bg.jpg';
-import arrow from '../assets/arrow.png';
-import { useNavigation } from '@react-navigation/native';
-
+import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from "@react-navigation/native"
+import { useToken } from "../hooks/useToken"
+import { getUser } from "../hooks/getUserHook"
 const { width, height } = Dimensions.get('window');
 
-export default function SideBar({ open }) {
-    const naviagte = useNavigation();
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const slideAnim = useRef(new Animated.Value(-width / 1.2)).current; // Initially hidden off-screen
+const SIDEBAR_WIDTH = Math.min(width * 0.85, 400);
 
-    useEffect(() => {
-        // Slide the sidebar in or out based on the `open` prop
-        Animated.timing(slideAnim, {
-            toValue: open ? 0 : -width / 1.2,
-            duration: 300,
-            useNativeDriver: true,
-        }).start();
-    }, [open]);
-    const handleLogin = () => {
+export default function Sidebar({ open, onClose }) {
+  const slideAnim = useRef(new Animated.Value(-SIDEBAR_WIDTH)).current;
+  const navigation = useNavigation()
+  const { token, isLoggedIn, deleteToken } = useToken()
+  const { user: userData } = getUser()
+  const navigationItems = [
+    { title: 'Home', icon: 'home', screen: 'Home', requiresAuth: false },
+    { title: 'My Appointments', icon: 'calendar', screen: 'Appointments', requiresAuth: true },
+    { title: 'Grooming Sessions', icon: 'water', screen: 'Groomings', requiresAuth: true },
+    { title: 'Orders', icon: 'cube', screen: 'Orders', requiresAuth: true },
+    { title: 'Cakes Order', icon: 'gift', screen: 'cakeorder', requiresAuth: true },
+    { title: 'Physio Bookings', icon: 'fitness', screen: 'physioBookings', requiresAuth: true },
+    { title: 'Lab & Vaccination', icon: 'medical', screen: 'labVaccinations', requiresAuth: true },
+  ];
 
-        console.log('Login clicked');
-        naviagte.navigate('register')
-    };
+  const settingsItems = [
+    { title: 'Help & Support', icon: 'help-circle', screen: 'Support', requiresAuth: false },
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch('https://www.doggy.adsdigitalmedia.com/api/v1/Product/Get-All-category');
-                const result = await response.json();
-                setData(result.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
+    { title: 'Profile', icon: 'person', screen: 'Profile', requiresAuth: true },
+  ];
+  const LoginItems = [
+    { title: 'Login', icon: 'arrow-forward-outline', screen: 'login', requiresAuth: false },
+    { title: 'Register', icon: 'person-add', screen: 'register', requiresAuth: false },
+  ]
+
+  useEffect(() => {
+    Animated.spring(slideAnim, {
+      toValue: open ? 0 : -SIDEBAR_WIDTH,
+      useNativeDriver: true,
+      damping: 20,
+      stiffness: 90,
+    }).start();
+  }, [open]);
+
+  const handleLogout = () => {
+    deleteToken()
+    onClose && onClose()
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Home" }],
+    })
+  }
+  const handleNavigation = (screen) => {
+    onClose();
+    navigation.navigate(screen);
+  };
+
+  const handleLoginPress = () => {
+    onClose();
+    navigation.navigate('login');
+  };
+
+  const handleRegisterPress = () => {
+    onClose();
+    navigation.navigate('register');
+  };
+
+  const renderNavItem = (item, index) => {
+    if (item.requiresAuth && !isLoggedIn) return null;
 
     return (
-        <Animated.View style={[styles.sideBarContainer, { transform: [{ translateX: slideAnim }] }]}>
-            <ImageBackground source={bg} style={styles.backgroundImage}>
-                <View style={styles.userSide}>
-                    <Text style={styles.greetingText}>Hi Pet Parent</Text>
-                    <Image source={user} style={styles.userImage} />
-                </View>
-            </ImageBackground>
-            <TouchableOpacity 
- activeOpacity={0.9}onPress={handleLogin} style={styles.buttonContainer}>
-                <Text style={styles.buttonText}>Signup or Login</Text>
-            </TouchableOpacity>
-            <ScrollView style={styles.sidebar} contentContainerStyle={styles.sidebarContent}>
-                {loading ? (
-                    <Text style={styles.loadingText}>Loading...</Text>
-                ) : (
-                    data.map((item, index) => (
-                        <View key={index} style={styles.itemContainer}>
-                            <View style={styles.itemContent}>
-                                <Image
-                                    source={{ uri: item.Image?.url }}
-                                    style={styles.itemImage}
-                                    resizeMode="contain"
-                                />
-                                <Text style={styles.sidebarTitle}>{item.CategoryTitle}</Text>
-                            </View>
-                            <Image source={arrow} style={styles.arrowImage} />
-                        </View>
-                    ))
-                )}
-            </ScrollView>
-        </Animated.View>
+      <TouchableOpacity
+        key={index}
+        style={styles.navItem}
+        onPress={() => handleNavigation(item.screen)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.navIconContainer}>
+          <Ionicons name={item.icon} size={22} color="#6366F1" />
+        </View>
+        <Text style={styles.navText}>{item.title}</Text>
+        <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
+      </TouchableOpacity>
     );
+  };
+
+  return (
+    <>
+      {open && (
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.backdrop}
+          onPress={onClose}
+        />
+      )}
+
+      <Animated.View style={[styles.container, { transform: [{ translateX: slideAnim }] }]}>
+
+
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <View style={styles.section}>
+
+            {navigationItems.map(renderNavItem)}
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>SETTINGS</Text>
+            {settingsItems.map(renderNavItem)}
+          </View>
+
+          {!isLoggedIn && (
+            <View style={styles.section}>
+              {LoginItems.map(renderNavItem)}
+            </View>
+          )}
+
+          {isLoggedIn && (
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={() => {
+                handleLogout();
+                onClose();
+              }}
+            >
+              <Ionicons name="log-out" size={22} color="#EF4444" />
+              <Text style={styles.logoutText}>Logout</Text>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+
+        <View style={styles.footer}>
+          <Text style={styles.version}>Version 1.0.0</Text>
+        </View>
+      </Animated.View>
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
-    sideBarContainer: {
-        backgroundColor: '#fff',
-        height: height,
-        width: width / 1.2,
-        position: 'absolute',
-        zIndex: 99,
-    },
-    backgroundImage: {
-        width: '100%',
-        height: 100,
-        justifyContent: 'center',
-        alignItems: 'center',
-        resizeMode: 'cover',
-    },
-    userSide: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '90%',
-        // paddingHorizontal: 10,
-    },
-    greetingText: {
-        color: '#fff',
-        fontWeight: '900',
-        fontSize: 25,
-    },
-    userImage: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#fff',
-    },
-    sidebar: {
-        flex: 1,
-    },
-    sidebarContent: {
-        paddingHorizontal: 20,
-        paddingTop: 20,
-        paddingBottom: 20,
-    },
-    loadingText: {
-        fontSize: 16,
-        color: '#000',
-    },
-    itemContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 15,
-    },
-    itemContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    itemImage: {
-        width: 30,
-        height: 30,
-        marginRight: 10,
-    },
-    sidebarTitle: {
-        fontSize: 16,
-        color: '#000',
-    },
-    arrowImage: {
-        width: 20,
-        height: 20,
-    },
-    buttonContainer: {
-        backgroundColor: '#ffe4e1',
-        paddingVertical: 12,
-        paddingHorizontal: 25,
-        // marginBottom: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonText: {
-        color: '#000',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 98,
+  },
+  container: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: SIDEBAR_WIDTH,
+    height: height,
+    backgroundColor: '#FFFFFF',
+    zIndex: 99,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  header: {
+    padding: 15,
+    backgroundColor: '#F8FAFC',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  avatarContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#EEF2FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userInfo: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1E293B',
+  },
+  userEmail: {
+    fontSize: 14,
+    color: '#64748B',
+    marginTop: 2,
+  },
+  authButtons: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  loginButton: {
+    flex: 1,
+    backgroundColor: '#6366F1',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  registerButton: {
+    flex: 1,
+    backgroundColor: '#EEF2FF',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  registerButtonText: {
+    color: '#6366F1',
+    fontWeight: '600',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  section: {
+    paddingTop: 14,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#64748B',
+    paddingHorizontal: 24,
+    marginBottom: 8,
+  },
+  navItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    paddingHorizontal: 24,
+  },
+  navIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: '#EEF2FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  navText: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1E293B',
+    marginLeft: 4,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+    marginVertical: 16,
+    marginHorizontal: 24,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    paddingHorizontal: 24,
+    marginTop: 8,
+  },
+  logoutText: {
+    fontSize: 15,
+    color: '#EF4444',
+    marginLeft: 12,
+    fontWeight: '500',
+  },
+  footer: {
+    padding: 16,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+  },
+  version: {
+    fontSize: 12,
+    color: '#94A3B8',
+  },
 });

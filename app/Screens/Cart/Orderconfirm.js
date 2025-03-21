@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,16 +8,23 @@ import { Ionicons } from '@expo/vector-icons';
 export default function Orderconfirm() {
     const route = useRoute();
     const { order } = route.params || {};
+    const navigation = useNavigation()
+
+    useEffect(() => {
+        setTimeout(() => {
+            navigation.navigate('Home')
+        }, 3000)
+    }, [])
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Hero Section */}
-                <Animated.View 
+                <Animated.View
                     entering={FadeInDown.duration(800)}
                     style={styles.heroSection}
                 >
-                    <Image 
+                    <Image
                         source={{ uri: 'https://ideogram.ai/assets/image/lossless/response/butgHCHeSAOdaMlHGmhsow' }}
                         style={styles.heroImage}
                     />
@@ -28,7 +35,7 @@ export default function Orderconfirm() {
                 </Animated.View>
 
                 {/* Order Summary */}
-                <Animated.View 
+                <Animated.View
                     entering={FadeInUp.duration(800).delay(200)}
                     style={styles.summaryCard}
                 >
@@ -37,7 +44,7 @@ export default function Orderconfirm() {
                 </Animated.View>
 
                 {/* Order Items */}
-                <Animated.View 
+                <Animated.View
                     entering={FadeInUp.duration(800).delay(400)}
                     style={styles.itemsContainer}
                 >
@@ -47,20 +54,20 @@ export default function Orderconfirm() {
                                 <Ionicons name="cafe-outline" size={24} color="#8B4513" />
                                 <Text style={styles.itemTitle}>{item.title}</Text>
                             </View>
-                            
+
                             <View style={styles.itemDetails}>
-                                <DetailRow 
-                                    label="Quantity" 
+                                <DetailRow
+                                    label="Quantity"
                                     value={item.quantity.toString()}
                                 />
                                 {item.isVarientTrue && (
-                                    <DetailRow 
-                                        label="Size" 
+                                    <DetailRow
+                                        label="Size"
                                         value={item.varientSize}
                                     />
                                 )}
-                                <DetailRow 
-                                    label="Type" 
+                                <DetailRow
+                                    label="Type"
                                     value={item.isBakeryProduct ? "Bakery Item" : "Other"}
                                 />
                             </View>
@@ -69,14 +76,14 @@ export default function Orderconfirm() {
                 </Animated.View>
 
                 {/* Additional Info */}
-                <Animated.View 
+                <Animated.View
                     entering={FadeInUp.duration(800).delay(600)}
                     style={styles.infoCard}
                 >
                     <Text style={styles.infoText}>
                         We'll notify you when your order is ready for pickup
                     </Text>
-                   
+
                 </Animated.View>
             </ScrollView>
         </SafeAreaView>

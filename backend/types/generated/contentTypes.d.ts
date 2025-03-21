@@ -428,6 +428,10 @@ export interface ApiAuthAuth extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     DOB: Schema.Attribute.Date;
+    grooming_bookings: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::grooming-booking.grooming-booking'
+    >;
     isVerified: Schema.Attribute.Boolean;
     lab_and_vaccination_bookings: Schema.Attribute.Relation<
       'oneToMany',
@@ -568,6 +572,7 @@ export interface ApiBookingConsultationBookingConsultation
       Schema.Attribute.Private;
     Date: Schema.Attribute.Date;
     doctor: Schema.Attribute.Relation<'manyToOne', 'api::doctor.doctor'>;
+    feedback: Schema.Attribute.Text;
     is_consultation_complete: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<false>;
     is_rate_done: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
@@ -665,6 +670,10 @@ export interface ApiClinicClinic extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    grooming_bookings: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::grooming-booking.grooming-booking'
+    >;
     images: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios',
       true
@@ -922,6 +931,66 @@ export interface ApiFlavourFlavour extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiGroomingBookingGroomingBooking
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'grooming_bookings';
+  info: {
+    description: '';
+    displayName: 'Grooming_Booking';
+    pluralName: 'grooming-bookings';
+    singularName: 'grooming-booking';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    booking_status: Schema.Attribute.String;
+    clinic: Schema.Attribute.Relation<'manyToOne', 'api::clinic.clinic'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Customize: Schema.Attribute.Component<
+      'customize-package-booking.customize-package-booking',
+      true
+    >;
+    Date_of_Service: Schema.Attribute.Date;
+    feedback: Schema.Attribute.Text;
+    General_Booking: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    grooming_service: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::grooming-service.grooming-service'
+    >;
+    Is_Cancel_admin: Schema.Attribute.Boolean;
+    Is_Cancel_admin_reason: Schema.Attribute.Text;
+    Is_Cancel_By_User: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    Is_Cancel_user_reason: Schema.Attribute.Text;
+    is_rate: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::grooming-booking.grooming-booking'
+    > &
+      Schema.Attribute.Private;
+    Package: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::grooming-package.grooming-package'
+    >;
+    pet: Schema.Attribute.Relation<'manyToOne', 'api::auth.auth'>;
+    publishedAt: Schema.Attribute.DateTime;
+    rate: Schema.Attribute.Integer;
+    service_complete: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    Time: Schema.Attribute.String;
+    Type: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiGroomingPackageGroomingPackage
   extends Struct.CollectionTypeSchema {
   collectionName: 'grooming_packages';
@@ -940,6 +1009,10 @@ export interface ApiGroomingPackageGroomingPackage
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     discount_: Schema.Attribute.BigInteger;
+    grooming_bookings: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::grooming-booking.grooming-booking'
+    >;
     includes: Schema.Attribute.JSON;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -952,6 +1025,56 @@ export interface ApiGroomingPackageGroomingPackage
     publishedAt: Schema.Attribute.DateTime;
     show: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiGroomingServiceGroomingService
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'grooming_services';
+  info: {
+    displayName: ' Grooming service';
+    pluralName: 'grooming-services';
+    singularName: 'grooming-service';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    anyOffer: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    Booking_Accept: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    desc: Schema.Attribute.Text;
+    endPrice: Schema.Attribute.BigInteger;
+    grooming_bookings: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::grooming-booking.grooming-booking'
+    >;
+    image: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::grooming-service.grooming-service'
+    > &
+      Schema.Attribute.Private;
+    offer: Schema.Attribute.String;
+    PriceVary: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    publishedAt: Schema.Attribute.DateTime;
+    startPrice: Schema.Attribute.BigInteger;
+    type: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1691,6 +1814,42 @@ export interface ApiSettingSetting extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiTimeManagementTimeManagement
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'time_managements';
+  info: {
+    description: '';
+    displayName: 'Time_Management';
+    pluralName: 'time-managements';
+    singularName: 'time-management';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    End_Time: Schema.Attribute.Time;
+    For_What: Schema.Attribute.String;
+    Is_Sunday_off: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::time-management.time-management'
+    > &
+      Schema.Attribute.Private;
+    Max_Booking_Allowed_in_per_slots: Schema.Attribute.BigInteger;
+    publishedAt: Schema.Attribute.DateTime;
+    Start_Time: Schema.Attribute.Time;
+    Times_Block: Schema.Attribute.Component<'times.time-block', true>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Which_Date_booking_Closed: Schema.Attribute.Date;
+  };
+}
+
 export interface ApiVaccinationVaccination extends Struct.CollectionTypeSchema {
   collectionName: 'vaccinations';
   info: {
@@ -2265,7 +2424,9 @@ declare module '@strapi/strapi' {
       'api::display-doctor.display-doctor': ApiDisplayDoctorDisplayDoctor;
       'api::doctor.doctor': ApiDoctorDoctor;
       'api::flavour.flavour': ApiFlavourFlavour;
+      'api::grooming-booking.grooming-booking': ApiGroomingBookingGroomingBooking;
       'api::grooming-package.grooming-package': ApiGroomingPackageGroomingPackage;
+      'api::grooming-service.grooming-service': ApiGroomingServiceGroomingService;
       'api::home-address.home-address': ApiHomeAddressHomeAddress;
       'api::home-page-slider.home-page-slider': ApiHomePageSliderHomePageSlider;
       'api::lab-and-vaccination-booking.lab-and-vaccination-booking': ApiLabAndVaccinationBookingLabAndVaccinationBooking;
@@ -2284,6 +2445,7 @@ declare module '@strapi/strapi' {
       'api::product.product': ApiProductProduct;
       'api::quantity.quantity': ApiQuantityQuantity;
       'api::setting.setting': ApiSettingSetting;
+      'api::time-management.time-management': ApiTimeManagementTimeManagement;
       'api::vaccination.vaccination': ApiVaccinationVaccination;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

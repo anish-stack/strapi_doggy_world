@@ -1,11 +1,11 @@
-import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Alert, ScrollView, RefreshControl } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
 import Layout from '../../layouts/Layout';
 import Slider from '../../components/Slider/Slider';
 import LocationTab from '../../layouts/locationTab';
 import Categories from '../../components/Categories/Categories';
 import Doctors from '../Doctors/Doctors';
-import * as Location from 'expo-location'; // ✅ Un-commented import
+import * as Location from 'expo-location';
 import axios from 'axios';
 import Blogs from '../../components/Blogs/Blogs';
 import Made from '../../components/love/Made';
@@ -14,6 +14,7 @@ export default function Home() {
     const [location, setLocation] = useState(null);
     const [locData, setLocData] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
 
     const requestLocationPermission = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -29,7 +30,7 @@ export default function Home() {
         if (hasPermission) {
             try {
                 const userLocation = await Location.getCurrentPositionAsync({});
-                setLocation(userLocation); // ✅ Set location state
+                setLocation(userLocation);
             } catch (error) {
                 setErrorMsg('Error getting location: ' + error.message);
             }
@@ -50,7 +51,7 @@ export default function Home() {
     };
 
     useEffect(() => {
-        getLocation(); 
+        getLocation();
     }, []);
 
     useEffect(() => {
@@ -61,13 +62,26 @@ export default function Home() {
 
     useEffect(() => {
         if (errorMsg) {
-            Alert.alert('Location Error', errorMsg); // ✅ Show alert on error
+            Alert.alert('Location Error', errorMsg);
         }
     }, [errorMsg]);
 
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await getLocation(); 
+        setRefreshing(false);
+    }, []);
+
     return (
         <Layout>
-            <ScrollView showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.scrollView}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
                 <View>
                     <LocationTab data={locData} />
                     <Slider />

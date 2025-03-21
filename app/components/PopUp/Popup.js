@@ -1,228 +1,145 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
     SafeAreaView,
-    Animated,
     Dimensions,
-    Image,
+    Animated,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { MaterialIcons } from '@expo/vector-icons';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function Popup({ navigation }) {
-    const [show, setShow] = useState(true);
-    const scaleAnim = new Animated.Value(0.5);
-    const opacityAnim = new Animated.Value(0);
-    const translateYAnim = new Animated.Value(50);
+    const [visible, setVisible] = useState(true);
+    const fadeAnim = useMemo(() => new Animated.Value(0), []);
 
-    useEffect(() => {
-        setShow(true);
-        Animated.parallel([
-            Animated.spring(scaleAnim, {
+    // Simple fade animation
+    React.useEffect(() => {
+        if (visible) {
+            Animated.timing(fadeAnim, {
                 toValue: 1,
-                tension: 50,
-                friction: 7,
+                duration: 200,
                 useNativeDriver: true,
-            }),
-            Animated.timing(opacityAnim, {
-                toValue: 1,
-                duration: 300,
-                useNativeDriver: true,
-            }),
-            Animated.spring(translateYAnim, {
-                toValue: 0,
-                tension: 50,
-                friction: 7,
-                useNativeDriver: true,
-            }),
-        ]).start();
-    }, []);
+            }).start();
+        }
+    }, [visible]);
 
     const handleClose = () => {
-        Animated.parallel([
-            Animated.timing(scaleAnim, {
-                toValue: 0.5,
-                duration: 200,
-                useNativeDriver: true,
-            }),
-            Animated.timing(opacityAnim, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: true,
-            }),
-            Animated.timing(translateYAnim, {
-                toValue: 50,
-                duration: 200,
-                useNativeDriver: true,
-            }),
-        ]).start(() => {
-            setShow(false);
-        });
+        Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 150,
+            useNativeDriver: true,
+        }).start(() => setVisible(false));
     };
 
-    const handleLogin = () => {
+    const handleNavigation = (route) => {
         handleClose();
-        navigation.navigate('login');
+        // Delay navigation slightly to ensure smooth animation
+        setTimeout(() => navigation.navigate(route), 100);
     };
 
-    const handleRegister = () => {
-        handleClose();
-        navigation.navigate('register');
-    };
-
-    if (!show) return null;
+    if (!visible) return null;
 
     return (
-        <Animated.View
-            style={[
-                styles.overlay,
-                {
-                    opacity: opacityAnim,
-                },
-            ]}
-        >
-            <SafeAreaView style={styles.container}>
+        <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+            <SafeAreaView style={styles.content}>
                 <TouchableOpacity
                     style={styles.closeButton}
                     onPress={handleClose}
-                    activeOpacity={0.7}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                    <Icon name="close" size={24} color="#6B7280" />
+                    <MaterialIcons name="close" size={24} color="#666" />
                 </TouchableOpacity>
 
-                <Animated.View
-                    style={[
-                        styles.popup,
-                        {
-                            transform: [
-                                { scale: scaleAnim },
-                                { translateY: translateYAnim },
-                            ],
-                        },
-                    ]}
-                >
-                    <View style={styles.iconContainer}>
-                        <Icon name="pets" size={32} color="#E34234" />
-                    </View>
+                <View style={styles.popup}>
+                    <MaterialIcons name="pets" size={40} color="#E34234" />
 
-                    <Text style={styles.title}>Welcome to PawCare</Text>
-                    <Text style={styles.subtitle}>
-                        Your trusted partner in pet healthcare
-                    </Text>
+                    <Text style={styles.title}>Welcome to Doggy Wold Care</Text>
+                    <Text style={styles.subtitle}>Your pet healthcare partner</Text>
 
                     <View style={styles.features}>
-                        <View style={styles.featureItem}>
-                            <Icon name="video-camera-front" size={24} color="#FA5F55" />
-                            <Text style={styles.featureText}>Online Consultations</Text>
-                        </View>
-                        <View style={styles.featureItem}>
-                            <Icon name="schedule" size={24} color="#FA5F55" />
-                            <Text style={styles.featureText}>Best Doctors</Text>
-                        </View>
-                        <View style={styles.featureItem}>
-                            <Icon name="local-pharmacy" size={24} color="#FA5F55" />
-                            <Text style={styles.featureText}>Pet Medicine And Products</Text>
-                        </View>
+                        {[
+                            { icon: 'video-camera-front', text: 'Online Consultations' },
+                            { icon: 'schedule', text: 'Best Doctors' },
+                            { icon: 'local-pharmacy', text: 'Pet Medicine' },
+                        ].map((feature, index) => (
+                            <View key={index} style={styles.featureItem}>
+                                <MaterialIcons name={feature.icon} size={24} color="#FA5F55" />
+                                <Text style={styles.featureText}>{feature.text}</Text>
+                            </View>
+                        ))}
                     </View>
 
-                    <View style={styles.buttonContainer}>
+                    <View style={styles.buttons}>
                         <TouchableOpacity
-                            style={[styles.button, styles.loginButton]}
-                            onPress={handleLogin}
-                            activeOpacity={0.9}
+                            style={styles.signInButton}
+                            onPress={() => handleNavigation('login')}
                         >
-                            <Text style={styles.loginButtonText}>Sign In</Text>
-                            <Icon name="arrow-forward" size={20} color="#FFFFFF" />
+                            <Text style={styles.signInText}>Sign In</Text>
+                            <MaterialIcons name="arrow-forward" size={20} color="#FFF" />
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            style={[styles.button, styles.registerButton]}
-                            onPress={handleRegister}
-                            activeOpacity={0.9}
+                            style={styles.createButton}
+                            onPress={() => handleNavigation('register')}
                         >
-                            <Text style={styles.registerButtonText}>Create Account</Text>
+                            <Text style={styles.createText}>Create Account</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.termsText}>
+                    <Text style={styles.terms}>
                         By continuing, you agree to our Terms of Service
                     </Text>
-                </Animated.View>
+                </View>
             </SafeAreaView>
         </Animated.View>
     );
 }
 
 const styles = StyleSheet.create({
-    overlay: {
+    container: {
         position: 'absolute',
         width: width,
-        bottom: 0,
-        height: "100%",
+        height: '100%',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 999,
     },
-    container: {
+    content: {
         width: '90%',
         maxWidth: 400,
         alignItems: 'center',
     },
     closeButton: {
         position: 'absolute',
-        top: -50,
+        top: -45,
         right: 0,
-        width: 36,
-        height: 36,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 18,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 4,
+        backgroundColor: '#FFF',
+        padding: 8,
+        borderRadius: 20,
+        zIndex: 1,
     },
     popup: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        backgroundColor: '#FFF',
+        borderRadius: 20,
         padding: 24,
         width: '100%',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-        elevation: 8,
-    },
-    iconContainer: {
-        width: 64,
-        height: 64,
-        backgroundColor: '#EEF2FF',
-        borderRadius: 32,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 20,
     },
     title: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
         color: '#1F2937',
+        marginTop: 16,
         marginBottom: 8,
-        textAlign: 'center',
     },
     subtitle: {
         fontSize: 16,
         color: '#6B7280',
         marginBottom: 24,
-        textAlign: 'center',
     },
     features: {
         width: '100%',
@@ -240,42 +157,37 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#4B5563',
     },
-    buttonContainer: {
+    buttons: {
         width: '100%',
         gap: 12,
         marginBottom: 16,
     },
-    button: {
-        width: '100%',
-        height: 48,
-        borderRadius: 24,
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
-    },
-    loginButton: {
+    signInButton: {
         backgroundColor: '#E34234',
-        shadowColor: '#E34234',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 4,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 14,
+        borderRadius: 12,
+        gap: 8,
     },
-    loginButtonText: {
-        color: '#FFFFFF',
+    signInText: {
+        color: '#FFF',
         fontSize: 16,
         fontWeight: '600',
-        marginRight: 8,
     },
-    registerButton: {
+    createButton: {
         backgroundColor: '#F3F4F6',
+        padding: 14,
+        borderRadius: 12,
+        alignItems: 'center',
     },
-    registerButtonText: {
+    createText: {
         color: '#4B5563',
         fontSize: 16,
         fontWeight: '600',
     },
-    termsText: {
+    terms: {
         fontSize: 12,
         color: '#9CA3AF',
         textAlign: 'center',

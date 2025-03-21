@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "grooming_services",
+  "info": {
+    "singularName": "grooming-service",
+    "pluralName": "grooming-services",
+    "displayName": " Grooming service"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "type": {
+      "type": "string"
+    },
+    "desc": {
+      "type": "text"
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "startPrice": {
+      "type": "biginteger"
+    },
+    "endPrice": {
+      "type": "biginteger"
+    },
+    "anyOffer": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "offer": {
+      "type": "string"
+    },
+    "PriceVary": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "Booking_Accept": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "grooming_bookings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::grooming-booking.grooming-booking",
+      "mappedBy": "grooming_service"
+    }
+  }
+}

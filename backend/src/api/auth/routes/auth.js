@@ -101,5 +101,14 @@ module.exports = {
         middlewares: [],
       },
     },
+    {
+      method: 'GET',
+      path: '/findMyAllOrders',
+      handler: 'auth.findMyAllOrders',
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
   ],
 };

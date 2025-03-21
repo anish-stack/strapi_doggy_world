@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "time_managements",
+  "info": {
+    "singularName": "time-management",
+    "pluralName": "time-managements",
+    "displayName": "Time_Management",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "For_What": {
+      "type": "string"
+    },
+    "Start_Time": {
+      "type": "time"
+    },
+    "End_Time": {
+      "type": "time"
+    },
+    "Which_Date_booking_Closed": {
+      "type": "date"
+    },
+    "Is_Sunday_off": {
+      "type": "boolean",
+      "default": false
+    },
+    "Times_Block": {
+      "displayName": "Time_Block",
+      "type": "component",
+      "repeatable": true,
+      "component": "times.time-block"
+    },
+    "Max_Booking_Allowed_in_per_slots": {
+      "type": "biginteger"
+    }
+  }
+}

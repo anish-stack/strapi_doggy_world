@@ -10,7 +10,25 @@ module.exports = {
                 policies: [],
                 middlewares: [],
             },
-        }
+        },
+        {
+            method: 'POST',
+            path: '/cancel-consultation-bboking',
+            handler: 'booking-consultation.cancel_booking',
+            config: {
+                policies: [],
+                middlewares: [],
+            },
+        },
+        {
+            method: 'POST',
+            path: '/rate-consultation-bboking',
+            handler: 'booking-consultation.rate_Service',
+            config: {
+                policies: [],
+                middlewares: [],
+            },
+        },
 
     ],
 };

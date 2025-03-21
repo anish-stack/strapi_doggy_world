@@ -24,7 +24,7 @@ export default function Grooming() {
 
             <View style={styles.container}>
                 <UpperLayout title={"Dog Grooming"} />
-                <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
                     <CustomSlider autoPlay={true} navigationShow={true} Dealy={3000} imagesByProp={images} />
 
                     <View style={styles.infoContainer}>

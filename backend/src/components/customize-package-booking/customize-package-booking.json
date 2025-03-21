@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_customize_package_booking_customize_package_bookings",
+  "info": {
+    "displayName": "Customize-Package-booking",
+    "icon": "apps",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "ServiceType": {
+      "type": "string"
+    },
+    "ServiceName": {
+      "type": "string"
+    },
+    "Details": {
+      "type": "text"
+    },
+    "Price": {
+      "type": "string"
+    }
+  }
+}

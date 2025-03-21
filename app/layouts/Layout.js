@@ -32,7 +32,7 @@ export default function Layout({ children }) {
     }, []);
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+
             <View style={styles.container}>
                 <Header />
                 <ScrollView
@@ -43,11 +43,12 @@ export default function Layout({ children }) {
                     {children}
                 </ScrollView>
                 <Tabs />
+                {!isLoggedIn && <Popup navigation={navigation} />}
             </View>
             
-            {/* Show popup if user is not logged in */}
-            {!isLoggedIn && <Popup navigation={navigation} />}
-        </SafeAreaView>
+       
+           
+  
     );
 }
 

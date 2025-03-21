@@ -70,7 +70,7 @@ export default function Dynmaic_Products_Shop() {
     <SafeAreaView>
       <UpperLayout title={heading} isBellShow={false} />
       <ScrollView>
-        <DynmaicSlider navigationShow={true} mode={'contain'} heightPass={140} autoPlay={true} Dealy={4500} isUri={true} imagesByProp={images} />
+        <DynmaicSlider navigationShow={true} mode={'cover'} heightPass={230} autoPlay={true} Dealy={4500} isUri={true} imagesByProp={images} />
         {data && data.length > 0 ? (
           <FlatList
             data={data}

@@ -63,34 +63,40 @@ export default function Blogs() {
                 />
                 <ScrollView
                     horizontal
+
+
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.featuredContainer}
                 >
                     {blogs.slice(0, 3).map((blog) => (
-                        <TouchableOpacity
-                            key={blog.id}
-                            style={styles.featuredCard}
-                            onPress={() => navigation.navigate('single-blog', { blog })}
-                        >
-                            <Image
-                                source={{ uri: blog.blogImage?.url }}
-                                style={styles.featuredImage}
-                            />
-                            <LinearGradient
-                                colors={['transparent', 'rgba(0,0,0,0.8)']}
-                                style={styles.featuredGradient}
+                        <View>
+                            <TouchableOpacity
+                                key={blog.id}
+                                activeOpacity={0.8}
+                                style={styles.featuredCard}
+                                onPress={() => navigation.navigate('single-blog', { blog })}
                             >
-                                <Text style={styles.featuredTitle} numberOfLines={2}>
-                                    {blog.title}
-                                </Text>
-                                <View style={styles.featuredMeta}>
-                                    {/* <Calendar size={14} color="#fff" /> */}
-                                    <Text style={styles.featuredDate}>
-                                        {formatDate(blog.createdAt)}
+                                <Image
+                                    source={{ uri: blog.blogImage?.url }}
+                                    style={styles.featuredImage}
+                                />
+                                <LinearGradient
+                                    colors={['transparent', 'rgba(0,0,0,0.8)']}
+                                    style={styles.featuredGradient}
+
+                                >
+                                    <Text style={styles.featuredTitle} numberOfLines={2}>
+                                        {blog.title}
                                     </Text>
-                                </View>
-                            </LinearGradient>
-                        </TouchableOpacity>
+                                    <View style={styles.featuredMeta}>
+                                        {/* <Calendar size={14} color="#fff" /> */}
+                                        <Text style={styles.featuredDate}>
+                                            {formatDate(blog.createdAt)}
+                                        </Text>
+                                    </View>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
                     ))}
                 </ScrollView>
             </View>

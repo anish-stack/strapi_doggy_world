@@ -1,26 +1,30 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
-
   TouchableOpacity,
   ActivityIndicator,
   Animated,
   StatusBar,
   SafeAreaView,
   Modal,
+  RefreshControl,
+
+  Dimensions,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import { Ionicons } from '@expo/vector-icons';
-import styles from './Styles';
+import { MaterialIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import styles from './VStyles';
 import { useDispatch } from 'react-redux';
 import { AddingStart, AddingSuccess } from '../../redux/slice/labTestCart';
+
+
 
 export default function VaccineDetails() {
   const dispatch = useDispatch();
   const route = useRoute();
+  const navigation = useNavigation();
   const { id } = route.params || {};
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,13 +32,14 @@ export default function VaccineDetails() {
   const [isInCart, setIsInCart] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
   const notificationOpacity = useRef(new Animated.Value(0)).current;
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  console.log("id", id)
-
-  useEffect(() => {
-    fetchData();
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchData().finally(() => setRefreshing(false));
   }, []);
 
   const fetchData = async () => {
@@ -49,17 +54,56 @@ export default function VaccineDetails() {
         `http://192.168.1.3:1337/api/vaccinations?filters[documentId][$eq]=${id}&populate=*`
       );
       setData(response.data.data[0] || null);
+      setError('');
     } catch (err) {
-      setError('Failed to fetch vaccination details.');
+      setError('Failed to fetch vaccination details. Pull down to refresh.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddToCart = () => {
+  React.useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleAddToCart = async () => {
     if (data?.isPackage) {
       setShowModal(true);
-    } else {
+      return;
+    }
+
+    try {
+      setAddingToCart(true);
+      const cartItem = {
+        documentId: data.documentId,
+        test_name: data.title,
+        isUltraSound: false,
+        serviceType: 'Clinic',
+        imageUrl: data.image?.url,
+        discountPrice: data.discount_price,
+        test_price: data.price,
+      };
+
+      dispatch(AddingStart());
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+      dispatch(AddingSuccess([cartItem]));
+      setIsInCart(true);
+      showNotification('Successfully added to cart!', 'success');
+    } catch (err) {
+      showNotification('Failed to add to cart. Please try again.', 'error');
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  const confirmAddToCart = async () => {
+    if (!selectedOption) {
+      showNotification('Please select a service type', 'error');
+      return;
+    }
+
+    try {
+      setAddingToCart(true);
       const cartItem = {
         documentId: data.documentId,
         test_name: data.title,
@@ -67,46 +111,27 @@ export default function VaccineDetails() {
         serviceType: selectedOption,
         imageUrl: data.image?.url,
         discountPrice:
-          data.discount_price,
-
-        test_price: data.price,
+          selectedOption === "Clinic"
+            ? data.discount_price
+            : data.HomePriceOfPackageDiscount,
+        test_price:
+          selectedOption === "Clinic" ? data.price : data.HomePriceOfPackage,
       };
 
-
+      dispatch(AddingStart());
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+      dispatch(AddingSuccess([cartItem]));
       setIsInCart(true);
       setShowModal(false);
-      showNotification();
-      dispatch(AddingStart());
-      dispatch(AddingSuccess([cartItem]));
+      showNotification('Successfully added to cart!', 'success');
+    } catch (err) {
+      showNotification('Failed to add to cart. Please try again.', 'error');
+    } finally {
+      setAddingToCart(false);
     }
   };
 
-  const confirmAddToCart = () => {
-    if (!selectedOption) return;
-
-    const cartItem = {
-      documentId: data.documentId,
-      test_name: data.title,
-      isUltraSound: false,
-      serviceType: selectedOption,
-      imageUrl: data.image?.url,
-      discountPrice:
-        selectedOption === "Clinic"
-          ? data.discount_price
-          : data.HomePriceOfPackageDiscount,
-      test_price:
-        selectedOption === "Clinic" ? data.price : data.HomePriceOfPackage,
-    };
-
-
-    setIsInCart(true);
-    setShowModal(false);
-    showNotification();
-    dispatch(AddingStart());
-    dispatch(AddingSuccess([cartItem]));
-  };
-
-  const showNotification = () => {
+  const showNotification = (message, type = 'success') => {
     Animated.sequence([
       Animated.timing(notificationOpacity, {
         toValue: 1,
@@ -130,144 +155,233 @@ export default function VaccineDetails() {
     );
   }
 
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
-
-  if (!data) {
-    return (
-      <View style={styles.centered}>
-        <Text>No data available</Text>
-      </View>
-    );
-  }
-
   const headerHeight = scrollY.interpolate({
     inputRange: [0, 200],
-    outputRange: [200, 80],
+    outputRange: [250, 100],
+    extrapolate: 'clamp',
+  });
+
+  const imageOpacity = scrollY.interpolate({
+    inputRange: [0, 150],
+    outputRange: [1, 0],
     extrapolate: 'clamp',
   });
 
   const headerTitleOpacity = scrollY.interpolate({
-    inputRange: [0, 200],
+    inputRange: [100, 150],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor="#FF6B6B" />
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <MaterialIcons name="arrow-back" size={24} color="#FFF" />
+      </TouchableOpacity>
       <Animated.View style={[styles.header, { height: headerHeight }]}>
         <Animated.Image
-          source={{ uri: data.image?.url || 'https://via.placeholder.com/150' }}
-          style={[styles.headerImage, {
-            opacity: headerTitleOpacity.interpolate({
-              inputRange: [0, 1],
-              outputRange: [1, 0],
-            })
-          }]}
+          source={{
+            uri: data?.image?.url || 'https://images.unsplash.com/photo-1584362917165-526a968579e8?w=800'
+          }}
+          style={[styles.headerImage, { opacity: imageOpacity }]}
         />
-        <Animated.Text style={[styles.headerTitle, { opacity: headerTitleOpacity }]}>
-          {data.title}
+        <Animated.Text
+          style={[styles.headerTitle, { opacity: headerTitleOpacity }]}
+          numberOfLines={1}
+        >
+          {data?.title}
         </Animated.Text>
+
       </Animated.View>
-      <Animated.ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        scrollEventThrottle={16}
-      >
-        <View style={styles.contentContainer}>
-          <Text style={styles.title}>{data.title}</Text>
-          <Text style={styles.forage}>For age: {data.forage}</Text>
-          <View style={styles.priceContainer}>
-            <Text style={styles.price}>₹{data.discount_price}</Text>
-            <Text style={styles.strikePrice}>₹{data.price}</Text>
-            <View style={styles.discountBadge}>
-              <Text style={styles.discountText}>
-                {Math.round((1 - data.discount_price / data.price) * 100)}% OFF
-              </Text>
-            </View>
-          </View>
 
-          <View style={styles.vaccineListContainer}>
-            <Text style={styles.sectionTitle}>Vaccinations Included:</Text>
-            {data.name && data.name.map((item, index) => (
-              <View key={index} style={styles.vaccineItem}>
-                <Ionicons name="checkmark-circle" size={24} color="#ff6b6b" style={styles.vaccineIcon} />
-                <Text style={styles.vaccineName}>{item.vaccine_name}</Text>
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.sectionTitle}>Information</Text>
-            <Text style={styles.description}>{data.small_dsec}</Text>
-          </View>
+      {error ? (
+        <View style={styles.errorContainer}>
+          <FontAwesome5 name="exclamation-circle" size={50} color="#FF6B6B" />
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={onRefresh}>
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
         </View>
-      </Animated.ScrollView>
+      ) : (
+        <Animated.ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          scrollEventThrottle={16}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#6C63FF"
+              colors={['#6C63FF']}
+            />
+          }
+        >
+          <View style={styles.contentContainer}>
+            <Text style={styles.title}>{data?.title}</Text>
+            <Text style={styles.forage}>Recommended for age: {data?.forage}</Text>
 
-      <TouchableOpacity
-        style={[styles.addToCartButton, isInCart && styles.addedToCartButton]}
-        onPress={() => handleAddToCart(data)}
-        disabled={isInCart}
-      >
-        <Text style={styles.addToCartText}>
-          {isInCart ? 'Added to Cart' : 'Add to Cart'}
-        </Text>
-        <Ionicons name={isInCart ? "checkmark-circle" : "cart-outline"} size={24} color="white" />
-      </TouchableOpacity>
-      {data?.isPackage && (
-        <Modal transparent visible={showModal} animationType="fade">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalContainers}>
-                <Text style={styles.modalTitle}>Select Service Type</Text>
-                <TouchableOpacity onPress={() => setShowModal(false)} style={styles.closeButton}>
-                  <Text style={styles.closeText}>X</Text>
-                </TouchableOpacity>
+            <View style={styles.priceContainer}>
+              <View style={styles.priceWrapper}>
+                <Text style={styles.price}>₹{data?.discount_price}</Text>
+                <Text style={styles.strikePrice}>₹{data?.price}</Text>
               </View>
-              <TouchableOpacity
-                style={[
-                  styles.optionButton,
-                  selectedOption === "Clinic" && styles.selectedOption,
-                ]}
-                onPress={() => setSelectedOption("Clinic")}
-              >
-                <Text style={styles.optionText}>Clinic - ₹{data.discount_price}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.optionButton,
-                  selectedOption === "Home Vaccination" && styles.selectedOption,
-                ]}
-                onPress={() => setSelectedOption("Home Vaccination")}
-              >
-                <Text style={styles.optionText}>
-                  Home Vaccination - ₹{data.HomePriceOfPackageDiscount}
+              <View style={styles.discountBadge}>
+                <Text style={styles.discountText}>
+                  {Math.round((1 - data?.discount_price / data?.price) * 100)}% OFF
                 </Text>
-              </TouchableOpacity>
+              </View>
+            </View>
 
-              <TouchableOpacity
-                style={styles.confirmButton}
-                onPress={confirmAddToCart}
-              >
-                <Text style={styles.confirmText}>Confirm</Text>
-              </TouchableOpacity>
+            <View style={styles.vaccineListContainer}>
+              <Text style={styles.sectionTitle}>
+                <FontAwesome5 name="syringe" size={18} color="#6C63FF" /> Vaccinations Included
+              </Text>
+              {data?.name?.map((item, index) => (
+                <View key={index} style={styles.vaccineItem}>
+                  <MaterialIcons name="check-circle" size={24} color="#4CAF50" />
+                  <Text style={styles.vaccineName}>{item.vaccine_name}</Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.sectionTitle}>
+                <MaterialIcons name="info" size={18} color="#6C63FF" /> Information
+              </Text>
+              <Text style={styles.description}>{data?.small_dsec}</Text>
             </View>
           </View>
-        </Modal>
+        </Animated.ScrollView>
       )}
 
-      <Animated.View style={[styles.notification, { opacity: notificationOpacity }]}>
+      {!error && (
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity
+            style={[
+              styles.addToCartButton,
+              isInCart && styles.addedToCartButton,
+              addingToCart && styles.loadingButton
+            ]}
+            onPress={handleAddToCart}
+            disabled={isInCart || addingToCart}
+          >
+            {addingToCart ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
+              <>
+                <Text style={styles.addToCartText}>
+                  {isInCart ? 'Added to Cart' : 'Add to Cart'}
+                </Text>
+                <MaterialIcons
+                  name={isInCart ? "check-circle" : "shopping-cart"}
+                  size={24}
+                  color="white"
+                />
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
+
+      <Modal
+        transparent
+        visible={showModal}
+        animationType="slide"
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Service Type</Text>
+              <TouchableOpacity
+                onPress={() => setShowModal(false)}
+                style={styles.closeButton}
+              >
+                <MaterialIcons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.optionButton,
+                selectedOption === "Clinic" && styles.selectedOption
+              ]}
+              onPress={() => setSelectedOption("Clinic")}
+            >
+              <MaterialIcons name="local-hospital" size={24} color={selectedOption === "Clinic" ? "#FFF" : "#666"} />
+              <View style={styles.optionContent}>
+                <Text style={[
+                  styles.optionTitle,
+                  selectedOption === "Clinic" && styles.selectedOptionText
+                ]}>
+                  Clinic Visit
+                </Text>
+                <Text style={[
+                  styles.optionPrice,
+                  selectedOption === "Clinic" && styles.selectedOptionText
+                ]}>
+                  ₹{data?.discount_price}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.optionButton,
+                selectedOption === "Home Vaccination" && styles.selectedOption
+              ]}
+              onPress={() => setSelectedOption("Home Vaccination")}
+            >
+              <MaterialIcons name="home" size={24} color={selectedOption === "Home Vaccination" ? "#FFF" : "#666"} />
+              <View style={styles.optionContent}>
+                <Text style={[
+                  styles.optionTitle,
+                  selectedOption === "Home Vaccination" && styles.selectedOptionText
+                ]}>
+                  Home Vaccination
+                </Text>
+                <Text style={[
+                  styles.optionPrice,
+                  selectedOption === "Home Vaccination" && styles.selectedOptionText
+                ]}>
+                  ₹{data?.HomePriceOfPackageDiscount}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.confirmButton,
+                !selectedOption && styles.disabledButton
+              ]}
+              onPress={confirmAddToCart}
+              disabled={!selectedOption || addingToCart}
+            >
+              {addingToCart ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.confirmText}>Confirm Selection</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Animated.View
+        style={[
+          styles.notification,
+          { opacity: notificationOpacity }
+        ]}
+      >
+        <MaterialIcons name="check-circle" size={24} color="#FFF" />
         <Text style={styles.notificationText}>Added to cart successfully!</Text>
       </Animated.View>
     </SafeAreaView>

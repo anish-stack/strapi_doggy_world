@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import servicesData from './custom.json';
+import { useNavigation } from '@react-navigation/native';
 
 const HEADER_HEIGHT = 120;
 
@@ -12,22 +13,36 @@ export default function CustomPackage() {
   const [selectedHaircut, setSelectedHaircut] = useState(null);
   const [selectedAdditional, setSelectedAdditional] = useState([]);
 
-  const handleBathSelection = (bathId) => {
+  const [selectedBathData, setSelectedBathData] = useState(null);
+  const [selectedHaircutData, setSelectedHaircutData] = useState(null);
+  const [selectedAdditionalData, setSelectedAdditionalData] = useState([]);
+  const navigation = useNavigation()
+
+  const handleBathSelection = (bathId, item) => {
     setSelectedBath(bathId);
+    setSelectedBathData(item)
   };
 
-  const handleHaircutSelection = (haircutId) => {
+  const handleHaircutSelection = (haircutId, item) => {
     setSelectedHaircut(haircutId);
+    setSelectedHaircutData(item)
   };
 
-  const handleAdditionalSelection = (serviceId) => {
+  const handleAdditionalSelection = (serviceId, item) => {
     setSelectedAdditional(prev => {
       if (prev.includes(serviceId)) {
-        return prev.filter(id => id !== serviceId);
+        // Remove item from selected list
+        const updatedSelection = prev.filter(id => id !== serviceId);
+        setSelectedAdditionalData(prevData => prevData.filter(i => i.id !== item.id));
+        return updatedSelection;
+      } else {
+
+        setSelectedAdditionalData(prevData => [...prevData, item]);
+        return [...prev, serviceId];
       }
-      return [...prev, serviceId];
     });
   };
+
 
   const calculatePriceRange = () => {
     let minTotal = 0;
@@ -131,7 +146,7 @@ export default function CustomPackage() {
           {servicesData[0].SubItems.map(item => renderServiceCard(
             item,
             selectedBath === item.SubId,
-            () => handleBathSelection(item.SubId)
+            () => handleBathSelection(item.SubId, item)
           ))}
         </View>
 
@@ -142,7 +157,7 @@ export default function CustomPackage() {
             {servicesData[1].SubItems.map(item => renderServiceCard(
               item,
               selectedHaircut === item.id,
-              () => handleHaircutSelection(item.id)
+              () => handleHaircutSelection(item.id, item)
             ))}
           </View>
         )}
@@ -154,7 +169,7 @@ export default function CustomPackage() {
             {servicesData[2].SubItems.map(item => renderServiceCard(
               item,
               selectedAdditional.includes(item.id),
-              () => handleAdditionalSelection(item.id),
+              () => handleAdditionalSelection(item.id, item),
               selectedBath && servicesData[0].SubItems.find(
                 bath => bath.SubId === selectedBath
               )?.including?.includes(item.SubTitle)
@@ -176,6 +191,14 @@ export default function CustomPackage() {
             styles.continueButton,
             (!selectedBath) && styles.continueButtonDisabled
           ]}
+          onPress={() => navigation.navigate('clinic', {
+            customizedData: {
+              bathService: selectedBathData,
+              haircutService: selectedHaircutData,
+              additionalServices: selectedAdditionalData
+            },
+            type: 'Customize Booking'
+          })}
           disabled={!selectedBath}
         >
           <Text style={styles.continueButtonText}>Continue</Text>

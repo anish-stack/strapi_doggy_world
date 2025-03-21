@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   Platform,
   Dimensions
 } from 'react-native';
@@ -15,7 +15,7 @@ import { BlurView } from 'expo-blur';
 
 const { width } = Dimensions.get('window');
 
-export default function UpperLayout({ title, isBellShow = true }) {
+export default function UpperLayout({ title, isBellShow = true, isSearchShow = true }) {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { CartCount } = useSelector((state) => state.cart);
@@ -28,14 +28,14 @@ export default function UpperLayout({ title, isBellShow = true }) {
     >
       <Icon name={icon} size={22} color="#AA0000" />
       {badge != null && <Text style={styles.badge}>{badge}</Text>}
-    
+
     </TouchableOpacity>
   );
 
   const Container = Platform.OS === 'ios' ? BlurView : View;
-  const containerProps = Platform.OS === 'ios' ? { 
-    intensity: 100, 
-    tint: 'light' 
+  const containerProps = Platform.OS === 'ios' ? {
+    intensity: 100,
+    tint: 'light'
   } : {};
 
   return (
@@ -53,20 +53,23 @@ export default function UpperLayout({ title, isBellShow = true }) {
         </TouchableOpacity>
 
         <View style={styles.actions}>
-          <HeaderButton 
-            icon="search" 
-            onPress={() => navigation.navigate('search')} 
-          />
-          
-          {isBellShow && (
-            <HeaderButton 
-              icon="bell-o" 
-              onPress={() => {}} 
+          {isSearchShow && (
+
+            <HeaderButton
+              icon="search"
+              onPress={() => navigation.navigate('search')}
             />
           )}
-          
-          <HeaderButton 
-            icon="shopping-bag" 
+
+          {isBellShow && (
+            <HeaderButton
+              icon="bell-o"
+              onPress={() => { }}
+            />
+          )}
+
+          <HeaderButton
+            icon="shopping-bag"
             onPress={() => navigation.navigate('cart')}
             badge={CartCount || 0}
           />
@@ -78,7 +81,7 @@ export default function UpperLayout({ title, isBellShow = true }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding:5,
+    padding: 5,
     backgroundColor: Platform.select({
       ios: 'transparent',
 

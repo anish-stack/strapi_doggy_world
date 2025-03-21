@@ -6,6 +6,7 @@ const { width } = Dimensions.get('window');
 
 
 const images = [
+    // { id: 3, src: require('../../assets/slider/doggy-world.jpg') },
     { id: 1, src: require('../../assets/slider/banner.webp') },
     { id: 2, src: require('../../assets/slider/slider-doggy-world1.webp') },
 ];

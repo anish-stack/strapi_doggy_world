@@ -206,6 +206,7 @@ export default function BookingConsultation() {
                         {doctors.map((doctor) => (
                             <TouchableOpacity
                                 key={doctor.id}
+                                activeOpacity={0.9}
                                 onPress={() => handleSelectDoctor(doctor)}
                                 style={styles.doctorCardWrapper}
                             >

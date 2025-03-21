@@ -1,9 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { TouchableOpacity, Image, View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { TouchableOpacity, Image, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 
 export default function Card({ data }) {
     const navigation = useNavigation();
+    const [loading, setLoading] = useState(false);
 
     if (!data) {
         return (
@@ -13,43 +14,36 @@ export default function Card({ data }) {
         );
     }
 
+    const navigationRoutes = {
+        "Pet Bakery": "Bakery",
+        "Consultation": "Consultation",
+        "Pet Shop": "Pet_Shop",
+        "Dog Grooming": "Grooming",
+        "Physiotherapy": "Physiotherapy",
+        "Vaccination": "vaccination",
+        "Lab Test": "Lab",
+        "Pharmacy": "Coming_soon",
+        "Coming soon": "Coming_soon",
+    };
+
     const handlePress = () => {
-        console.log("data",data.title)
-        if (data.title === "Pet Bakery") {
-            navigation.navigate('Bakery');
-        } else if (data.title === 'Consultation') {
-            navigation.navigate('Consultation');
+        setLoading(true);
+        const route = navigationRoutes[data.title] || "Category_Screens";
 
-        } else if (data.title === 'Pet Shop') {
-            navigation.navigate('Pet_Shop');
-        } else if (data.title === 'Dog Grooming') {
-
-            navigation.navigate('Grooming');
-
-        } else if (data.title === 'Physiotherapy') {
-            navigation.navigate('Physiotherapy');
-        }
-        else if (data.title === 'Vaccination') {
-            navigation.navigate('vaccination');
-        }
-        else if (data.title === 'Lab Test') {
-            navigation.navigate('Lab');
-        } else if (data.title === 'Coming soon') {
-            navigation.navigate('Coming_soon');
-        } else {
-            navigation.navigate('Category_Screens', { item: data.title });
-        }
+        setTimeout(() => {
+            navigation.navigate(route, route === "Category_Screens" ? { item: data.title } : undefined);
+            setLoading(false);
+        }, 500); // Delay to simulate loading
     };
 
     return (
-        <TouchableOpacity
-            activeOpacity={0.9} onPress={handlePress}>
+        <TouchableOpacity activeOpacity={0.9} onPress={handlePress} disabled={loading}>
             <View style={styles.card}>
-                <Image
-                    source={{ uri: data.image.url }}
-                    style={styles.image}
-                    resizeMode="contain"
-                />
+                {loading ? (
+                    <ActivityIndicator size="small" color="#00aaa9" />
+                ) : (
+                    <Image source={{ uri: data.image.url }} style={styles.image} resizeMode="contain" />
+                )}
             </View>
             <Text style={styles.cardTitle}>{data.title || "Category Title"}</Text>
         </TouchableOpacity>
@@ -71,6 +65,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 5,
         alignItems: 'center',
+        justifyContent: 'center',
         margin: 8,
     },
     image: {

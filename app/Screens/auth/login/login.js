@@ -112,7 +112,7 @@ export default function Login() {
       }
     } catch (error) {
       console.error("Login error:", error)
-      setError(error.response?.data?.message || "Unable to connect to server. Please check your internet connection.")
+      setError(error.response?.data?.error?.message || "Unable to connect to server. Please check your internet connection.")
     } finally {
       setLoading(false)
     }
@@ -147,7 +147,7 @@ export default function Login() {
       }
     } catch (error) {
       console.error("OTP request error:", error)
-      setError(error.response?.data?.message || "Unable to send OTP. Please check your internet connection.")
+      setError(error.response?.data?.error?.message || "Unable to send OTP. Please check your internet connection.")
     } finally {
       setLoading(false)
     }
@@ -193,7 +193,7 @@ export default function Login() {
       }
     } catch (error) {
       console.error("OTP verification error:", error)
-      setError(error.response?.data?.message || "Unable to verify OTP. Please check your internet connection.")
+      setError(error.response?.data?.error?.message || "Unable to verify OTP. Please check your internet connection.")
     } finally {
       setLoading(false)
     }
@@ -219,7 +219,7 @@ export default function Login() {
       }
     } catch (error) {
       console.error("OTP resend error:", error)
-      setError(error.response?.data?.message || "Unable to resend OTP. Please check your internet connection.")
+      setError(error.response?.data?.error?.message || "Unable to resend OTP. Please check your internet connection.")
     } finally {
       setLoading(false)
     }
@@ -262,8 +262,9 @@ export default function Login() {
               <TextInput
                 placeholder="Enter your 10-digit phone number"
                 value={contactNumber}
+                autoFocus={true}
                 onChangeText={handleNumberChange}
-                style={styles.input}
+                style={[styles.input, { borderColor: "#000", borderWidth: 0.2 }]}
                 keyboardType="phone-pad"
                 placeholderTextColor="#A0A0A0"
                 maxLength={10}
@@ -334,7 +335,7 @@ export default function Login() {
               )}
             </TouchableOpacity>
 
-            {/* OTP Resend Button */}
+
             {isOtpMode && otpSent && (
               <TouchableOpacity
                 style={[styles.resendButton, (resendTimer > 0 || loading) && styles.disabledResendButton]}
@@ -347,9 +348,8 @@ export default function Login() {
               </TouchableOpacity>
             )}
 
-            {/* Toggle Login Mode Button */}
             <TouchableOpacity style={styles.toggleButton} onPress={toggleLoginMode} disabled={loading}>
-              <Text style={styles.toggleText}>{isOtpMode ? "Use Password Instead" : "Use OTP Instead"}</Text>
+              <Text style={styles.toggleText}>{isOtpMode ? null : "Use OTP Instead"}</Text>
             </TouchableOpacity>
 
             {/* Forgot Password Link */}

@@ -155,6 +155,8 @@ export default function NewTests() {
 
     return (
 
+        <Layout>
+
         <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.container}>
 
@@ -178,8 +180,9 @@ export default function NewTests() {
                     columnWrapperStyle={styles.columnWrapper}
                 />
             </View>
-            <Tabs />
+          
         </SafeAreaView>
+        </Layout>
 
 
 
@@ -191,7 +194,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingBottom: 60,
-        backgroundColor: '#fff',
+        // backgroundColor: '#fff',
     },
     mainHeading: {
         fontSize: scale(16),

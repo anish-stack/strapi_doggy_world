@@ -142,7 +142,7 @@ export default function GroomingPackages() {
             </TouchableOpacity>
           )}
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('clinic', { id: pkg._id })} activeOpacity={0.9} style={styles.bookNowButton}>
+        <TouchableOpacity onPress={() => navigation.navigate('clinic', { type:"Package", Package: pkg.documentId })} activeOpacity={0.9} style={styles.bookNowButton}>
           <Icon name="calendar" size={16} color="#fff" style={styles.bookIcon} />
           <Text style={styles.bookNowText}>Book Now</Text>
         </TouchableOpacity>

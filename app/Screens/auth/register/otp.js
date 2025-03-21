@@ -92,7 +92,7 @@ export default function OtpVerification() {
             setTimer(120);
             Alert.alert("Success", "A new OTP has been sent to your WhatsApp.");
         } catch (error) {
-            Alert.alert("Error", error.response?.data?.message || "Failed to resend OTP");
+            Alert.alert("Error", error.response?.data?.error?.message || "Failed to resend OTP");
         } finally {
             setLoading(false);
         }
@@ -121,7 +121,7 @@ export default function OtpVerification() {
 
             navigation.navigate('Home');
         } catch (error) {
-            Alert.alert("Error", error.response?.data?.message || "Invalid OTP");
+            Alert.alert("Error", error.response?.data?.error?.message || "Invalid OTP");
         } finally {
             setLoading(false);
         }

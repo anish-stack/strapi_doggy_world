@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import Layout from '../../layouts/Layout';
 
 const { width } = Dimensions.get('window');
 
@@ -62,130 +63,133 @@ export default function Vaccinations() {
     }
 
     return (
-        <ScrollView scrollEventThrottle={16} overScrollMode="never" decelerationRate="normal" showsVerticalScrollIndicator={false}>
-            <View>
-                <ScrollView scrollEventThrottle={5} showsHorizontalScrollIndicator={false} horizontal={true}>
-                    <View style={styles.filterContainer}>
-                        <TouchableOpacity
-                            style={[styles.filterButton, filter === 'All' && styles.activeFilter]}
-                            onPress={() => setFilter('All')}
-                        >
-                            <Text style={[styles.filterText, filter === 'All' && styles.activeText]}>All</Text>
-                        </TouchableOpacity>
+        <Layout>
 
-                        <TouchableOpacity
-                            style={[styles.filterButton, filter === 'Dog' && styles.activeFilter]}
-                            onPress={() => setFilter('Dog')}
-                        >
-                            <Text style={[styles.filterText, filter === 'Dog' && styles.activeText]}>Dog</Text>
-                        </TouchableOpacity>
+            <ScrollView scrollEventThrottle={16} overScrollMode="never" decelerationRate="normal" showsVerticalScrollIndicator={false}>
+                <View style={{ paddingBottom: 120 }}>
+                    <ScrollView scrollEventThrottle={5} showsHorizontalScrollIndicator={false} horizontal={true}>
+                        <View style={styles.filterContainer}>
+                            <TouchableOpacity
+                                style={[styles.filterButton, filter === 'All' && styles.activeFilter]}
+                                onPress={() => setFilter('All')}
+                            >
+                                <Text style={[styles.filterText, filter === 'All' && styles.activeText]}>All</Text>
+                            </TouchableOpacity>
 
-                        <TouchableOpacity
-                            style={[styles.filterButton, filter === 'Cat' && styles.activeFilter]}
-                            onPress={() => setFilter('Cat')}
-                        >
-                            <Text style={[styles.filterText, filter === 'Cat' && styles.activeText]}>Cat</Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.filterButton, filter === 'Dog' && styles.activeFilter]}
+                                onPress={() => setFilter('Dog')}
+                            >
+                                <Text style={[styles.filterText, filter === 'Dog' && styles.activeText]}>Dog</Text>
+                            </TouchableOpacity>
 
-                        <TouchableOpacity
-                            style={[styles.filterButton, filter === 'Packages' && styles.activeFilter]}
-                            onPress={() => setFilter('Packages')}
-                        >
-                            <Text style={[styles.filterText, filter === 'Packages' && styles.activeText]}>Packages</Text>
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
+                            <TouchableOpacity
+                                style={[styles.filterButton, filter === 'Cat' && styles.activeFilter]}
+                                onPress={() => setFilter('Cat')}
+                            >
+                                <Text style={[styles.filterText, filter === 'Cat' && styles.activeText]}>Cat</Text>
+                            </TouchableOpacity>
 
-                {/* Conditional Rendering of Cards based on Filter */}
-                {filter !== 'Cat' && filter !== 'Dog' && (
-                    <View style={styles.HeadingPhase}>
-                        <Text style={styles.HeadingTitle}>Packages</Text>
-                        <Text style={styles.HeadingTag}>Popular</Text>
-                    </View>
-                )}
-                <ScrollView scrollEventThrottle={5} showsHorizontalScrollIndicator={false} horizontal={true}>
-                    {filter !== 'Cat' && filter !== 'Dog' && Packages.length > 0 && (
-                        Packages.map((pkg, index) => (
-                            <View key={index}>
-                                <TouchableOpacity
-                                    onPress={() => navigation.navigate('VaccineDetails', { id: pkg.documentId })}
-                                    activeOpacity={0.7}
-                                    style={styles.Card}
-                                >
-                                    <Image source={{ uri: pkg.image?.url || 'https://via.placeholder.com/150' }} style={styles.cardImage} />
-                                    <View style={styles.cardContent}>
-                                        <Text numberOfLines={1} style={styles.cardTitle}>{pkg.title}</Text>
-                                        <Text style={styles.cardForage}>{pkg.forage}</Text>
-                                        <View style={styles.priceContainer}>
-                                            <Text style={styles.cardPrice}>₹{pkg.discount_price}</Text>
-                                            <Text style={styles.cardStrikePrice}>₹{pkg.price}</Text>
-                                        </View>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        ))
+                            <TouchableOpacity
+                                style={[styles.filterButton, filter === 'Packages' && styles.activeFilter]}
+                                onPress={() => setFilter('Packages')}
+                            >
+                                <Text style={[styles.filterText, filter === 'Packages' && styles.activeText]}>Packages</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
+
+                    {/* Conditional Rendering of Cards based on Filter */}
+                    {filter !== 'Cat' && filter !== 'Dog' && (
+                        <View style={styles.HeadingPhase}>
+                            <Text style={styles.HeadingTitle}>Packages</Text>
+                            <Text style={styles.HeadingTag}>Popular</Text>
+                        </View>
                     )}
-                </ScrollView>
-
-                {filter !== 'Cat' && filter !== 'Packages' && (
-                    <View style={styles.HeadingPhase}>
-                        <Text style={styles.HeadingTitle}>Vaccines For Dog</Text>
-                    </View>
-                )}
-                <ScrollView scrollEventThrottle={5} showsHorizontalScrollIndicator={false} horizontal={true}>
-                    {filter !== 'Cat' && filter !== 'Packages' && dogData.length > 0 && (
-                        dogData.map((dog, index) => (
-                            <View key={index}>
-                                <TouchableOpacity
-                                    onPress={() => navigation.navigate('VaccineDetails', { id: dog.documentId })}
-                                    activeOpacity={0.7}
-                                    style={styles.Card}
-                                >
-                                    <Image source={{ uri: dog.image?.url || 'https://via.placeholder.com/150' }} style={styles.cardImage} />
-                                    <View style={styles.cardContent}>
-                                        <Text numberOfLines={1} style={styles.cardTitle}>{dog.title}</Text>
-                                        <Text style={styles.cardForage}>{dog.forage}</Text>
-                                        <View style={styles.priceContainer}>
-                                            <Text style={styles.cardPrice}>₹{dog.discount_price}</Text>
-                                            <Text style={styles.cardStrikePrice}>₹{dog.price}</Text>
+                    <ScrollView scrollEventThrottle={5} showsHorizontalScrollIndicator={false} horizontal={true}>
+                        {filter !== 'Cat' && filter !== 'Dog' && Packages.length > 0 && (
+                            Packages.map((pkg, index) => (
+                                <View key={index}>
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate('VaccineDetails', { id: pkg.documentId })}
+                                        activeOpacity={0.7}
+                                        style={styles.Card}
+                                    >
+                                        <Image source={{ uri: pkg.image?.url || 'https://via.placeholder.com/150' }} style={styles.cardImage} />
+                                        <View style={styles.cardContent}>
+                                            <Text numberOfLines={1} style={styles.cardTitle}>{pkg.title}</Text>
+                                            <Text style={styles.cardForage}>{pkg.forage}</Text>
+                                            <View style={styles.priceContainer}>
+                                                <Text style={styles.cardPrice}>₹{pkg.discount_price}</Text>
+                                                <Text style={styles.cardStrikePrice}>₹{pkg.price}</Text>
+                                            </View>
                                         </View>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        ))
-                    )}
-                </ScrollView>
+                                    </TouchableOpacity>
+                                </View>
+                            ))
+                        )}
+                    </ScrollView>
 
-                {filter !== 'Dog' && filter !== 'Packages' && (
-                    <View style={styles.HeadingPhase}>
-                        <Text style={styles.HeadingTitle}>Vaccines For Cat</Text>
-                    </View>
-                )}
-                <ScrollView scrollEventThrottle={5} showsHorizontalScrollIndicator={false} horizontal={true}>
-                    {filter !== 'Dog' && filter !== 'Packages' && CatData.length > 0 && (
-                        CatData.map((cat, index) => (
-                            <View key={index}>
-                                <TouchableOpacity
-                                    onPress={() => navigation.navigate('VaccineDetails', { id: cat.documentId })}
-                                    activeOpacity={0.7}
-                                    style={styles.Card}
-                                >
-                                    <Image source={{ uri: cat.image?.url || 'https://via.placeholder.com/150' }} style={styles.cardImage} />
-                                    <View style={styles.cardContent}>
-                                        <Text numberOfLines={1} style={styles.cardTitle}>{cat.title}</Text>
-                                        <Text style={styles.cardForage}>{cat.forage}</Text>
-                                        <View style={styles.priceContainer}>
-                                            <Text style={styles.cardPrice}>₹{cat.discount_price}</Text>
-                                            <Text style={styles.cardStrikePrice}>₹{cat.price}</Text>
-                                        </View>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        ))
+                    {filter !== 'Cat' && filter !== 'Packages' && (
+                        <View style={styles.HeadingPhase}>
+                            <Text style={styles.HeadingTitle}>Vaccines For Dog</Text>
+                        </View>
                     )}
-                </ScrollView>
-            </View>
-        </ScrollView>
+                    <ScrollView scrollEventThrottle={5} showsHorizontalScrollIndicator={false} horizontal={true}>
+                        {filter !== 'Cat' && filter !== 'Packages' && dogData.length > 0 && (
+                            dogData.map((dog, index) => (
+                                <View key={index}>
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate('VaccineDetails', { id: dog.documentId })}
+                                        activeOpacity={0.7}
+                                        style={styles.Card}
+                                    >
+                                        <Image source={{ uri: dog.image?.url || 'https://via.placeholder.com/150' }} style={styles.cardImage} />
+                                        <View style={styles.cardContent}>
+                                            <Text numberOfLines={1} style={styles.cardTitle}>{dog.title}</Text>
+                                            <Text style={styles.cardForage}>{dog.forage}</Text>
+                                            <View style={styles.priceContainer}>
+                                                <Text style={styles.cardPrice}>₹{dog.discount_price}</Text>
+                                                <Text style={styles.cardStrikePrice}>₹{dog.price}</Text>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                            ))
+                        )}
+                    </ScrollView>
+
+                    {filter !== 'Dog' && filter !== 'Packages' && (
+                        <View style={styles.HeadingPhase}>
+                            <Text style={styles.HeadingTitle}>Vaccines For Cat</Text>
+                        </View>
+                    )}
+                    <ScrollView scrollEventThrottle={5} showsHorizontalScrollIndicator={false} horizontal={true}>
+                        {filter !== 'Dog' && filter !== 'Packages' && CatData.length > 0 && (
+                            CatData.map((cat, index) => (
+                                <View key={index}>
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate('VaccineDetails', { id: cat.documentId })}
+                                        activeOpacity={0.7}
+                                        style={styles.Card}
+                                    >
+                                        <Image source={{ uri: cat.image?.url || 'https://via.placeholder.com/150' }} style={styles.cardImage} />
+                                        <View style={styles.cardContent}>
+                                            <Text numberOfLines={1} style={styles.cardTitle}>{cat.title}</Text>
+                                            <Text style={styles.cardForage}>{cat.forage}</Text>
+                                            <View style={styles.priceContainer}>
+                                                <Text style={styles.cardPrice}>₹{cat.discount_price}</Text>
+                                                <Text style={styles.cardStrikePrice}>₹{cat.price}</Text>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                            ))
+                        )}
+                    </ScrollView>
+                </View>
+            </ScrollView>
+        </Layout>
     );
 }
 
@@ -222,17 +226,17 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 10,
         marginBottom: 20,
-       
+
     },
     filterButton: {
         backgroundColor: '#e0e0e0',
-        paddingVertical:6,
+        paddingVertical: 6,
         paddingHorizontal: 36,
         marginHorizontal: 5,
         borderRadius: 20,
         borderWidth: 1,
         borderColor: 'transparent',
-     
+
     },
     activeFilter: {
         backgroundColor: '#B32113',
@@ -256,7 +260,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowOffset: { width: 0, height: 5 },
         shadowRadius: 10,
-        marginBottom:12,
+        marginBottom: 12,
         paddingHorizontal: 10,
         paddingVertical: 10,
     },

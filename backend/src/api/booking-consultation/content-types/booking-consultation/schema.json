@@ -67,6 +67,9 @@
       "relation": "manyToOne",
       "target": "api::doctor.doctor",
       "inversedBy": "booking_consultations"
+    },
+    "feedback": {
+      "type": "text"
     }
   }
 }

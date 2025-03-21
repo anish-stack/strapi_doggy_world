@@ -8,94 +8,146 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 
 export default function Header() {
-    const [showSideBar, setShowSideBar] = useState(false)
-    const { CartCount } = useSelector((state) => state.cart)
+  const [showSideBar, setShowSideBar] = useState(false);
+  const { CartCount } = useSelector((state) => state.cart);
+  const navigation = useNavigation();
 
-    const navigation = useNavigation()
-    const handleSideBarToggle = () => {
-        setShowSideBar(!showSideBar);
-    }
+  const handleSideBarToggle = () => {
+    setShowSideBar(!showSideBar);
+  };
 
+  return (
+    <>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleSideBarToggle}
+            style={styles.logoContainer}
+          >
+            <Image source={logo} style={styles.logo} />
+          </TouchableOpacity>
 
-    return (
-        <>
+          <View style={styles.iconsContainer}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('search')}
+              style={styles.iconButton}
+            >
+              <View style={styles.iconWrapper}>
+                <Icon name="search" size={20} color="#B32113" />
+              </View>
+            </TouchableOpacity>
 
-            <View style={styles.header}>
-                <TouchableOpacity
-                    activeOpacity={0.9} onPress={handleSideBarToggle} style={styles.iconContainer}>
-                   <Image source={logo} style={styles.logo} />
-                </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.iconButton}
+              onPress={() => navigation.navigate('Notifications')}
+            >
+              <View style={styles.iconWrapper}>
+                <Icon name="bell-o" size={20} color="#B32113" />
+                <View style={styles.notificationDot} />
+              </View>
+            </TouchableOpacity>
 
-                
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('cart')}
+              style={styles.iconButton}
+            >
+              <View style={styles.iconWrapper}>
+                <Icon name="shopping-bag" size={20} color="#B32113" />
+                {CartCount > 0 && (
+                  <View style={styles.cartCountContainer}>
+                    <Text style={styles.cartCount}>
+                      {CartCount > 99 ? '99+' : CartCount}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
 
-                <View style={styles.iconsContainer}>
-                    <TouchableOpacity
-                        activeOpacity={0.9} onPress={() => navigation.navigate('search')} style={styles.iconContainer}>
-                        <Icon name="search" size={24} color="#B32113" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        activeOpacity={0.9} style={styles.iconContainer}>
-                        <Icon name="bell-o" size={24} color="#B32113" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        activeOpacity={0.9} onPress={() => navigation.navigate('cart')} style={styles.iconContainer}>
-                        <Icon name="shopping-bag" size={24} color="#B32113" />
-                        <Text style={styles.cartCount}>{CartCount || 0}</Text>
-                    </TouchableOpacity>
-                </View>
-
-            </View>
-            {showSideBar && (
-                <View>
-                    <SideBar open={showSideBar} />
-                </View>
-            )}
-        </>
-    );
+      {showSideBar && (
+        <SideBar onClose={() => setShowSideBar(false)} open={showSideBar} />
+      )}
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
-    header: {
-        padding: 5,
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
-        backgroundColor: '#fff',
-        elevation: 3,
-    },
-    logo: {
-        width: 50,
-        height: 50,
-        resizeMode: 'contain',
+  safeArea: {
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.06)',
 
-    },
-    iconsContainer: {
-        flexDirection: 'row',
-        marginLeft: 'auto',
-    },
-    iconContainer: {
-        fontWeight: 400,
-        marginHorizontal: 10,
-        padding: 5,
-    },
-    cartCount: {
-        position: 'absolute',
-        top: -5,
-        right: -8,
-        backgroundColor: '#FF4500',
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: 'bold',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 12,
-        minWidth: 18,
-        textAlign: 'center',
-        lineHeight: 20,
-    },
-
-    Weight: {
-        fontWeight: 400,
-    }
+  },
+  logoContainer: {
+    padding: 4,
+    borderRadius: 8,
+  },
+  logo: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+    borderRadius: 8,
+  },
+  iconsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconButton: {
+    padding: 8,
+  },
+  iconWrapper: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(179, 33, 19, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  notificationDot: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#B32113',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  cartCountContainer: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#B32113',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  cartCount: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
 });

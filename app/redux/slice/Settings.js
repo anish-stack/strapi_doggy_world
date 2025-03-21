@@ -18,7 +18,7 @@ export const fetchSettings = createAsyncThunk(
       return data.data[0];
     } catch (error) {
       return thunkApi.rejectWithValue(
-        error.response?.data?.message || "Failed to fetch settings"
+        error.response?.data?.error?.message || "Failed to fetch settings"
       );
     }
   }

@@ -84,6 +84,12 @@
       "relation": "oneToMany",
       "target": "api::cake-booking.cake-booking",
       "mappedBy": "clinic"
+    },
+    "grooming_bookings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::grooming-booking.grooming-booking",
+      "mappedBy": "clinic"
     }
   }
 }

@@ -478,57 +478,122 @@ module.exports = {
     },
 
 
-    async findMe(ctx) {
+
+    async  findMe(ctx) {
         try {
-
             const authHeader = ctx.request.headers.authorization;
-            console.log("authHeader", authHeader)
-
-            if (!authHeader) {
+            console.log("authHeader:", authHeader);
+    
+            if (!authHeader || !authHeader.startsWith("Bearer ")) {
                 return ctx.unauthorized("Missing Authorization header.");
             }
-
-            const token = authHeader.split(" ")[1];
-            if (!token) {
-                return ctx.unauthorized("Invalid Authorization header format.");
+    
+            const token = authHeader.split(" ")[1]?.trim();
+            
+            // ⛔️ Check for null/empty token
+            if (!token || token === "null" || token.split(".").length !== 3) {
+                console.error("Invalid token format:", token);
+                return ctx.unauthorized("Invalid or missing token.");
             }
-
-            const decoded = jwt.verify(token, strapi.config.get("plugin::users-permissions.jwtSecret"))
-            if (!decoded || !decoded?.id) {
+    
+            const jwtSecret = strapi.config.get("plugin::users-permissions.jwtSecret");
+    
+            let decoded;
+            try {
+                decoded = jwt.verify(token, jwtSecret);
+            } catch (error) {
+                console.error("JWT Verification Error:", error);
                 return ctx.unauthorized("Invalid or expired token.");
             }
-
-
-            const user = await strapi.query("api::auth.auth").findOne({
-                where: { id: decoded.id }
-            });
-
-
-            const sendUser = {
-                id: user.documentId,
-                PetType: user.PetType,
-                petName: user.petName,
-                contact_number: user.contact_number,
-                Breed: user.Breed,
-                DOB: user.DOB,
-                Verified: user?.isVerified,
-                Age: user.Age,
+    
+            if (!decoded || !decoded.id) {
+                return ctx.unauthorized("Token verification failed.");
             }
+    
+            const currentTime = Math.floor(Date.now() / 1000);
+            if (decoded.exp < currentTime) {
+                return ctx.unauthorized("Token expired, please log in again.");
+            }
+    
+            await new Promise(resolve => setTimeout(resolve, 100));
+    
+            const user = await strapi.query("api::auth.auth").findOne({ where: { id: decoded.id } });
+    
             if (!user) {
                 return ctx.notFound("User not found.");
             }
-
-
+    
             return ctx.send({
                 success: true,
-                data: sendUser
+                data: {
+                    id: user.documentId,
+                    PetType: user.PetType,
+                    petName: user.petName,
+                    contact_number: user.contact_number,
+                    Breed: user.Breed,
+                    DOB: user.DOB,
+                    Verified: user?.isVerified,
+                    Age: user.Age,
+                }
             });
-
+    
         } catch (error) {
             console.error("Error in findMe:", error);
             return ctx.badRequest("An error occurred while fetching user data.");
         }
+    } ,
+
+    async findMyAllOrders(ctx) {
+        try {
+            const userId = ctx.state.user?.id || ctx.request.query.id;
+
+
+            if (!userId) {
+                return ctx.badRequest("User not authenticated");
+            }
+
+            // Fetch all bookings with populated relationships
+            const [
+                allConsultationBookings,
+                allCakeBookings,
+                allGroomingPackages,
+                allLabVaccinations,
+                allPetShopOrders,
+                allPhysioBookings
+            ] = await Promise.all([
+                strapi.entityService.findMany("api::booking-consultation.booking-consultation", { populate: "*" }),
+                strapi.entityService.findMany("api::cake-booking.cake-booking", { populate: "*" }),
+                strapi.entityService.findMany("api::grooming-booking.grooming-booking", { populate: "*" }),
+                strapi.entityService.findMany("api::lab-and-vaccination-booking.lab-and-vaccination-booking", { populate: "*" }),
+                strapi.entityService.findMany("api::pet-shop-and-bakery-order.pet-shop-and-bakery-order", { populate: "*" }),
+                strapi.entityService.findMany("api::physio-booking.physio-booking", { populate: "*" })
+            ]);
+
+            const consultationBookings = allConsultationBookings.filter(item => item.pet?.documentId === userId);
+            const cakeBookings = allCakeBookings.filter(item => item.pet_id?.documentId === userId);
+            const groomingPackages = allGroomingPackages.filter(item => item.pet?.documentId === userId);
+            const labVaccinations = allLabVaccinations.filter(item => item.auth?.documentId === userId);
+            const petShopOrders = allPetShopOrders.filter(item => item.auth?.documentId === userId);
+            const physioBookings = allPhysioBookings.filter(item => item.PetID?.documentId === userId);
+
+            const allOrders = {
+                consultationBookings,
+                cakeBookings,
+                groomingPackages,
+                labVaccinations,
+                petShopOrders,
+                physioBookings
+            };
+
+            return ctx.send({ success: true, orders: allOrders });
+
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+            return ctx.internalServerError("Something went wrong while fetching orders");
+        }
     }
+
+
 
 
 };

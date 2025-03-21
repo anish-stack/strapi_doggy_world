@@ -1,14 +1,39 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import React from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { MapPin } from 'lucide-react-native';
 
 export default function LocationTab({ data }) {
+    const renderContent = () => {
+
+
+        if (!data?.address) {
+            return (
+                <View style={styles.centerContent}>
+                    <MapPin color="#fff" size={20} />
+                    <Text style={styles.locationText}>Doggy World is Best</Text>
+                </View>
+            );
+        }
+
+        const { area, city, postalCode, district } = data.address;
+        const formattedAddress = [area, city, postalCode, district]
+            .filter(Boolean)
+            .join(', ');
+
+        return (
+            <View style={styles.locationInfo}>
+                <MapPin color="#fff" size={20} />
+                <Text style={styles.locationText} numberOfLines={1}>
+                    {formattedAddress}
+                </Text>
+            </View>
+        );
+    };
 
     return (
         <View style={styles.container}>
-            <View style={styles.locationInfo}>
-                <Icon name="location-outline" size={24} color="#fff" />
-                <Text style={styles.locationText}>{data?.address?.area},{data?.address?.city}, {data?.address?.postalCode} , {data?.address?.district}</Text>
+            <View style={styles.content}>
+                {renderContent()}
             </View>
         </View>
     );
@@ -16,19 +41,42 @@ export default function LocationTab({ data }) {
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row',
-        alignItems: 'center',
         backgroundColor: '#B32113',
-        padding: 5,
-
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    content: {
+        paddingVertical: 10,
+        paddingHorizontal: 16,
     },
     locationInfo: {
         flexDirection: 'row',
         alignItems: 'center',
     },
+    centerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     locationText: {
         color: '#fff',
         fontSize: 14,
-        marginLeft: 10, // Space between icon and text
+        marginLeft: 8,
+        fontWeight: '500',
+        flex: 1,
+    },
+    loadingText: {
+        color: '#fff',
+        fontSize: 14,
+        marginLeft: 8,
+        fontWeight: '500',
+        opacity: 0.9,
+    },
+    errorText: {
+        color: '#fff',
+        fontSize: 14,
+        marginLeft: 8,
+        fontWeight: '500',
+        opacity: 0.9,
     },
 });
