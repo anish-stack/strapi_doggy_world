@@ -20,13 +20,22 @@ export default function Header() {
     <>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={handleSideBarToggle}
-            style={styles.logoContainer}
-          >
-            <Image source={logo} style={styles.logo} />
-          </TouchableOpacity>
+          <View style={styles.flexDirectionContainer}>
+            <TouchableOpacity
+              onPress={handleSideBarToggle}
+              activeOpacity={0.9}
+            >
+              <Icon name="bars" size={20} color="#B32113" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+
+              style={styles.logoContainer}
+            >
+              <Image source={logo} style={styles.logo} />
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.iconsContainer}>
             <TouchableOpacity
@@ -92,12 +101,21 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(0, 0, 0, 0.06)',
 
   },
+  flexDirectionContainer: {
+    flexDirection: 'row',
+    gap: 15,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   logoContainer: {
     padding: 4,
     borderRadius: 8,
   },
   logo: {
-    width: 40,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.06)',
+
+    aspectRatio: 1,
     height: 40,
     resizeMode: 'contain',
     borderRadius: 8,
