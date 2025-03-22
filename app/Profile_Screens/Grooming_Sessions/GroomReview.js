@@ -65,7 +65,7 @@ export default function GroomReview({ open, close, appointment, isGrooming }) {
 
         try {
             // Replace with your actual API endpoint
-            const response = await axios.post('http://192.168.1.3:1337/api/rate_Service', {
+            const response = await axios.post('https://admindoggy.adsdigitalmedia.com/api/rate_Service', {
                 id: appointment.id,
                 rate: selectedRating,
                 feedback: feedback.trim() || null

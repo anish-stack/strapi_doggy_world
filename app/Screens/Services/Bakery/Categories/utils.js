@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const BASE_API_URL = 'http://192.168.1.3:1337/api'
+const BASE_API_URL = 'https://admindoggy.adsdigitalmedia.com/api'
 
 export const fetchFlavours = async () => {
     try {

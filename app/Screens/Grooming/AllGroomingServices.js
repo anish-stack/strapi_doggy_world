@@ -31,13 +31,13 @@ export default function GroomingPackages() {
     setLoading(true);
     setError(null);
     try {
-      let url = 'http://192.168.1.3:1337/api/grooming-packages?populate=*';
+      let url = 'https://admindoggy.adsdigitalmedia.com/api/grooming-packages?populate=*';
       if (selectedCategory !== 'All') {
         const encodedCategory = encodeURIComponent(selectedCategory);
         console.log("selectedCategory", selectedCategory)
 
         console.log("encodedCategory", encodedCategory)
-        url = `http://192.168.1.3:1337/api/grooming-packages?filters[Category][$eq]=${encodedCategory}&populate=*`;
+        url = `https://admindoggy.adsdigitalmedia.com/api/grooming-packages?filters[Category][$eq]=${encodedCategory}&populate=*`;
       }
       const response = await axios.get(url);
       setPackages(response.data.data || []);

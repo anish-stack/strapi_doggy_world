@@ -27,7 +27,7 @@ export default function Single_Test() {
         try {
             setLoading(true);
             const response = await axios.get(
-                `http://192.168.1.3:1337/api/lab-tests?populate[clinics][populate]=*&populate=OtherImages&filters[documentId][$eq]=${Test}`
+                `https://admindoggy.adsdigitalmedia.com/api/lab-tests?populate[clinics][populate]=*&populate=OtherImages&filters[documentId][$eq]=${Test}`
             );
             setData(response.data.data[0] || null);
         } catch (error) {

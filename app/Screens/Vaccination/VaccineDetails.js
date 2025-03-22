@@ -51,7 +51,7 @@ export default function VaccineDetails() {
 
     try {
       const response = await axios.get(
-        `http://192.168.1.3:1337/api/vaccinations?filters[documentId][$eq]=${id}&populate=*`
+        `https://admindoggy.adsdigitalmedia.com/api/vaccinations?filters[documentId][$eq]=${id}&populate=*`
       );
       setData(response.data.data[0] || null);
       setError('');

@@ -16,7 +16,7 @@ export default function GroomingServices() {
 
     const fetchServices = async () => {
         try {
-            const response = await axios.get('http://192.168.1.3:1337/api/grooming-services?populate=*');
+            const response = await axios.get('https://admindoggy.adsdigitalmedia.com/api/grooming-services?populate=*');
             setServices(response.data.data);
             setLoading(false);
         } catch (err) {

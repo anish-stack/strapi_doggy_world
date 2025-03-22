@@ -66,7 +66,7 @@ export default function DatePicker({ isPhysiotherapy = false, isOpen, onClosed, 
     const handleBookPhysio = async (data) => {
         setLoading(true)
         try {
-            const response = await axios.post(`http://192.168.1.3:1337/api/make-order-physio-booking`, data)
+            const response = await axios.post(`https://admindoggy.adsdigitalmedia.com/api/make-order-physio-booking`, data)
             console.log(response.data)
             Alert.alert("Booking success", `Your's bookings have been successfully done`)
             setLoading(false)

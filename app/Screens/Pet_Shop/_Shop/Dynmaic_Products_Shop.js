@@ -20,8 +20,8 @@ export default function Dynmaic_Products_Shop() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://192.168.1.3:1337/api/pet-shop-products?populate=*`);
-        const fetchSliderData = await axios.get('http://192.168.1.3:1337/api/bakery-sliders?populate=*');
+        const response = await axios.get(`https://admindoggy.adsdigitalmedia.com/api/pet-shop-products?populate=*`);
+        const fetchSliderData = await axios.get('https://admindoggy.adsdigitalmedia.com/api/bakery-sliders?populate=*');
         const resdata = response.data.data;
         const fetchSlider = fetchSliderData.data.data;
         const filterData = resdata.filter(item =>

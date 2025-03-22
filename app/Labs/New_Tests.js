@@ -34,11 +34,11 @@ export default function NewTests() {
                     branchResponse,
                     popularResponse,
                 ] = await Promise.all([
-                    axios.get('http://192.168.1.3:1337/api/lab-tests?populate=*'),
-                    axios.get('http://192.168.1.3:1337/api/lab-tests?populate=*&filters[common_disease_dog][$eq]=true&filters[isPopular][$eq]=false'),
-                    axios.get('http://192.168.1.3:1337/api/lab-tests?populate=*&filters[common_disease_cat][$eq]=true&filters[isPopular][$eq]=false'),
-                    axios.get('http://192.168.1.3:1337/api/lab-tests?populate=*&filters[is_available_at_main_branch][$eq]=true'),
-                    axios.get('http://192.168.1.3:1337/api/lab-tests?populate=*&filters[isPopular][$eq]=true'),
+                    axios.get('https://admindoggy.adsdigitalmedia.com/api/lab-tests?populate=*'),
+                    axios.get('https://admindoggy.adsdigitalmedia.com/api/lab-tests?populate=*&filters[common_disease_dog][$eq]=true&filters[isPopular][$eq]=false'),
+                    axios.get('https://admindoggy.adsdigitalmedia.com/api/lab-tests?populate=*&filters[common_disease_cat][$eq]=true&filters[isPopular][$eq]=false'),
+                    axios.get('https://admindoggy.adsdigitalmedia.com/api/lab-tests?populate=*&filters[is_available_at_main_branch][$eq]=true'),
+                    axios.get('https://admindoggy.adsdigitalmedia.com/api/lab-tests?populate=*&filters[isPopular][$eq]=true'),
                 ]);
 
                 setAllTests(allResponse.data.data);

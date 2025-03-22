@@ -59,7 +59,7 @@ export default function Address() {
 
         try {
             const response = await axios.post(
-                `http://192.168.1.3:1337/api/create_order_of_product`,
+                `https://admindoggy.adsdigitalmedia.com/api/create_order_of_product`,
                 OrderDetails
             );
 
