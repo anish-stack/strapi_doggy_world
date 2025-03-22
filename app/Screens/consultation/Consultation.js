@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     View,
     Text,
@@ -7,28 +7,172 @@ import {
     Image,
     TouchableOpacity,
     ActivityIndicator,
-    RefreshControl
+    RefreshControl,
+    Dimensions,
+    Animated,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { AntDesign, FontAwesome } from '@expo/vector-icons';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
-import axios from 'axios';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import WebView from 'react-native-webview';
+import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { API_END_POINT_URL } from '../../constant/constant';
-import CustomSlider from '../Services/Bakery/Slider';
+import axios from 'axios';
+import TopHeadPart from '../../layouts/TopHeadPart';
 import Call_Header from '../../components/Call_header/Call_Header';
-import UpperLayout from '../../layouts/UpperLayout';
 
+import WebView from 'react-native-webview';
+const { width } = Dimensions.get('window');
 
+const ImageSlider = ({ images }) => {
+    const scrollX = useRef(new Animated.Value(0)).current;
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const scrollViewRef = useRef(null);
+
+    const handleScroll = Animated.event(
+        [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+        { useNativeDriver: false }
+    );
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const nextIndex = (currentIndex + 1) % images.length;
+            setCurrentIndex(nextIndex);
+            scrollViewRef.current?.scrollTo({
+                x: nextIndex * width,
+                animated: true,
+            });
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [currentIndex]);
+
+    return (
+        <View style={styles.sliderContainer}>
+            <ScrollView
+                ref={scrollViewRef}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+            >
+                {images.map((image, index) => (
+                    <Image
+                        key={index}
+                        source={image.src}
+                        style={styles.sliderImage}
+                        resizeMode="cover"
+                    />
+                ))}
+            </ScrollView>
+            <View style={styles.pagination}>
+                {images.map((_, index) => {
+                    const inputRange = [
+                        (index - 1) * width,
+                        index * width,
+                        (index + 1) * width,
+                    ];
+
+                    const dotWidth = scrollX.interpolate({
+                        inputRange,
+                        outputRange: [8, 16, 8],
+                        extrapolate: 'clamp',
+                    });
+
+                    const opacity = scrollX.interpolate({
+                        inputRange,
+                        outputRange: [0.3, 1, 0.3],
+                        extrapolate: 'clamp',
+                    });
+
+                    return (
+                        <Animated.View
+                            key={index}
+                            style={[styles.dot, { width: dotWidth, opacity }]}
+                        />
+                    );
+                })}
+            </View>
+        </View>
+    );
+};
+
+const ConsultationCard = ({ item, navigation }) => (
+    <TouchableOpacity
+        activeOpacity={0.9}
+        style={styles.card}
+        onPress={() => navigation.navigate('next-step', {
+            type: item.name,
+            id: item?.documentId
+        })}
+    >
+        <View style={styles.cardContent}>
+            <Image
+                source={{ uri: item.image?.url || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=2940&auto=format&fit=crop' }}
+                style={styles.cardImage}
+            />
+
+            <View style={styles.textContent}>
+                {/* <View style={styles.tagContainer}>
+          <LinearGradient
+            colors={['#ff4d4d', '#cc0000']}
+            style={styles.tag}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            <Text style={styles.tagText}>Featured</Text>
+          </LinearGradient>
+        </View> */}
+
+                <Text style={styles.cardTitle}>{item.name}</Text>
+                <Text style={styles.cardDescription} numberOfLines={3}>
+                    {item.description}
+                </Text>
+
+                <View style={styles.priceSection}>
+                    <View>
+                        <Text style={styles.priceLabel}>Starting from</Text>
+                        <Text style={styles.price}>₹{item.price}</Text>
+                        {item?.offer_valid_upto && (
+                            <Text style={styles.offer}>Valid until {item.offer_valid_upto}</Text>
+                        )}
+                    </View>
+
+                    <TouchableOpacity
+                        style={styles.bookButton}
+                        onPress={() => navigation.navigate('next-step', {
+                            type: item.name,
+                            id: item?.documentId
+                        })}
+                    >
+                        <LinearGradient
+                            colors={['#ff4d4d', '#cc0000']}
+                            style={styles.gradientButton}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                        >
+                            <Text style={styles.buttonText}>Book Now</Text>
+                            <Ionicons name="arrow-forward" size={moderateScale(18)} color="#fff" />
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>
+    </TouchableOpacity>
+);
 
 export default function Consultation() {
     const navigation = useNavigation();
-    const [expandedDescriptionIds, setExpandedDescriptionIds] = useState([]);
     const [consultation, setConsultation] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
+
+    const images = [
+        { id: 1, src: require('./cs.png') },
+        { id: 2, src: require('./con1.jpg') },
+    ];
 
     const fetchConsultation = async () => {
         try {
@@ -36,7 +180,7 @@ export default function Consultation() {
             const { data } = await axios.get(`${API_END_POINT_URL}/api/consultations?populate=*`);
             setConsultation(data.data);
         } catch (error) {
-            setError('Failed to load consultation data. Please try again.');
+            setError('Failed to load consultation data');
             console.error('Error fetching consultation:', error);
         } finally {
             setLoading(false);
@@ -48,25 +192,10 @@ export default function Consultation() {
         fetchConsultation();
     }, []);
 
-    const onRefresh = () => {
-        setRefreshing(true);
-        fetchConsultation();
-    };
-
-    const toggleDescription = (id) => {
-        setExpandedDescriptionIds(prev =>
-            prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
-        );
-    };
-
-    const images = [
-        { id: 1, src: require('./cs.png') },
-        { id: 2, src: require('./con1.jpg') },
-    ];
     if (loading && !refreshing) {
         return (
             <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#B32113" />
+                <ActivityIndicator size="large" color="#cc0000" />
             </View>
         );
     }
@@ -74,7 +203,7 @@ export default function Consultation() {
     if (error && !refreshing) {
         return (
             <View style={styles.centerContainer}>
-                <FontAwesome name="warning" size={50} color="#B32113" />
+                <Ionicons name="alert-circle" size={moderateScale(50)} color="#cc0000" />
                 <Text style={styles.errorText}>{error}</Text>
                 <TouchableOpacity style={styles.retryButton} onPress={fetchConsultation}>
                     <Text style={styles.retryButtonText}>Try Again</Text>
@@ -84,150 +213,91 @@ export default function Consultation() {
     }
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <UpperLayout isBellShow={false} title={"Online Consultation"} />
+        <SafeAreaView style={styles.container}>
+
+            <TopHeadPart title={'Online Consultation'} />
+
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.scrollContainer}
                 refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    <RefreshControl refreshing={refreshing} onRefresh={fetchConsultation} />
                 }
             >
-                <CustomSlider autoPlay={true} navigationShow={true} Dealy={2500} imagesByProp={images} />
+                <ImageSlider images={images} />
                 <Call_Header />
-                <View style={{ padding: 5 }}>
-
+               
+                <View style={styles.consultationsContainer}>
                     {consultation.map(item => (
-                        <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('next-step', {
-                            type: item.name,
-                            id: item?.documentId
-                        })} key={item.id} style={styles.card}>
-                            <Text style={styles.tag}>Featured</Text>
-
-                            <View style={styles.cardContent}>
-                                <View style={styles.textSection}>
-                                    <Text style={styles.consultationName}>{item.name}</Text>
-                                    <Text style={styles.description}>
-                                        {expandedDescriptionIds.includes(item.id)
-                                            ? item.description
-                                            : `${item.description.substring(0, 100)}...`}
-                                    </Text>
-
-                                    <TouchableOpacity onPress={() => toggleDescription(item.id)}>
-                                        <View style={styles.readMoreContainer}>
-                                            <Text style={styles.readMore}>
-                                                {expandedDescriptionIds.includes(item.id) ? "Read Less" : "Read More"}
-                                            </Text>
-                                            <AntDesign
-                                                name={expandedDescriptionIds.includes(item.id) ? "up" : "down"}
-                                                size={16}
-                                                color="#0066CC"
-                                            />
-                                        </View>
-                                    </TouchableOpacity>
-
-                                    <Text style={styles.price}>Starts from ₹{item.price}</Text>
-                                    {item?.offer_valid_upto && (
-                                        <Text style={styles.offer}>Offer valid: {item.offer_valid_upto}</Text>
-                                    )}
-
-                                </View>
-
-                                <View style={styles.imageSection}>
-                                    <Image
-                                        source={{ uri: item.image?.url }}
-                                        style={styles.image}
-                                    //   defaultSource={require('../assets/images/icon.png')}
-                                    />
-                                    <TouchableOpacity
-                                        style={styles.bookButton}
-                                        onPress={() => navigation.navigate('next-step', {
-                                            type: item.name,
-                                            id: item?.documentId
-                                        })}
-                                    >
-                                        <Text style={styles.buttonText}>Book Now</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
+                        <ConsultationCard
+                            key={item.id}
+                            item={item}
+                            navigation={navigation}
+                        />
                     ))}
                 </View>
-
-                <View style={styles.webViewContainer}>
-                    <WebView
+                <WebView
                         source={{ uri: "https://e646aa95356d411688ca904e76e00491.elf.site" }}
-                        style={styles.webView}
+                        style={{  overflow:"hidden", height: 500 }}
                     />
-                </View>
+               
             </ScrollView>
+          
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    safeArea: {
+    container: {
         flex: 1,
         backgroundColor: '#f5f5f5',
     },
-    centerContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    errorText: {
-        fontSize: 16,
-        color: '#666',
-        textAlign: 'center',
-        marginVertical: 16,
-    },
-    retryButton: {
-        backgroundColor: '#B32113',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 8,
-    },
-    retryButtonText: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    scrollContainer: {
-        padding: 0,
-    },
-    sliderContainer: {
-        height: 200,
-        marginBottom: 15,
-        borderRadius: 12,
-        overflow: 'hidden',
-    },
-    sliderImage: {
-        width: '100%',
-        height: '100%',
-    },
-    sliderNavigation: {
-        position: 'absolute',
-        top: '50%',
-        left: 10,
-        right: 10,
+    header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        transform: [{ translateY: -20 }],
-    },
-    navButton: {
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: scale(20),
+        paddingVertical: verticalScale(15),
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    headerTitle: {
+        fontSize: moderateScale(24),
+        fontWeight: '700',
+        color: '#333',
+    },
+    filterButton: {
+        padding: moderateScale(8),
+        borderRadius: moderateScale(8),
+        backgroundColor: '#f5f5f5',
+    },
+    sliderContainer: {
+        height: verticalScale(200),
+        width: width,
+    },
+    sliderImage: {
+        width: width,
+        height: verticalScale(200),
+    },
+    pagination: {
+        flexDirection: 'row',
+        position: 'absolute',
+        bottom: verticalScale(15),
+        alignSelf: 'center',
+    },
+    dot: {
+        height: verticalScale(8),
+        borderRadius: moderateScale(4),
+        backgroundColor: '#fff',
+        marginHorizontal: scale(4),
+    },
+    consultationsContainer: {
+        padding: scale(4),
     },
     card: {
         backgroundColor: '#fff',
-        borderRadius: 12,
-        marginBottom: 15,
-        padding: 15,
+        borderRadius: moderateScale(15),
+        marginBottom: verticalScale(15),
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -235,91 +305,117 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.1,
         shadowRadius: 3.84,
-        elevation: 5,
-    },
-    tag: {
-        position: 'absolute',
-        top: 12,
-        right: 12,
-        backgroundColor: '#B32113',
-        color: '#fff',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-        fontSize: 12,
-        fontWeight: '600',
-        zIndex: 1,
+        elevation: 0,
     },
     cardContent: {
         flexDirection: 'row',
-        gap: 15,
+        overflow: 'hidden',
+        justifyContent: 'flex-start',
+        paddingVertical: verticalScale(5),
+        paddingHorizontal: scale(15),
+        borderRadius: moderateScale(15),
     },
-    textSection: {
-        flex: 1,
-    },
-    consultationName: {
-        fontSize: 18,
-        fontWeight: '700',
-        color: '#1A1A1A',
-        marginBottom: 8,
-    },
-    description: {
-        fontSize: 14,
-        color: '#4A4A4A',
-        lineHeight: 20,
-        marginBottom: 8,
-    },
-    readMoreContainer: {
+    cardImage: {
+        width: scale(150),
         flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 12,
+        overflow: 'hidden',
+        alignSelf: 'center',
+        height: scale(150),
+
+        justifyContent: 'center',
+        resizeMode: 'cover',
+        height: scale(220),
+        borderRadius: moderateScale(15),
+        marginHorizontal: scale(5)
+
     },
-    readMore: {
-        color: '#0066CC',
-        fontSize: 14,
+    textContent: {
+        flex: 1,
+        padding: scale(15),
+    },
+    tagContainer: {
+        marginBottom: verticalScale(10),
+    },
+    tag: {
+        alignSelf: 'flex-start',
+        paddingHorizontal: scale(12),
+        paddingVertical: verticalScale(6),
+        borderRadius: moderateScale(20),
+    },
+    tagText: {
+        color: '#fff',
+        fontSize: moderateScale(12),
         fontWeight: '600',
-        marginRight: 4,
+    },
+    cardTitle: {
+        fontSize: moderateScale(14),
+        fontWeight: '700',
+        color: '#333',
+        marginBottom: verticalScale(8),
+    },
+    cardDescription: {
+        fontSize: moderateScale(12),
+        color: '#666',
+        lineHeight: moderateScale(20),
+        marginBottom: verticalScale(12),
+    },
+    priceSection: {
+        marginTop: 'auto',
+    },
+    priceLabel: {
+        fontSize: moderateScale(12),
+        color: '#666',
     },
     price: {
-        fontSize: 16,
+        fontSize: moderateScale(18),
         fontWeight: '700',
-        color: '#1A1A1A',
-        marginBottom: 4,
+        color: '#333',
+        marginBottom: verticalScale(8),
     },
     offer: {
-        fontSize: 13,
-        color: '#B32113',
-        fontStyle: 'italic',
-    },
-    imageSection: {
-        alignItems: 'center',
-        gap: 10,
-    },
-    image: {
-        width: 120,
-        height: 120,
-        borderRadius: 10,
+        fontSize: moderateScale(12),
+        color: '#cc0000',
+        marginBottom: verticalScale(8),
     },
     bookButton: {
-        backgroundColor: '#B32113',
-        paddingVertical: 8,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        width: '100%',
+        overflow: 'hidden',
+        borderRadius: moderateScale(25),
+    },
+    gradientButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: scale(20),
+        paddingVertical: verticalScale(10),
+        borderRadius: moderateScale(25),
+        gap: scale(5),
     },
     buttonText: {
         color: '#fff',
         fontWeight: '600',
-        fontSize: 14,
-        textAlign: 'center',
+        fontSize: moderateScale(14),
     },
-    webViewContainer: {
-        height: 500,
-        marginTop: 20,
-        borderRadius: 12,
-        overflow: 'hidden',
-    },
-    webView: {
+    centerContainer: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: scale(20),
+    },
+    errorText: {
+        fontSize: moderateScale(16),
+        color: '#666',
+        textAlign: 'center',
+        marginVertical: verticalScale(16),
+    },
+    retryButton: {
+        backgroundColor: '#cc0000',
+        paddingHorizontal: scale(20),
+        paddingVertical: verticalScale(10),
+        borderRadius: moderateScale(25),
+    },
+    retryButtonText: {
+        color: '#fff',
+        fontSize: moderateScale(14),
+        fontWeight: '600',
     },
 });
