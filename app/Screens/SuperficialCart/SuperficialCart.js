@@ -48,7 +48,7 @@ export default function SuperficialCart() {
 
   const fetchOffers = async () => {
     try {
-      const { data } = await axios.get('http://192.168.1.3:1337/api/offers?populate=*');
+      const { data } = await axios.get('http://192.168.1.3/api/offers?populate=*');
       if (data?.data?.length) {
         setOffers(data.data);
       }
@@ -59,7 +59,7 @@ export default function SuperficialCart() {
 
   const fetchClinics = async () => {
     try {
-      const { data } = await axios.get('http://192.168.1.3:1337/api/clinics?populate=images');
+      const { data } = await axios.get('http://192.168.1.3/api/clinics?populate=images');
       setClinics(data.data);
     } catch (err) {
       setError('Error loading clinics');
@@ -106,7 +106,7 @@ export default function SuperficialCart() {
     }
 
     try {
-      const { data } = await axios.post('http://192.168.1.3:1337/api/make-order-lab-vacination', Booking_data)
+      const { data } = await axios.post('http://192.168.1.3/api/make-order-lab-vacination', Booking_data)
       Alert.alert("Booking Complete", "Thankyou For Booking From Doggy World ...")
       setLoading(false)
     } catch (error) {

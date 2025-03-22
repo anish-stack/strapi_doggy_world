@@ -42,6 +42,7 @@ export const getUser = () => {
     };
 
     const getUserOrders = async (id) => {
+        console.log("id",id)
         setLoading(true);
         setError(null);
         try {

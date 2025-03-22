@@ -68,6 +68,7 @@ import { StatusBar } from "expo-status-bar";
 import NotFoundScreen from "./NotFoundScreen";
 import ErrorBoundaryWrapper from "./ErrorBoundary";
 import NotificationScreen from "./layouts/NotificationScreen";
+import SingleCakeOrder from "./Profile_Screens/Cakes_order/SingleCakeOrder";
 const Stack = createNativeStackNavigator();
 
 SplashScreen.preventAutoHideAsync();
@@ -227,13 +228,18 @@ const App = () => {
           />
           <Stack.Screen
             name="Groomings"
-            options={{ headerShown: true, title: "Grooming Sessions" }}
+            options={{ headerShown: true, title: "My Grooming Sessions" }}
             component={Grooming_Sessions}
           />
           <Stack.Screen
             name="cakeorder"
-            options={{ headerShown: true, title: "Cakes Order" }}
+            options={{ headerShown: false, title: "Cakes Order" }}
             component={Cakes_order}
+          />
+          <Stack.Screen
+            name="SingleCakeOrder"
+            options={{ headerShown: false, title: "Cakes Order" }}
+            component={SingleCakeOrder}
           />
           <Stack.Screen
             name="labVaccinations"

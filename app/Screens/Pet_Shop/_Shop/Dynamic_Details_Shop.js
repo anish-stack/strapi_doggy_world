@@ -33,7 +33,7 @@ export default function Dynamic_Details_Shop() {
 
     const fetchProduct = async () => {
         try {
-            const res = await axios.get(`http://192.168.1.3:1337/api/pet-shop-products/${id}?populate=*`);
+            const res = await axios.get(`http://192.168.1.3/api/pet-shop-products/${id}?populate=*`);
             setProduct(res.data.data);
 
         } catch (error) {

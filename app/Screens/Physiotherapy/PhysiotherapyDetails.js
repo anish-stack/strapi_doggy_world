@@ -19,7 +19,7 @@ export default function PhysiotherapyDetails() {
    
     const fetchData = async () => {
         try {
-            const res = await axios.get(`http://192.168.1.3:1337/api/physiotherapies?filters[documentId][$eq]=${serviceId}&populate=*`);
+            const res = await axios.get(`http://192.168.1.3/api/physiotherapies?filters[documentId][$eq]=${serviceId}&populate=*`);
             setData(res.data.data[0] || {});
         } catch (error) {
             console.log(error);

@@ -114,12 +114,7 @@ export default function Grooming_Sessions() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>My Grooming Sessions</Text>
-                <TouchableOpacity style={styles.filterButton}>
-                    <Filter size={20} color="#6b7280" />
-                </TouchableOpacity>
-            </View>
+         
 
             <View style={styles.filterTabs}>
                 <TouchableOpacity

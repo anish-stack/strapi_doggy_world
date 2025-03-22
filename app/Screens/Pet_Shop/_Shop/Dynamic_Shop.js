@@ -19,7 +19,7 @@ export default function Dynamic_Shop() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`http://192.168.1.3:1337/api/pet-shop-categories?populate=*`);
+                const response = await axios.get(`http://192.168.1.3/api/pet-shop-categories?populate=*`);
                 const resdata = response.data.data;
 
                 const filterData = resdata.filter(item =>

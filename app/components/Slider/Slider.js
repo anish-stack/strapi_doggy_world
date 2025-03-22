@@ -42,19 +42,10 @@ export default function CustomSlider() {
     });
 
     return (
-        <View style={styles.container}>
+        <View >
             <View style={styles.imageContainer} {...panResponder.panHandlers}>
                 <Image source={images[activeIndex].src} style={styles.image} />
-                {/* <View style={styles.navigation}>
-                    <TouchableOpacity 
- activeOpacity={0.9}onPress={goToPrevious} style={styles.navButton}>
-                        <Icon name="chevron-back" size={30} color="#fff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity 
- activeOpacity={0.9}onPress={goToNext} style={styles.navButton}>
-                        <Icon name="chevron-forward" size={30} color="#fff" />
-                    </TouchableOpacity>
-                </View> */}
+               
             </View>
 
             <Text style={styles.counter}>
@@ -68,17 +59,17 @@ const styles = StyleSheet.create({
 
     imageContainer: {
         width: width,
-        height: 180,
-        // borderWidth:2,
+        height: 200,
+    
         overflow: 'hidden',
-        top: 0,
+
         position: 'relative',
         // marginBottom: 20,
     },
     image: {
         width: '100%',
         height: '100%',
-        resizeMode: 'contain',
+        resizeMode: 'cover',
     },
     navigation: {
         position: 'absolute',

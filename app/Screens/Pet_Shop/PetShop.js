@@ -49,8 +49,8 @@ import {
         setError(null);
         
         const [petshopsRes, slidersRes] = await Promise.all([
-          axios.get('http://192.168.1.3:1337/api/petshops?populate=*'),
-          axios.get('http://192.168.1.3:1337/api/bakery-sliders?populate=*')
+          axios.get('http://192.168.1.3/api/petshops?populate=*'),
+          axios.get('http://192.168.1.3/api/bakery-sliders?populate=*')
         ]);
   
         const fetchedData = petshopsRes.data.data;

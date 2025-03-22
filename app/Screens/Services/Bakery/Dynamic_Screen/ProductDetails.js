@@ -27,7 +27,7 @@ export default function ProductDetails() {
 
   const fetchProduct = async () => {
     try {
-      const res = await axios.get(`http://192.168.1.3:1337/api/products/${id}?populate=*`);
+      const res = await axios.get(`http://192.168.1.3/api/products/${id}?populate=*`);
       setProduct(res.data.data);
     } catch (error) {
       setError('Failed to load product details.');

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Doggy World Care",
-    "slug": "Doggy World Care",
+    "slug": "DoggyWorldCare",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/Doggy_.png",
@@ -21,14 +21,14 @@
         "foregroundImage": "./assets/Doggy_.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.happy_coding.gateway"
+      "package": "com.happy_coding.DoggyWorldCare"
     },
     "web": {
       "favicon": "./assets/Doggy_.png"
     },
     "extra": {
       "eas": {
-        "projectId": "f0248ecc-28be-491a-b25d-c81f8f89235f"
+        "projectId": "96f03094-1297-449c-9ca8-8e2781703363"
       }
     },
     "plugins": [

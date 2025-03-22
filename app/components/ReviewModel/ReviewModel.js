@@ -65,7 +65,7 @@ export default function ReviewModal({ open, close, appointment, isGrooming }) {
 
         try {
             // Replace with your actual API endpoint
-            const response = await axios.post('http://192.168.1.3:1337/api/rate-consultation-bboking', {
+            const response = await axios.post('http://192.168.1.3/api/rate-consultation-bboking', {
                 id: appointment.id,
                 rate: selectedRating,
                 feedback: feedback.trim() || null

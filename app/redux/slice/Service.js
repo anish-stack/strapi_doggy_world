@@ -14,7 +14,7 @@ export const fetchService = createAsyncThunk(
 
 
         try {
-            const { data } = await axios.get('http://192.168.1.3:1337/api/v1/Doctors/Get-Services');
+            const { data } = await axios.get('http://192.168.1.3/api/v1/Doctors/Get-Services');
 
             return data.data;
         } catch (error) {

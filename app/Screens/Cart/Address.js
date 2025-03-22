@@ -50,7 +50,7 @@ export default function Address() {
 
 
             const response = await axios.post(
-                `http://192.168.1.3:1337/api/create_order_of_product`,
+                `http://192.168.1.3/api/create_order_of_product`,
                 OrderDetails
             );
 

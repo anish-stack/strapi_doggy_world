@@ -19,7 +19,7 @@ import axios from "axios"
 import { useToken } from "../../../hooks/useToken"
 
 // API base URL - should be moved to environment config in production
-const API_BASE_URL = "http://192.168.1.3:1337/api"
+const API_BASE_URL = "http://192.168.1.3/api"
 
 export default function Login() {
   // Navigation

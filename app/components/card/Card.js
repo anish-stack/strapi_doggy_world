@@ -1,11 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { TouchableOpacity, Image, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 
 export default function Card({ data }) {
     const navigation = useNavigation();
     const [loading, setLoading] = useState(false);
-
+    const pressCount = useRef(0);
+    const lastPressTime = useRef(0);
+    
     if (!data) {
         return (
             <View style={styles.noDataContainer}>
@@ -13,7 +15,7 @@ export default function Card({ data }) {
             </View>
         );
     }
-
+    
     const navigationRoutes = {
         "Pet Bakery": "Bakery",
         "Consultation": "Consultation",
@@ -25,24 +27,74 @@ export default function Card({ data }) {
         "Pharmacy": "Coming_soon",
         "Coming soon": "Coming_soon",
     };
-
-    const handlePress = () => {
+    
+    const handlePress = useCallback(() => {
+        // Track press count and time
+        pressCount.current += 1;
+        const now = Date.now();
+        const timeSinceLastPress = now - lastPressTime.current;
+        lastPressTime.current = now;
+        
+        console.log(`===== PRESS DEBUG =====`);
+        console.log(`Press #${pressCount.current} detected on "${data.title}" card`);
+        console.log(`Time since last press: ${timeSinceLastPress}ms`);
+        console.log(`Current loading state: ${loading}`);
+        
+        if (loading) {
+            console.log(`Press ignored - component is in loading state`);
+            return;
+        }
+        
+        console.log(`Setting loading to true`);
         setLoading(true);
+        
         const route = navigationRoutes[data.title] || "Category_Screens";
-
-        setTimeout(() => {
-            navigation.navigate(route, route === "Category_Screens" ? { item: data.title } : undefined);
+        const params = route === "Category_Screens" ? { item: data.title } : undefined;
+        
+        console.log(`Route selected: ${route}`);
+        console.log(`Params: ${JSON.stringify(params)}`);
+        console.log(`Setting timeout for navigation...`);
+        
+        const navigateTimeout = setTimeout(() => {
+            console.log(`Timeout fired after 300ms`);
+            console.log(`Navigating to ${route}`);
+            
+            try {
+                navigation.navigate(route, params);
+                console.log(`Navigation completed successfully`);
+            } catch (error) {
+                console.error(`Navigation error: ${error.message}`);
+            }
+            
+            console.log(`Setting loading to false`);
             setLoading(false);
-        }, 500); // Delay to simulate loading
-    };
-
+        }, 300);
+        
+        return () => {
+            console.log(`Cleanup function called - clearing timeout`);
+            clearTimeout(navigateTimeout);
+        };
+    }, [data, loading, navigation]);
+    
     return (
-        <TouchableOpacity activeOpacity={0.9} onPress={handlePress} disabled={loading}>
+        <TouchableOpacity 
+            activeOpacity={0.7} 
+            onPress={() => {
+                console.log(`TouchableOpacity onPress triggered for "${data.title}"`);
+                handlePress();
+            }}
+            style={{opacity: loading ? 0.7 : 1}}
+        >
             <View style={styles.card}>
                 {loading ? (
                     <ActivityIndicator size="small" color="#00aaa9" />
                 ) : (
-                    <Image source={{ uri: data.image.url }} style={styles.image} resizeMode="contain" />
+                    <Image 
+                        source={{ uri: data.image.url }} 
+                        style={styles.image} 
+                        resizeMode="contain" 
+                        onError={() => console.error(`Image loading error for ${data.title}`)}
+                    />
                 )}
             </View>
             <Text style={styles.cardTitle}>{data.title || "Category Title"}</Text>

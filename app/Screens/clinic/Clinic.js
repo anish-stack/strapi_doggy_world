@@ -36,7 +36,7 @@ export default function ClinicScreen({ isUpperLayoutShow = true }) {
 
   const fetchClinics = async () => {
     try {
-      const response = await axios.get('http://192.168.1.3:1337/api/clinics?populate=images');
+      const response = await axios.get('http://192.168.1.3/api/clinics?populate=images');
       setClinics(response.data.data);
       setLoading(false);
     } catch (err) {

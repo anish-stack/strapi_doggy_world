@@ -27,7 +27,7 @@ export default function BookingStep() {
         const fetchData = async () => {
             try {
                 setLoading(true)
-                const res = await axios.get(`http://192.168.1.3:1337/api/time-managements?filters[For_What][$eq]=Grooming&populate=*`)
+                const res = await axios.get(`http://192.168.1.3/api/time-managements?filters[For_What][$eq]=Grooming&populate=*`)
                 if (res.data && res.data.data.length > 0) {
                     setTimeData(res.data.data[0])
                 } else {
@@ -187,7 +187,7 @@ export default function BookingStep() {
         setLoading(true)
         try {
             const response = await axios.post(
-                "http://192.168.1.3:1337/api/make_a_grooming_Booking",
+                "http://192.168.1.3/api/make_a_grooming_Booking",
                 data_to_be_send
             );
 

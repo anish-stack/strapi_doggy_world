@@ -28,7 +28,7 @@ export default function Blogs() {
 
     const fetchBlogs = async () => {
         try {
-            const response = await axios.get('http://192.168.1.3:1337/api/Blogs?populate=*');
+            const response = await axios.get('http://192.168.1.3/api/Blogs?populate=*');
             setBlogs(response.data.data);
             setLoading(false);
         } catch (error) {
@@ -55,23 +55,24 @@ export default function Blogs() {
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
 
             <View style={styles.featuredSection}>
+
                 <SectionTitle
                     title="Featured Blogs"
                     subtitle="Learn and Explore What Your Furry Friend Wants"
                     variant="primary"
                     style={{ marginBottom: 20 }}
                 />
+
                 <ScrollView
                     horizontal
-
-
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.featuredContainer}
                 >
-                    {blogs.slice(0, 3).map((blog) => (
+                    
+                    {blogs.slice(0, 3).map((blog, index) => (
                         <View>
                             <TouchableOpacity
-                                key={blog.id}
+                                key={index}
                                 activeOpacity={0.8}
                                 style={styles.featuredCard}
                                 onPress={() => navigation.navigate('single-blog', { blog })}

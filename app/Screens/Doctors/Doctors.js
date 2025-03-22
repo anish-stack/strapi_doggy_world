@@ -31,7 +31,7 @@ export default function Doctors() {
 
   const fetchDoctors = async () => {
     try {
-      const response = await axios.get('http://192.168.1.3:1337/api/display-doctors?populate=*');
+      const response = await axios.get('http://192.168.1.3/api/display-doctors?populate=*');
       setDoctors(response.data.data);
       setLoading(false);
     } catch (err) {
