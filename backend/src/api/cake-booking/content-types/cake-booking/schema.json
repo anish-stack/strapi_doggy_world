@@ -47,10 +47,6 @@
       "type": "boolean",
       "default": false
     },
-    "Order_Stauts": {
-      "type": "string",
-      "default": "Pending"
-    },
     "Admin_Cancel_order": {
       "type": "boolean"
     },
@@ -76,6 +72,19 @@
       "relation": "manyToOne",
       "target": "api::auth.auth",
       "inversedBy": "cake_bookings"
+    },
+    "Order_Stauts": {
+      "type": "enumeration",
+      "enum": [
+        "Pending",
+        "Cake Preparing",
+        "Cancel",
+        "Rejected",
+        "Order Accepted",
+        "Dispatched",
+        "Canceled",
+        "Delivered"
+      ]
     }
   }
 }

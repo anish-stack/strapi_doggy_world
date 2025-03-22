@@ -635,8 +635,18 @@ export interface ApiCakeBookingCakeBooking extends Struct.CollectionTypeSchema {
     Order_Cancel_by_user: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<false>;
     Order_Cancel_by_user_reason: Schema.Attribute.String;
-    Order_Stauts: Schema.Attribute.String &
-      Schema.Attribute.DefaultTo<'Pending'>;
+    Order_Stauts: Schema.Attribute.Enumeration<
+      [
+        'Pending',
+        'Cake Preparing',
+        'Cancel',
+        'Rejected',
+        'Order Accepted',
+        'Dispatched',
+        'Canceled',
+        'Delivered',
+      ]
+    >;
     pet_id: Schema.Attribute.Relation<'manyToOne', 'api::auth.auth'>;
     price: Schema.Attribute.BigInteger;
     publishedAt: Schema.Attribute.DateTime;
