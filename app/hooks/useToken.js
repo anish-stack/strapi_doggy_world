@@ -9,6 +9,7 @@ export const useToken = () => {
     const getToken = async () => {
         try {
             const storedToken = await SecureStore.getItemAsync(TOKEN_KEY);
+            
             setToken(storedToken);
             setIsLoggedIn(!!storedToken); 
             

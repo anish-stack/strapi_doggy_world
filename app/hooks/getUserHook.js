@@ -12,15 +12,13 @@ export const getUser = () => {
 
     const getUserFnc = async () => {
         if (!token) {
-            console.log("Token:", token);
-            console.warn("Token is missing, retrying in 500ms...");
-           
+            console.warn("Token is missing, retrying...");
             return;
         }
 
         setLoading(true);
         setError(null);
-        console.log("Token:", token);
+        console.log("Fetching user data...");
 
         try {
             const response = await axios.get(`${API_END_POINT_URL}/api/auth/me`, {
@@ -28,13 +26,14 @@ export const getUser = () => {
             });
 
             const userData = response?.data?.data || {};
+            console.log("User data:", userData);
             setUser(userData);
 
             if (userData?.id) {
                 await getUserOrders(userData.id);
             }
         } catch (err) {
-            console.error("Error fetching user:", err?.response?.data?.error?.message);
+            console.error("Error fetching user:", err?.response);
             setError(err?.response?.data?.error?.message || "An error occurred");
         } finally {
             setLoading(false);
@@ -42,16 +41,13 @@ export const getUser = () => {
     };
 
     const getUserOrders = async (id) => {
-        console.log("id",id)
+        console.log("Fetching orders for user ID:", id);
         setLoading(true);
         setError(null);
         try {
             const response = await axios.get(`${API_END_POINT_URL}/api/findMyAllOrders?id=${id}`);
-
             setOrderData(response.data.orders);
-            setLoading(false);
         } catch (err) {
-            setLoading(false);
             console.error("Error fetching orders:", err?.response?.data?.error?.message || err.message);
             setError(err?.response?.data?.error?.message || "Failed to fetch orders");
         } finally {
@@ -60,12 +56,18 @@ export const getUser = () => {
     };
 
     useEffect(() => {
+        let interval;
         if (isLoggedIn && token) {
-            getUserFnc();
+            getUserFnc(); 
+            interval = setInterval(() => {
+                getUserFnc();
+            }, 10000); // Run every 10 seconds
         } else {
             setUser(null);
             setOrderData(null);
         }
+
+        return () => clearInterval(interval); 
     }, [isLoggedIn, token]);
 
     return { getUserFnc, user, orderData, loading, error };

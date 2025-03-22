@@ -17,6 +17,7 @@ import { useNavigation } from "@react-navigation/native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import axios from "axios"
 import { useToken } from "../../../hooks/useToken"
+import { getUser } from "../../../hooks/getUserHook"
 
 // API base URL - should be moved to environment config in production
 const API_BASE_URL = "https://admindoggy.adsdigitalmedia.com/api"
@@ -24,6 +25,7 @@ const API_BASE_URL = "https://admindoggy.adsdigitalmedia.com/api"
 export default function Login() {
   // Navigation
   const navigation = useNavigation()
+  const { getUserFnc } = getUser()
 
   // Form state
   const [contactNumber, setContactNumber] = useState("")
@@ -119,7 +121,7 @@ export default function Login() {
   }
 
   const handleRequestOtp = async () => {
-    console.log("I am Hites")
+
     if (!contactNumber) {
       setError("Please enter your contact number")
       return
@@ -157,47 +159,56 @@ export default function Login() {
   const handleVerifyOtp = async () => {
     // Validate inputs
     if (!contactNumber || !otp) {
-      setError("Please enter both contact number and OTP")
-      return
+      setError("Please enter both contact number and OTP");
+      return;
     }
 
     if (!isValidPhoneNumber(contactNumber)) {
-      setError("Please enter a valid 10-digit phone number")
-      return
+      setError("Please enter a valid 10-digit phone number");
+      return;
     }
 
     if (otp.length < 4) {
-      setError("Please enter a valid OTP")
-      return
+      setError("Please enter a valid OTP");
+      return;
     }
 
     try {
-      setLoading(true)
-      setError("")
+      setLoading(true);
+      setError("");
 
       const response = await axios.post(`${API_BASE_URL}/user-login-verify-otp`, {
         contact_number: contactNumber,
         otp: otp,
-      })
+      });
 
       if (response.data && response.data.success) {
-        setSuccess("OTP verified successfully!")
-        const token = response.data.token
-        saveToken(token)
+        const token = response.data.token;
 
+        if (!token) {
+          setError("Verification successful, but no token received. Please contact support.");
+          return;
+        }
+
+        setSuccess("OTP verified successfully!");
+        await saveToken(token);
+        await getUserFnc()
         setTimeout(() => {
-          navigation.navigate("Home")
-        }, 1000)
+          navigation.navigate("Home");
+        }, 2000);
       } else {
-        setError(response.data?.message || "Invalid OTP. Please try again.")
+        setError(response.data?.message || "Invalid OTP. Please try again.");
       }
     } catch (error) {
-      console.error("OTP verification error:", error)
-      setError(error.response?.data?.error?.message || "Unable to verify OTP. Please check your internet connection.")
+      console.error("OTP verification error:", error);
+      setError(
+        error.response?.data?.error?.message || "Unable to verify OTP. Please check your internet connection."
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
 
   // Resend OTP
   const handleResendOtp = async () => {

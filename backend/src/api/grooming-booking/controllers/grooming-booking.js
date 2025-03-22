@@ -7,7 +7,6 @@ module.exports = {
             const { clinic_id, data_of_g, type, customizedData, Package, time, date, pet } = ctx.request.body || {};
 
 
-            // Validate required fields
             if (!clinic_id?.id || !type || !time || !date) {
                 return ctx.badRequest("Missing required fields: clinic_id, type, time, and date are mandatory.");
             }

@@ -1,5 +1,5 @@
 import { Image, View, StyleSheet, Text } from "react-native";
-
+import * as Sentry from "@sentry/react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./Screens/Home/Home";
@@ -28,7 +28,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppRegistry } from "react-native";
 import { name as appName } from "./app.json";
 import * as SplashScreen from "expo-splash-screen";
-import { AppLoading } from "expo";
+
 import Cart from "./Screens/Cart/Cart";
 import Offers from "./Screens/Cart/Offers";
 import PetShop from "./Screens/Pet_Shop/PetShop";
@@ -74,14 +74,24 @@ import ViewPhysioDetails from "./Profile_Screens/Orders/Physio/ViewPhysioDetails
 import ViewLabDetails from "./Profile_Screens/Orders/lab/ViewLabDetails";
 import PetShopOrders from "./Profile_Screens/Orders/petShopOrders/PetShopOrders";
 import ViewPetShopOrder from "./Profile_Screens/Orders/petShopOrders/ViewPetShopOrder";
+import { getUser } from "./hooks/getUserHook";
 const Stack = createNativeStackNavigator();
 
 SplashScreen.preventAutoHideAsync();
+Sentry.init({
+  dsn: "https://5b208c724079bf3e5789b51da0190912@o4508873810771970.ingest.us.sentry.io/4509020408643584",
+
+  sendDefaultPii: true,
+});
+
+
 const App = () => {
+  const { getUserFnc } = getUser()
   const navigationContainerRef = useRef();
   const [currentRoute, setCurrentRoute] = useState("");
   const { labTests, labTestsCount } = useSelector((state) => state.labCart);
   const [showGif, setShowGif] = useState(false);
+
   useEffect(() => {
     const getCurrentRoute = () => {
       if (navigationContainerRef.current) {
@@ -121,7 +131,7 @@ const App = () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       SplashScreen.hideAsync();
     };
-
+    getUserFnc()
     loadApp();
   }, []);
 
@@ -524,6 +534,7 @@ const RootApp = () => (
 
   </Provider>
 );
-AppRegistry.registerComponent(appName, () => RootApp);
+const wrappedWithSentry = Sentry.wrap(RootApp);
+AppRegistry.registerComponent(appName, () => wrappedWithSentry);
 
-export default RootApp;
+export default Sentry.wrap(wrappedWithSentry);

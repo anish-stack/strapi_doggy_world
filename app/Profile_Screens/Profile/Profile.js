@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, TouchableWithoutFeedback } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { getUser } from '../../hooks/getUserHook';
 import { useToken } from '../../hooks/useToken';
 import { useNavigation } from '@react-navigation/native';
@@ -59,6 +59,10 @@ export default function Profile() {
             routes: [{ name: 'Home' }],
         })
     }
+
+    useEffect(() => {
+        getUserFnc()
+    }, [])
 
     if (!isLoggedIn || !user) {
         return (
