@@ -561,6 +561,7 @@ export interface ApiBookingConsultationBookingConsultation
     draftAndPublish: true;
   };
   attributes: {
+    booking_status: Schema.Attribute.String;
     Cancel_Reason: Schema.Attribute.Text;
     consulation_rate: Schema.Attribute.Integer;
     consultation: Schema.Attribute.Relation<

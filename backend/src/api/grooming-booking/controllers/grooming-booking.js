@@ -109,7 +109,7 @@ module.exports = {
                     Package: packageBooking ? Package : null,
                     grooming_service: generalBooking ? data_of_g?.documentId : null,
                     Customize: customizeBooking ? ArrayOfCustomized : [],
-                    booking_status: "pending"
+                    booking_status: "Pending"
                 }
             });
             const content = {
