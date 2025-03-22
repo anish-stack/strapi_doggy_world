@@ -95,7 +95,9 @@ module.exports = {
             console.log(ArrayOfCustomized);
 
 
-
+            if (!pet) {
+                return ctx.badRequest("Pet not found,Please try again later.");
+            }
 
             // Create Booking
             const newBooking = await strapi.entityService.create("api::grooming-booking.grooming-booking", {
