@@ -210,6 +210,9 @@ module.exports = {
                 return ctx.badRequest("Grooming service already Cancel!");
             }
             const { pet, Type } = booking || {}
+            if (!pet) {
+                return ctx.badRequest("Pet not found,Please try again later.");
+            }
             // Update the booking record
             await strapi.entityService.update("api::grooming-booking.grooming-booking", id, {
                 data: {
