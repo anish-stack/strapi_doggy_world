@@ -75,6 +75,7 @@ module.exports = {
 
     async cancel_cake_order_by_user(ctx) {
         try {
+            console.log("ctx.request?.body", ctx.request?.body)
             const { orderId, reason } = ctx.request?.body || {};
 
             if (!orderId || !reason) {
@@ -119,8 +120,8 @@ module.exports = {
                 date: new Date().toLocaleDateString("en-US"),
                 type: flavour,
             };
-
-            await CancelBookings(pet_id?.contact_number, content)
+            console.log("content", content)
+            // await CancelBookings(pet_id?.contact_number, content)
             return ctx.send({
                 status: 200,
                 message: "Cake Order Booking canceled successfully."

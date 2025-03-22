@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, TouchableWithoutFeedback } from 'react-native';
 import React from 'react';
 import { getUser } from '../../hooks/getUserHook';
 import { useToken } from '../../hooks/useToken';
@@ -7,6 +7,7 @@ import { Share } from 'react-native';
 import { CreditCard as Edit3, Package, Calendar, Cake, Scissors, Stethoscope, ShoppingBag, Star, Share2, PhoneCall, LogOut, PawPrint as Paw } from 'lucide-react-native';
 import Tabs from '../../layouts/Tabs';
 import Layout from '../../layouts/Layout';
+import TopHeadPart from '../../layouts/TopHeadPart';
 
 export default function Profile() {
     const { user, getUserFnc, orderData } = getUser();
@@ -23,26 +24,26 @@ export default function Profile() {
     } = orderData || {};
 
     const stats = [
-        { title: 'Consultations', count: consultationBookings.length, icon: Stethoscope },
-        { title: 'Cake Orders', count: cakeBookings.length, icon: Cake },
-        { title: 'Grooming', count: groomingPackages.length, icon: Scissors },
-        { title: 'Lab & Vaccines', count: labVaccinations.length, icon: Package },
-        { title: 'Shop Orders', count: petShopOrders.length, icon: ShoppingBag },
-        { title: 'Physio Sessions', count: physioBookings.length, icon: Calendar },
+        { title: 'Consultations', route: "Appointments", count: consultationBookings.length, icon: Stethoscope },
+        { title: 'Cake Orders', route: "cakeorder", count: cakeBookings.length, icon: Cake },
+        { title: 'Grooming', route: "Groomings", count: groomingPackages.length, icon: Scissors },
+        { title: 'Lab & Vaccines', route: "labVaccinations", count: labVaccinations.length, icon: Package },
+        { title: 'Shop Orders', route: "Orders", count: petShopOrders.length, icon: ShoppingBag },
+        { title: 'Physio Sessions', route: "physioBookings", count: physioBookings.length, icon: Calendar },
     ];
 
     const menuItems = [
-        { title: 'Edit Profile', icon: Edit3, onPress: () => router.navigate('*') },
+        // { title: 'Edit Profile', icon: Edit3, onPress: () => router.navigate('home') },
         { title: 'Rate Our App', icon: Star, onPress: () => { } },
         { title: 'Share App', icon: Share2, onPress: handleShare },
-        { title: 'Contact Us', icon: PhoneCall, onPress: () => router.navigate('*') },
+        { title: 'Contact Us', icon: PhoneCall, onPress: () => router.navigate('Support') },
         { title: 'Logout', icon: LogOut, onPress: handleLogout, danger: true },
     ];
 
     async function handleShare() {
         try {
             await Share.share({
-                message: 'Check out Doggy World - The best pet care app!',
+                message: 'Check out Doggy World Care - The best pet care app!',
                 url: 'https://doggyworldapp.com',
                 title: 'Doggy World',
             });
@@ -74,65 +75,72 @@ export default function Profile() {
     }
 
     return (
-        <Layout>
-            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-                <View style={styles.header}>
-                    <View style={styles.profileInfo}>
-                        <View style={styles.avatarContainer}>
-                            <Paw size={32} color="#FFFFFF" />
+        <>
+
+            <TopHeadPart title='Pet Profile 🐾🐾' icon='info' />
+            <Layout isHeaderShow={false}>
+
+                <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+                    <View style={styles.header}>
+                        <View style={styles.profileInfo}>
+                            <View style={styles.avatarContainer}>
+                                <Paw size={32} color="#FFFFFF" />
+                            </View>
+                            <View style={styles.userInfo}>
+                                <Text style={styles.petName}>{user.petName}</Text>
+                                <Text style={styles.breed}>{user.Breed} • {user.PetType}</Text>
+                                <Text style={styles.phone}>{user.contact_number}</Text>
+                            </View>
                         </View>
-                        <View style={styles.userInfo}>
-                            <Text style={styles.petName}>{user.petName}</Text>
-                            <Text style={styles.breed}>{user.Breed} • {user.PetType}</Text>
-                            <Text style={styles.phone}>{user.contact_number}</Text>
+                        <TouchableOpacity
+                            style={styles.editButton}
+                            onPress={() => router.navigate('/profile/edit')}
+                        >
+                            <Edit3 size={20} color="#B32113" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.statsContainer}>
+                        <Text style={styles.sectionTitle}>Your Activity</Text>
+                        <View style={styles.statsGrid}>
+                            {stats.map((stat, index) => (
+                                <TouchableWithoutFeedback onPress={() => router.navigate(stat.route)} >
+                                    <View key={index} style={styles.statCard}>
+                                        <stat.icon size={24} color="#B32113" />
+                                        <Text style={styles.statCount}>{stat.count}</Text>
+                                        <Text style={styles.statTitle}>{stat.title}</Text>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            ))}
                         </View>
                     </View>
-                    <TouchableOpacity
-                        style={styles.editButton}
-                        onPress={() => router.navigate('/profile/edit')}
-                    >
-                        <Edit3 size={20} color="#B32113" />
-                    </TouchableOpacity>
-                </View>
 
-                <View style={styles.statsContainer}>
-                    <Text style={styles.sectionTitle}>Your Activity</Text>
-                    <View style={styles.statsGrid}>
-                        {stats.map((stat, index) => (
-                            <View key={index} style={styles.statCard}>
-                                <stat.icon size={24} color="#B32113" />
-                                <Text style={styles.statCount}>{stat.count}</Text>
-                                <Text style={styles.statTitle}>{stat.title}</Text>
-                            </View>
+                    <View style={styles.menuContainer}>
+                        <Text style={styles.sectionTitle}>Quick Actions</Text>
+                        {menuItems.map((item, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.menuItem}
+                                onPress={item.onPress}
+                            >
+                                <View style={styles.menuItemLeft}>
+                                    <item.icon size={20} color={item.danger ? '#EF4444' : '#1F2937'} />
+                                    <Text style={[styles.menuItemText, item.danger && styles.dangerText]}>
+                                        {item.title}
+                                    </Text>
+                                </View>
+                                <View style={styles.menuItemArrow} />
+                            </TouchableOpacity>
                         ))}
                     </View>
-                </View>
 
-                <View style={styles.menuContainer}>
-                    <Text style={styles.sectionTitle}>Quick Actions</Text>
-                    {menuItems.map((item, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={styles.menuItem}
-                            onPress={item.onPress}
-                        >
-                            <View style={styles.menuItemLeft}>
-                                <item.icon size={20} color={item.danger ? '#EF4444' : '#1F2937'} />
-                                <Text style={[styles.menuItemText, item.danger && styles.dangerText]}>
-                                    {item.title}
-                                </Text>
-                            </View>
-                            <View style={styles.menuItemArrow} />
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                    <View style={styles.footer}>
+                        <Text style={styles.version}>Version 1.0.0</Text>
+                    </View>
+                </ScrollView>
 
-                <View style={styles.footer}>
-                    <Text style={styles.version}>Version 1.0.0</Text>
-                </View>
-            </ScrollView>
-
-        </Layout>
+            </Layout>
+        </>
 
     );
 }

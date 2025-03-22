@@ -12,7 +12,7 @@ export default function Categories() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://192.168.1.3/api/main-categories?populate=*');
+                const response = await axios.get('http://192.168.1.3:1337/api/main-categories?populate=*');
                 setData(response.data.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -41,11 +41,11 @@ export default function Categories() {
     
     return (
         <View style={styles.container}>
-            <ImageBackground 
+            {/* <ImageBackground 
                 source={require('./paw-prints.png')} 
                 style={styles.backgroundImage}
                 imageStyle={styles.backgroundImageStyle}
-            >
+            > */}
                 <View style={styles.cardsContainer}>
                     {memoizedData && memoizedData.length > 0 ? (
                         memoizedData.map((item, index) => (
@@ -57,7 +57,7 @@ export default function Categories() {
                         <Text style={styles.noDataText}>No Categories Available</Text>
                     )}
                 </View>
-            </ImageBackground>
+            {/* </ImageBackground> */}
         </View>
     );
 }

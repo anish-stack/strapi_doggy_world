@@ -19,13 +19,13 @@ import { getUser } from '../../hooks/getUserHook';
 
 export default function Address() {
     const [address, setAddress] = useState({
-        fullName: 'Anish',
-        street: 'Delhi Street',
-        city: 'Delhi',
-        HouseNo: '109',
-        landmark: 'Naharpur',
-        zipCode: '110085',
-        phone: '7217619794',
+        fullName: '',
+        street: '',
+        city: '',
+        HouseNo: '',
+    
+        zipCode: '',
+        phone: '',
     });
 
     const { token, isLoggedIn, deleteToken } = useToken()
@@ -43,29 +43,37 @@ export default function Address() {
             Alert.alert('Login Required', 'Please log in to place your order.');
             return;
         }
-        setLoading(true)
+
+        // Check if any address field is empty
+        const missingFields = Object.entries(address).filter(([key, value]) => !value.trim());
+
+        if (missingFields.length > 0) {
+            const missingFieldNames = missingFields.map(([key]) => key).join(', ');
+            Alert.alert('Missing Address Details', `Please fill in the following fields: ${missingFieldNames}`);
+            return;
+        }
+
+        setLoading(true);
+
         const OrderDetails = { Product: { ...data }, address, user };
 
         try {
-
-
             const response = await axios.post(
-                `http://192.168.1.3/api/create_order_of_product`,
+                `http://192.168.1.3:1337/api/create_order_of_product`,
                 OrderDetails
             );
 
-
             navigation.navigate('Order-confirm', {
                 order: response.data.order
+            });
 
-            })
-            setLoading(false)
+            setLoading(false);
             Alert.alert('Success', 'Your order has been placed successfully.');
         } catch (error) {
             console.log("Error Response:", error.response?.data?.error?.message);
 
             if (error.response?.data?.error?.message === 'User not found.') {
-                await deleteToken()
+                await deleteToken();
                 Alert.alert(
                     'Session Expired',
                     'Your session has expired. Please log in again to continue.',
@@ -80,7 +88,7 @@ export default function Address() {
             } else {
                 Alert.alert('Order Failed', error.response?.data?.error?.message || 'Something went wrong. Please try again.');
             }
-            setLoading(false)
+            setLoading(false);
         }
     };
 

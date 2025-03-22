@@ -70,10 +70,10 @@ export default function DynamicSlider({
         {navigationShow && (
           <View style={styles.navigation}>
             <TouchableOpacity activeOpacity={0.9} onPress={goToPrevious} style={styles.navButton}>
-              <Icon name="chevron-back" size={30} color="#fff" />
+              <Icon name="chevron-back" size={20} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.9} onPress={goToNext} style={styles.navButton}>
-              <Icon name="chevron-forward" size={30} color="#fff" />
+              <Icon name="chevron-forward" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
         )}

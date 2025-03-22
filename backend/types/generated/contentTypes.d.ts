@@ -954,7 +954,9 @@ export interface ApiGroomingBookingGroomingBooking
     draftAndPublish: true;
   };
   attributes: {
-    booking_status: Schema.Attribute.String;
+    booking_status: Schema.Attribute.Enumeration<
+      ['Pending', 'Canceled', 'Rejected', 'Accepted', 'Completed']
+    >;
     clinic: Schema.Attribute.Relation<'manyToOne', 'api::clinic.clinic'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

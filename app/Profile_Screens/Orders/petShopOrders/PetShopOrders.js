@@ -1,11 +1,11 @@
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  FlatList, 
-  Image, 
-  RefreshControl, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Image,
+  RefreshControl,
   ActivityIndicator,
   Alert
 } from 'react-native';
@@ -17,16 +17,16 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function Lab() {
+export default function PetShopOrders() {
   const navigation = useNavigation();
   const { orderData, getUserFnc, loading, error } = getUser();
-  const [labData, setLabData] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [filterType, setFilterType] = useState("all");
 
   useEffect(() => {
     if (orderData) {
-      setLabData(orderData?.labVaccinations || []);
+      setOrders(orderData?.petShopOrders || []);
     }
   }, [orderData]);
 
@@ -43,17 +43,13 @@ export default function Lab() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   }, []);
 
-  const getStatus = useCallback((booking) => {
-    if (booking.isBookingCancel) return "cancelled";
-    if (booking.is_order_complete) return "completed";
-    return "pending";
-  }, []);
-
   const getStatusColor = useCallback((status) => {
     switch (status.toLowerCase()) {
-      case "pending":
+      case "order placed":
         return "#f59e0b";
-      case "completed":
+      case "shipped":
+        return "#3b82f6";
+      case "delivered":
         return "#10b981";
       case "cancelled":
         return "#ef4444";
@@ -62,10 +58,10 @@ export default function Lab() {
     }
   }, []);
 
-  const handleCancelBooking = useCallback((item) => {
+  const handleCancelOrder = useCallback((item) => {
     Alert.alert(
-      "Cancel Booking",
-      "Are you sure you want to cancel this lab test/vaccination?",
+      "Cancel Order",
+      "Are you sure you want to cancel this order?",
       [
         {
           text: "No",
@@ -75,8 +71,8 @@ export default function Lab() {
           text: "Yes, Cancel",
           style: "destructive",
           onPress: () => {
-            // Add your cancel booking API call here
-            Alert.alert("Success", "Your lab test/vaccination has been cancelled successfully.");
+            // Add your cancel order API call here
+            Alert.alert("Success", "Your order has been cancelled successfully.");
           }
         }
       ]
@@ -84,7 +80,7 @@ export default function Lab() {
   }, []);
 
   const handleViewDetails = useCallback((item) => {
-    navigation.navigate('ViewLabDetails', { labBooking: item });
+    navigation.navigate('ViewPetShopOrder', { order: item });
   }, [navigation]);
 
   const handleSupport = useCallback(() => {
@@ -107,19 +103,21 @@ export default function Lab() {
     );
   }, []);
 
-  const filteredLabData = useMemo(() => {
-    if (filterType === "all") return labData;
-    
-    return labData.filter(booking => {
-      const status = getStatus(booking);
-      return status === filterType;
+  const filteredOrders = useMemo(() => {
+    if (filterType === "all") return orders;
+
+    return orders.filter(order => {
+      if (filterType === "cancelled") {
+        return order.isCancelbyUser || order.isCancelbyAdmin;
+      }
+      return order.Order_Status.toLowerCase().includes(filterType.toLowerCase());
     });
-  }, [labData, filterType, getStatus]);
+  }, [orders, filterType]);
 
   const renderFilterButton = useCallback((title, type) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[
-        styles.filterButton, 
+        styles.filterButton,
         filterType === type && styles.activeFilterButton
       ]}
       onPress={() => setFilterType(type)}
@@ -135,153 +133,154 @@ export default function Lab() {
 
   const renderEmptyState = useCallback(() => (
     <View style={styles.emptyContainer}>
-      <Image 
-        source={require('../../../assets/empty.png')} 
+      <Image
+        source={require('../../../assets/empty.png')}
         style={styles.emptyImage}
       />
-      <Text style={styles.emptyTitle}>No Lab Tests or Vaccinations</Text>
+      <Text style={styles.emptyTitle}>No Orders Found</Text>
       <Text style={styles.emptyText}>
-        You haven't booked any lab tests or vaccinations yet. When you do, they will appear here.
+        You haven't placed any orders yet. When you do, they will appear here.
       </Text>
-      <TouchableOpacity 
-        style={styles.bookNowButton}
-        onPress={() => navigation.navigate('LabServices')}
+      <TouchableOpacity
+        style={styles.shopNowButton}
+        onPress={() => navigation.navigate('PetShop')}
       >
-        <Text style={styles.bookNowButtonText}>Book Now</Text>
+        <Text style={styles.shopNowButtonText}>Shop Now</Text>
       </TouchableOpacity>
     </View>
   ), [navigation]);
 
-  const renderLabItem = useCallback(({ item }) => {
-    const status = getStatus(item);
+  const getItemCount = useCallback((items) => {
+    if (!items || !items.length) return 0;
+    return items.reduce((total, item) => total + item.quantity, 0);
+  }, []);
+
+  const renderOrderItem = useCallback(({ item }) => {
+    const status = item.isCancelbyUser || item.isCancelbyAdmin ? "Cancelled" : item.Order_Status;
     const statusColor = getStatusColor(status);
-    
-    // Get the first test name for display
-    const firstTestName = item.Test && item.Test.length > 0 ? item.Test[0].Test_Name : "Lab Test";
-    const additionalTestsCount = item.Test ? item.Test.length - 1 : 0;
-    
+    const itemCount = getItemCount(item.Shop_bakery_cart_items);
+    const firstItem = item.Shop_bakery_cart_items && item.Shop_bakery_cart_items.length > 0
+      ? item.Shop_bakery_cart_items[0]
+      : null;
+    const additionalItemsCount = item.Shop_bakery_cart_items ? item.Shop_bakery_cart_items.length - 1 : 0;
+
     return (
-      <TouchableOpacity 
-        style={styles.labCard}
+      <TouchableOpacity
+        style={styles.orderCard}
         onPress={() => handleViewDetails(item)}
         activeOpacity={0.9}
       >
         <View style={styles.cardHeader}>
           <View style={styles.titleContainer}>
-            <Text style={styles.labTitle} numberOfLines={1}>
-              {firstTestName}
-              {additionalTestsCount > 0 && ` +${additionalTestsCount} more`}
-            </Text>
+            <Text style={styles.orderId}>Order #{item.documentId.substring(0, 8)}</Text>
             <View style={[
-              styles.statusBadge, 
+              styles.statusBadge,
               { backgroundColor: statusColor + '20' }
             ]}>
               <Text style={[
-                styles.statusText, 
+                styles.statusText,
                 { color: statusColor }
               ]}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
+                {status}
               </Text>
             </View>
           </View>
-          <Text style={styles.bookingId}>Booking ID: {item.documentId.substring(0, 10)}...</Text>
+          <Text style={styles.orderDate}>Ordered on {formatDate(item.createdAt)}</Text>
         </View>
 
         <View style={styles.cardDivider} />
 
-        <View style={styles.detailsContainer}>
-          <View style={styles.detailRow}>
-            <MaterialCommunityIcons name="paw" size={16} color="#666" />
-            <Text style={styles.detailLabel}>Pet:</Text>
-            <Text style={styles.detailValue}>{item.auth?.petName || "Pet"}</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <MaterialIcons name="medical-services" size={16} color="#666" />
-            <Text style={styles.detailLabel}>Type:</Text>
-            <Text style={styles.detailValue}>
-              {item.Test && item.Test.length > 0 && item.Test[0].Type_Of_Test ? 
-                item.Test[0].Type_Of_Test : "Lab Test/Vaccination"}
-            </Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <FontAwesome name="calendar" size={16} color="#666" />
-            <Text style={styles.detailLabel}>Date:</Text>
-            <Text style={styles.detailValue}>{formatDate(item.Booking_Date)}</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <MaterialIcons name="access-time" size={16} color="#666" />
-            <Text style={styles.detailLabel}>Time:</Text>
-            <Text style={styles.detailValue}>{item.Time_Of_Test}</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <MaterialIcons name="location-on" size={16} color="#666" />
-            <Text style={styles.detailLabel}>Clinic:</Text>
-            <Text style={styles.detailValue}>{item.clinic?.clinic_name}</Text>
-          </View>
-
-          <View style={styles.priceContainer}>
-            <View style={styles.priceItem}>
-              <Text style={styles.priceLabel}>Total:</Text>
-              <Text style={styles.originalPrice}>₹{item.Total_Price}</Text>
+        <View style={styles.itemsContainer}>
+          {firstItem ? (
+            <View style={styles.itemRow}>
+              <View style={styles.itemTypeIconContainer}>
+                <MaterialCommunityIcons
+                  name={firstItem.isPetShopProduct ? "dog" : "food-croissant"}
+                  size={20}
+                  color="#4F46E5"
+                />
+              </View>
+              <View style={styles.itemDetails}>
+                <Text style={styles.itemName} numberOfLines={1}>{firstItem.title}</Text>
+                <View style={styles.itemMeta}>
+                  <Text style={styles.itemQuantity}>Qty: {firstItem.quantity}</Text>
+                  {firstItem.isVarientTrue && firstItem.varientSize && (
+                    <Text style={styles.itemVariant}>Size: {firstItem.varientSize}</Text>
+                  )}
+                </View>
+              </View>
             </View>
-            <View style={styles.priceItem}>
-              <Text style={styles.priceLabel}>Discount:</Text>
-              <Text style={styles.discountPrice}>-₹{item.Total_Discount}</Text>
-            </View>
-            <View style={styles.priceItem}>
-              <Text style={styles.priceLabel}>Payable:</Text>
-              <Text style={styles.finalPrice}>₹{item.Payable_Amount}</Text>
-            </View>
-          </View>
+          ) : (
+            <Text style={styles.noItemsText}>No items in this order</Text>
+          )}
 
-          {item.isBookingCancel && item.cancel_reason && (
-            <View style={styles.reasonContainer}>
-              <MaterialIcons name="info-outline" size={16} color="#ef4444" />
-              <Text style={styles.reasonText}>
-                Cancellation reason: {item.cancel_reason}
-              </Text>
-            </View>
+          {additionalItemsCount > 0 && (
+            <Text style={styles.additionalItemsText}>+{additionalItemsCount} more items</Text>
           )}
         </View>
 
+        <View style={styles.cardDivider} />
+
+        <View style={styles.orderSummary}>
+          <View style={styles.summaryItem}>
+            <MaterialIcons name="shopping-bag" size={16} color="#666" />
+            <Text style={styles.summaryText}>{itemCount} items</Text>
+          </View>
+
+          <View style={styles.summaryItem}>
+            <MaterialIcons name="location-on" size={16} color="#666" />
+            <Text style={styles.summaryText} numberOfLines={1}>
+              {item.Billing_Details?.city || "N/A"}
+            </Text>
+          </View>
+
+          <View style={styles.summaryItem}>
+            <MaterialIcons name="person" size={16} color="#666" />
+            <Text style={styles.summaryText} numberOfLines={1}>
+              {item.Billing_Details?.fullName || "N/A"}
+            </Text>
+          </View>
+        </View>
+
+        {(item.isCancelbyUser || item.isCancelbyAdmin) && (
+          <View style={styles.cancellationInfo}>
+            <MaterialIcons name="info-outline" size={16} color="#ef4444" />
+            <Text style={styles.cancellationText}>
+              {item.isCancelbyUser
+                ? `Cancelled by you: ${item.Cancel_user_reason || "No reason provided"}`
+                : `Cancelled by admin: ${item.admin_cancel_reason || "No reason provided"}`}
+            </Text>
+          </View>
+        )}
+
         <View style={styles.cardFooter}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.viewDetailsButton}
             onPress={() => handleViewDetails(item)}
           >
             <Text style={styles.viewDetailsText}>View Details</Text>
           </TouchableOpacity>
 
-          {status === "pending" ? (
-            <TouchableOpacity 
+          {!item.isCancelbyUser && !item.isCancelbyAdmin && (
+            <TouchableOpacity
               style={styles.cancelButton}
-              onPress={() => handleCancelBooking(item)}
+              onPress={() => handleCancelOrder(item)}
             >
-              <Text style={styles.cancelButtonText}>Cancel Booking</Text>
+              <Text style={styles.cancelButtonText}>Cancel Order</Text>
             </TouchableOpacity>
-          ) : (
-            <View style={styles.disabledCancelButton}>
-              <Text style={styles.disabledCancelText}>
-                {status === "cancelled" ? "Cancelled" : "Completed"}
-              </Text>
-            </View>
           )}
         </View>
       </TouchableOpacity>
     );
-  }, [formatDate, getStatus, getStatusColor, handleCancelBooking, handleViewDetails]);
+  }, [formatDate, getStatusColor, handleCancelOrder, handleViewDetails, getItemCount]);
 
   if (loading && !refreshing) {
     return (
       <View style={styles.container}>
-        <TopHeadPart title='Lab Tests & Vaccinations' />
+        <TopHeadPart title='My Orders' />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#4F46E5" />
-          <Text style={styles.loadingText}>Loading your bookings...</Text>
+          <Text style={styles.loadingText}>Loading your orders...</Text>
         </View>
       </View>
     );
@@ -290,12 +289,12 @@ export default function Lab() {
   if (error) {
     return (
       <View style={styles.container}>
-        <TopHeadPart title='Lab Tests & Vaccinations' />
+        <TopHeadPart title='My Orders' />
         <View style={styles.errorContainer}>
           <MaterialIcons name="error-outline" size={60} color="#ef4444" />
           <Text style={styles.errorTitle}>Oops!</Text>
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.retryButton}
             onPress={getUserFnc}
           >
@@ -308,18 +307,19 @@ export default function Lab() {
 
   return (
     <View style={styles.container}>
-      <TopHeadPart title='Lab Tests & Vaccinations' />
+      <TopHeadPart title='My Orders' />
 
       <View style={styles.filterContainer}>
         {renderFilterButton("All", "all")}
-        {renderFilterButton("Pending", "pending")}
-        {renderFilterButton("Completed", "completed")}
+        {renderFilterButton("Placed", "order placed")}
+        {renderFilterButton("Shipped", "shipped")}
+        {renderFilterButton("Delivered", "delivered")}
         {renderFilterButton("Cancelled", "cancelled")}
       </View>
 
       <FlatList
-        data={filteredLabData}
-        renderItem={renderLabItem}
+        data={filteredOrders}
+        renderItem={renderOrderItem}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
@@ -334,7 +334,7 @@ export default function Lab() {
         ListEmptyComponent={renderEmptyState}
       />
 
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.supportButton}
         onPress={handleSupport}
       >
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     padding: 15,
     paddingBottom: 80,
   },
-  labCard: {
+  orderCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
     marginBottom: 15,
@@ -400,11 +400,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 5,
   },
-  labTitle: {
+  orderId: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-    flex: 1,
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -415,7 +414,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  bookingId: {
+  orderDate: {
     fontSize: 12,
     color: '#888',
   },
@@ -424,66 +423,82 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     marginVertical: 10,
   },
-  detailsContainer: {
-    marginBottom: 15,
+  itemsContainer: {
+    marginBottom: 10,
   },
-  detailRow: {
+  itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
   },
-  detailLabel: {
-    fontSize: 14,
-    color: '#666',
-    width: 70,
-    marginLeft: 8,
+  itemTypeIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#EEF2FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
   },
-  detailValue: {
+  itemDetails: {
+    flex: 1,
+  },
+  itemName: {
     fontSize: 14,
     color: '#333',
     fontWeight: '500',
-    flex: 1,
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    padding: 10,
-    marginTop: 10,
-  },
-  priceItem: {
-    alignItems: 'center',
-  },
-  priceLabel: {
-    fontSize: 12,
-    color: '#666',
     marginBottom: 4,
   },
-  originalPrice: {
+  itemMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemQuantity: {
+    fontSize: 12,
+    color: '#666',
+    marginRight: 10,
+  },
+  itemVariant: {
+    fontSize: 12,
+    color: '#666',
+  },
+  noItemsText: {
     fontSize: 14,
     color: '#888',
-    textDecorationLine: 'line-through',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    padding: 10,
   },
-  discountPrice: {
-    fontSize: 14,
-    color: '#10b981',
-  },
-  finalPrice: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  additionalItemsText: {
+    fontSize: 12,
     color: '#4F46E5',
+    fontWeight: '500',
+    marginTop: 5,
   },
-  reasonContainer: {
+  orderSummary: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  summaryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  summaryText: {
+    fontSize: 12,
+    color: '#666',
+    marginLeft: 4,
+  },
+  cancellationInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FEE2E2',
     padding: 10,
     borderRadius: 8,
-    marginTop: 10,
+    marginBottom: 10,
   },
-  reasonText: {
-    fontSize: 13,
+  cancellationText: {
+    fontSize: 12,
     color: '#B91C1C',
     marginLeft: 8,
     flex: 1,
@@ -518,20 +533,6 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     color: '#ef4444',
     fontWeight: '600',
-    fontSize: 14,
-  },
-  disabledCancelButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    backgroundColor: '#f1f1f1',
-    borderRadius: 6,
-    flex: 1,
-    marginLeft: 8,
-    alignItems: 'center',
-  },
-  disabledCancelText: {
-    color: '#999',
-    fontWeight: '500',
     fontSize: 14,
   },
   loadingContainer: {
@@ -599,13 +600,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
-  bookNowButton: {
+  shopNowButton: {
     backgroundColor: '#4F46E5',
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 8,
   },
-  bookNowButtonText: {
+  shopNowButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',

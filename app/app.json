@@ -4,35 +4,29 @@
     "slug": "DoggyWorldCare",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/Doggy_.png",
+    "icon": "./assets/adaptive-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/Doggy_.png",
+      "image": "./assets/splash.png",
       "resizeMode": "cover",
       "imageWidth": 500,
-      "backgroundColor": "#d17a72"
+      "backgroundColor": "#fff"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/Doggy_.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.happy_coding.DoggyWorldCare"
     },
     "web": {
-      "favicon": "./assets/Doggy_.png"
+      "favicon": "./assets/adaptive-icon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "96f03094-1297-449c-9ca8-8e2781703363"
-      }
-    },
-    "plugins": [
-      "expo-secure-store"
-    ]
+    "extra": {},
+    "plugins": ["expo-secure-store"]
   }
 }

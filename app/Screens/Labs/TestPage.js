@@ -23,7 +23,7 @@ export default function TestPage() {
 
     const fetchMainBranchTest = async () => {
         try {
-            const { data } = await axios.get(`http://192.168.1.3/api/lab-tests?populate=*&filters[is_available_at_main_branch][$eq]=true`)
+            const { data } = await axios.get(`http://192.168.1.3:1337/api/lab-tests?populate=*&filters[is_available_at_main_branch][$eq]=true`)
             setMainBranch(data.data || [])
         } catch (error) {
             console.log(error)
@@ -33,7 +33,7 @@ export default function TestPage() {
     const fetchPopularTest = async () => {
         setLoading(true)
         try {
-            const { data } = await axios.get(`http://192.168.1.3/api/lab-tests?populate=*&filters[isPopular][$eq]=true&filters[clinics][documentId][$eq]=${clinicId}`)
+            const { data } = await axios.get(`http://192.168.1.3:1337/api/lab-tests?populate=*&filters[isPopular][$eq]=true&filters[clinics][documentId][$eq]=${clinicId}`)
             setPopularTest(data.data || [])
             setLoading(false)
         } catch (error) {
@@ -45,7 +45,7 @@ export default function TestPage() {
     const fetchOtherTest = async () => {
         setLoading(true)
         try {
-            const { data } = await axios.get(`http://192.168.1.3/api/lab-tests?populate=*&filters[common_disease_dog][$eq]=true&filters[isPopular][$eq]=false&filters[clinics][documentId][$eq]=${clinicId}`)
+            const { data } = await axios.get(`http://192.168.1.3:1337/api/lab-tests?populate=*&filters[common_disease_dog][$eq]=true&filters[isPopular][$eq]=false&filters[clinics][documentId][$eq]=${clinicId}`)
             setNormalTest(data.data || [])
             setLoading(false)
         } catch (error) {
@@ -57,7 +57,7 @@ export default function TestPage() {
     const fetchOtherTestForcat = async () => {
         setLoading(true)
         try {
-            const { data } = await axios.get(`http://192.168.1.3/api/lab-tests?populate=*&filters[common_disease_cat][$eq]=true&filters[isPopular][$eq]=false&filters[clinics][documentId][$eq]=${clinicId}`)
+            const { data } = await axios.get(`http://192.168.1.3:1337/api/lab-tests?populate=*&filters[common_disease_cat][$eq]=true&filters[isPopular][$eq]=false&filters[clinics][documentId][$eq]=${clinicId}`)
             setCatTests(data.data || [])
             setLoading(false)
         } catch (error) {

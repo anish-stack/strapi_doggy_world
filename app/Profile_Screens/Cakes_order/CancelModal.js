@@ -6,28 +6,36 @@ import { useNavigation } from "@react-navigation/native";
 
 const CancelModal = ({ visible, onClose, orderId, onSuccess }) => {
     const [cancelReason, setCancelReason] = useState("");
+    const [loading, setLoading] = useState(false)
     const navigation = useNavigation()
 
     const handleCancel = async () => {
+        setLoading(true)
         if (!cancelReason.trim()) {
             Alert.alert("Error", "Please provide a cancellation reason.");
+            setLoading(false)
             return;
         }
+
+
         if (cancelReason.length > 100) {
+            setLoading(false)
             Alert.alert("Error", "Cancellation reason should not exceed 100 characters.");
             return;
         }
 
+
         try {
+
             const response = await axios.post(
                 `${API_END_POINT_URL}/api/cancel_cake_order`,
                 {
-                    orderId: orderId,
-                    cancreasonl_reason: cancelReason,
+                    orderId: orderId?.id,
+                    reason: cancelReason,
                 }
             );
 
-            console.log("response", response.data);
+            setLoading(false)
 
             if (response.status === 200) {
                 Alert.alert("Success", "Your Order has been cancelled successfully.");
@@ -39,8 +47,9 @@ const CancelModal = ({ visible, onClose, orderId, onSuccess }) => {
                 Alert.alert("Error", "Failed to cancel Order. Please try again.");
             }
         } catch (error) {
-            console.error("Cancellation Error:", err);
-            Alert.alert("Error", err?.response?.data?.error?.message || "Something went wrong.");
+            setLoading(false)
+            console.error("Cancellation Error:", error?.response?.data?.error?.message);
+            Alert.alert("Error", error?.response?.data?.error?.message || "Something went wrong.");
         }
     };
 
@@ -64,8 +73,8 @@ const CancelModal = ({ visible, onClose, orderId, onSuccess }) => {
                         <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
                             <Text style={styles.cancelButtonText}>Cancel</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={handleCancel} style={styles.submitButton}>
-                            <Text style={styles.submitButtonText}>Submit</Text>
+                        <TouchableOpacity onPress={handleCancel} disabled={loading} style={styles.submitButton}>
+                            <Text style={styles.submitButtonText}>{loading ? 'Please Wait ...' : 'Submit'}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

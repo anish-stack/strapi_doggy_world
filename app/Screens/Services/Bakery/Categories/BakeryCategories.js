@@ -8,7 +8,7 @@ export default function BakeryCategories() {
     const navigation = useNavigation()
     const fetchData = async () => {
         try {
-            const res = await axios.get(`http://192.168.1.3/api/pet-bakeries?populate=*`)
+            const res = await axios.get(`http://192.168.1.3:1337/api/pet-bakeries?populate=*`)
             if (res.data) {
                 // console.log(res.data)
                 setData(res.data.data)

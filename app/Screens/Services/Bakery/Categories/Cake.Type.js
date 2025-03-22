@@ -224,7 +224,7 @@ export default function CakeDelivery() {
             text: 'Place Order',
             onPress: async () => {
               try {
-                const API = `http://192.168.1.3/api/create_cake_order`;
+                const API = `http://192.168.1.3:1337/api/create_cake_order`;
                 const response = await axios.post(API, data_send, {
                   headers: {
                     'Content-Type': 'application/json',

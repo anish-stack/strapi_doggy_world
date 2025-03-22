@@ -79,14 +79,21 @@
     "rate": {
       "type": "integer"
     },
-    "booking_status": {
-      "type": "string"
-    },
     "Package": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::grooming-package.grooming-package",
       "inversedBy": "grooming_bookings"
+    },
+    "booking_status": {
+      "type": "enumeration",
+      "enum": [
+        "Pending",
+        "Canceled",
+        "Rejected",
+        "Accepted",
+        "Completed"
+      ]
     }
   }
 }

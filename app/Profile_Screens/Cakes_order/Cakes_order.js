@@ -117,7 +117,8 @@ export default function Cakes_order() {
 
     const renderEmptyState = () => (
         <View style={styles.emptyContainer}>
-            {/* <Image source={require("../assets/empty-cake.png")} style={styles.emptyImage} /> */}
+            <Image source={require("../../assets/empty.png")} style={styles.emptyImage} />
+
             <Text style={styles.emptyTitle}>No Cake Orders Found</Text>
             <Text style={styles.emptyText}>You haven't placed any cake orders yet. When you do, they will appear here.</Text>
             <TouchableOpacity style={styles.orderNowButton} onPress={() => navigation.navigate("CakeShop")}>

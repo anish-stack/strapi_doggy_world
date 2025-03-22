@@ -69,6 +69,11 @@ import NotFoundScreen from "./NotFoundScreen";
 import ErrorBoundaryWrapper from "./ErrorBoundary";
 import NotificationScreen from "./layouts/NotificationScreen";
 import SingleCakeOrder from "./Profile_Screens/Cakes_order/SingleCakeOrder";
+import Physio from "./Profile_Screens/Orders/Physio/Physio";
+import ViewPhysioDetails from "./Profile_Screens/Orders/Physio/ViewPhysioDetails";
+import ViewLabDetails from "./Profile_Screens/Orders/lab/ViewLabDetails";
+import PetShopOrders from "./Profile_Screens/Orders/petShopOrders/PetShopOrders";
+import ViewPetShopOrder from "./Profile_Screens/Orders/petShopOrders/ViewPetShopOrder";
 const Stack = createNativeStackNavigator();
 
 SplashScreen.preventAutoHideAsync();
@@ -228,7 +233,7 @@ const App = () => {
           />
           <Stack.Screen
             name="Groomings"
-            options={{ headerShown: true, title: "My Grooming Sessions" }}
+            options={{ headerShown: false, title: "My Grooming Sessions" }}
             component={Grooming_Sessions}
           />
           <Stack.Screen
@@ -237,14 +242,39 @@ const App = () => {
             component={Cakes_order}
           />
           <Stack.Screen
+            name="physioBookings"
+            options={{ headerShown: false, title: "Cakes Order" }}
+            component={Physio}
+          />
+          <Stack.Screen
+            name="ViewPhysioDetails"
+            options={{ headerShown: false, title: "Cakes Order" }}
+            component={ViewPhysioDetails}
+          />
+          <Stack.Screen
             name="SingleCakeOrder"
             options={{ headerShown: false, title: "Cakes Order" }}
             component={SingleCakeOrder}
           />
           <Stack.Screen
             name="labVaccinations"
-            options={{ headerShown: true, title: "Lab And Vaccinations" }}
+            options={{ headerShown: false, title: "Lab And Vaccinations" }}
             component={Lab}
+          />
+          <Stack.Screen
+            name="ViewLabDetails"
+            options={{ headerShown: false, title: "Lab And Vaccinations" }}
+            component={ViewLabDetails}
+          />
+          <Stack.Screen
+            name="Orders"
+            options={{ headerShown: false, title: "Lab And Vaccinations" }}
+            component={PetShopOrders}
+          />
+          <Stack.Screen
+            name="ViewPetShopOrder"
+            options={{ headerShown: false, title: "Lab And Vaccinations" }}
+            component={ViewPetShopOrder}
           />
           <Stack.Screen
             name="Support"

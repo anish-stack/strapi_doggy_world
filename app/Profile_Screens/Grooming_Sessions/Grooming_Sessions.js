@@ -7,6 +7,7 @@ import { Calendar, Clock, MapPin, Filter, Package, Scissors, Plus, Star } from "
 
 import GroomReview from "./GroomReview"
 import CancelModal from "./CancelModal"
+import TopHeadPart from "../../layouts/TopHeadPart"
 
 export default function Grooming_Sessions() {
     const navigation = useNavigation()
@@ -113,137 +114,142 @@ export default function Grooming_Sessions() {
     }
 
     return (
-        <View style={styles.container}>
-         
+        <>
 
-            <View style={styles.filterTabs}>
-                <TouchableOpacity
-                    style={[styles.filterTab, filterType === "all" && styles.activeFilterTab]}
-                    onPress={() => setFilterType("all")}
+            <TopHeadPart title="My Grooming Sessions" fnc={() => console.log("I am ")} />
+
+            <View style={styles.container}>
+
+
+                <View style={styles.filterTabs}>
+                    <TouchableOpacity
+                        style={[styles.filterTab, filterType === "all" && styles.activeFilterTab]}
+                        onPress={() => setFilterType("all")}
+                    >
+                        <Text style={[styles.filterTabText, filterType === "all" && styles.activeFilterTabText]}>All</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.filterTab, filterType === "pending" && styles.activeFilterTab]}
+                        onPress={() => setFilterType("pending")}
+                    >
+                        <Text style={[styles.filterTabText, filterType === "pending" && styles.activeFilterTabText]}>Pending</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.filterTab, filterType === "completed" && styles.activeFilterTab]}
+                        onPress={() => setFilterType("completed")}
+                    >
+                        <Text style={[styles.filterTabText, filterType === "completed" && styles.activeFilterTabText]}>
+                            Completed
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    style={styles.sessionsList}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                 >
-                    <Text style={[styles.filterTabText, filterType === "all" && styles.activeFilterTabText]}>All</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.filterTab, filterType === "pending" && styles.activeFilterTab]}
-                    onPress={() => setFilterType("pending")}
-                >
-                    <Text style={[styles.filterTabText, filterType === "pending" && styles.activeFilterTabText]}>Pending</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.filterTab, filterType === "completed" && styles.activeFilterTab]}
-                    onPress={() => setFilterType("completed")}
-                >
-                    <Text style={[styles.filterTabText, filterType === "completed" && styles.activeFilterTabText]}>
-                        Completed
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                style={styles.sessionsList}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-            >
-                {getFilteredGroomings().length > 0 ? (
-                    getFilteredGroomings().map((grooming, index) => (
-                        <View key={index} style={styles.sessionCard}>
-                            <View style={styles.cardHeader}>
-                                <View style={styles.petInfo}>
-                                    <Text style={styles.petName}>{grooming.pet?.petName || "Your Pet"}</Text>
-                                    <Text style={styles.petBreed}>{grooming.pet?.Breed || "Dog"}</Text>
-                                </View>
-                                <View
-                                    style={[
-                                        styles.statusBadge,
-                                        {
-                                            backgroundColor: getStatusColor(grooming?.booking_status) + "20",
-                                            borderColor: getStatusColor(grooming?.booking_status),
-                                        },
-                                    ]}
-                                >
-                                    <Text style={[styles.statusText, { color: getStatusColor(grooming?.booking_status) }]}>
-                                        {grooming?.booking_status}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            <View style={styles.cardBody}>
-                                {renderServiceDetails(grooming)}
-
-                                <View style={styles.appointmentDetails}>
-                                    <View style={styles.detailRow}>
-                                        <Calendar size={16} color="#6b7280" />
-                                        <Text style={styles.detailText}>{formatDate(grooming.Date_of_Service)}</Text>
+                    {getFilteredGroomings().length > 0 ? (
+                        getFilteredGroomings().map((grooming, index) => (
+                            <View key={index} style={styles.sessionCard}>
+                                <View style={styles.cardHeader}>
+                                    <View style={styles.petInfo}>
+                                        <Text style={styles.petName}>{grooming.pet?.petName || "Your Pet"}</Text>
+                                        <Text style={styles.petBreed}>{grooming.pet?.Breed || "Dog"}</Text>
                                     </View>
-                                    <View style={styles.detailRow}>
-                                        <Clock size={16} color="#6b7280" />
-                                        <Text style={styles.detailText}>{formatTime(grooming.Time)}</Text>
+                                    <View
+                                        style={[
+                                            styles.statusBadge,
+                                            {
+                                                backgroundColor: getStatusColor(grooming?.booking_status) + "20",
+                                                borderColor: getStatusColor(grooming?.booking_status),
+                                            },
+                                        ]}
+                                    >
+                                        <Text style={[styles.statusText, { color: getStatusColor(grooming?.booking_status) }]}>
+                                            {grooming?.booking_status}
+                                        </Text>
                                     </View>
-                                    {grooming.clinic?.clinic_name && (
+                                </View>
+
+                                <View style={styles.cardBody}>
+                                    {renderServiceDetails(grooming)}
+
+                                    <View style={styles.appointmentDetails}>
                                         <View style={styles.detailRow}>
-                                            <MapPin size={16} color="#6b7280" />
-                                            <Text style={styles.detailText}>{grooming.clinic.clinic_name}</Text>
+                                            <Calendar size={16} color="#6b7280" />
+                                            <Text style={styles.detailText}>{formatDate(grooming.Date_of_Service)}</Text>
                                         </View>
+                                        <View style={styles.detailRow}>
+                                            <Clock size={16} color="#6b7280" />
+                                            <Text style={styles.detailText}>{formatTime(grooming.Time)}</Text>
+                                        </View>
+                                        {grooming.clinic?.clinic_name && (
+                                            <View style={styles.detailRow}>
+                                                <MapPin size={16} color="#6b7280" />
+                                                <Text style={styles.detailText}>{grooming.clinic.clinic_name}</Text>
+                                            </View>
+                                        )}
+                                    </View>
+                                </View>
+
+                                <View style={styles.cardFooter}>
+                                    {grooming?.booking_status === "pending" && (
+                                        <TouchableOpacity onPress={() => { setModalVisible(true), setSelectedGrooming(grooming) }} style={styles.cancelButton}>
+                                            <Text style={styles.cancelButtonText}>Cancel Booking</Text>
+                                        </TouchableOpacity>
+                                    )}
+
+
+                                    {grooming?.service_complete && grooming?.is_rate && (
+                                        <View style={styles.ratingContainer}>
+                                            <View style={styles.infoRow}>
+
+                                                <Text style={styles.ratingText}>
+                                                    Thank you for rating our service {grooming?.rate} stars!
+                                                </Text>
+                                            </View>
+                                            <Text style={styles.feedbackText}>Your feedback means the world to us. 🌟</Text>
+                                        </View>
+                                    )}
+
+
+                                    {grooming?.booking_status === "completed" && !grooming?.is_rate && !openRateModel && (
+                                        <TouchableOpacity
+                                            style={styles.rateButton}
+                                            onPress={() => {
+                                                setSelectedGrooming(grooming)
+                                                setOpenRateModel(true)
+                                            }}
+                                        >
+                                            <Text style={styles.rateButtonText}>Rate Service</Text>
+                                        </TouchableOpacity>
                                     )}
                                 </View>
                             </View>
-
-                            <View style={styles.cardFooter}>
-                                {grooming?.booking_status === "pending" && (
-                                    <TouchableOpacity onPress={() => { setModalVisible(true), setSelectedGrooming(grooming) }} style={styles.cancelButton}>
-                                        <Text style={styles.cancelButtonText}>Cancel Booking</Text>
-                                    </TouchableOpacity>
-                                )}
-
-
-                                {grooming?.service_complete && grooming?.is_rate && (
-                                    <View style={styles.ratingContainer}>
-                                        <View style={styles.infoRow}>
-
-                                            <Text style={styles.ratingText}>
-                                                Thank you for rating our service {grooming?.rate} stars!
-                                            </Text>
-                                        </View>
-                                        <Text style={styles.feedbackText}>Your feedback means the world to us. 🌟</Text>
-                                    </View>
-                                )}
-
-
-                                {grooming?.booking_status === "completed" && !grooming?.is_rate && !openRateModel && (
-                                    <TouchableOpacity
-                                        style={styles.rateButton}
-                                        onPress={() => {
-                                            setSelectedGrooming(grooming)
-                                            setOpenRateModel(true)
-                                        }}
-                                    >
-                                        <Text style={styles.rateButtonText}>Rate Service</Text>
-                                    </TouchableOpacity>
-                                )}
-                            </View>
+                        ))
+                    ) : (
+                        <View style={styles.emptyState}>
+                            <Text style={styles.emptyStateText}>No grooming sessions found</Text>
+                            <Text style={styles.emptyStateSubText}>Pull down to refresh or book a new session</Text>
                         </View>
-                    ))
-                ) : (
-                    <View style={styles.emptyState}>
-                        <Text style={styles.emptyStateText}>No grooming sessions found</Text>
-                        <Text style={styles.emptyStateSubText}>Pull down to refresh or book a new session</Text>
-                    </View>
-                )}
-            </ScrollView>
-            <GroomReview
-                open={openRateModel}
-                close={() => setOpenRateModel(false)}
-                appointment={selectedGrooming}
-                isGrooming={true}
-            />
-            <CancelModal
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                appointmentId={selectedGrooming?.id}
+                    )}
+                </ScrollView>
+                <GroomReview
+                    open={openRateModel}
+                    close={() => setOpenRateModel(false)}
+                    appointment={selectedGrooming}
+                    isGrooming={true}
+                />
+                <CancelModal
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    appointmentId={selectedGrooming?.id}
 
-                onSuccess={() => console.log("selectedGrooming cancelled successfully!")}
-            />
-        </View>
+                    onSuccess={() => console.log("selectedGrooming cancelled successfully!")}
+                />
+            </View>
+        </>
     )
 }
 
@@ -251,7 +257,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#f5f5f5",
-        padding: 16,
+        padding: 8,
     },
     header: {
         flexDirection: "row",

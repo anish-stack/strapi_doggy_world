@@ -7,7 +7,7 @@ import Tabs from './Tabs';
 import Popup from '../components/PopUp/Popup';
 import { useToken } from '../hooks/useToken';
 
-export default function Layout({ children }) {
+export default function Layout({ children ,isHeaderShow=true }) {
     const navigation = useNavigation();
     const { isLoggedIn, getToken } = useToken();
 
@@ -34,7 +34,10 @@ export default function Layout({ children }) {
     return (
 
             <View style={styles.container}>
-                <Header />
+                {isHeaderShow && (
+                    <Header />
+                )}
+        
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     style={styles.scrollView}

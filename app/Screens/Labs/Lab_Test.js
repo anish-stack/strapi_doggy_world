@@ -19,8 +19,8 @@ export default function Lab_Test() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get('http://192.168.1.3/api/collection-types?populate=*');
-                const fetchSliderData = await axios.get('http://192.168.1.3/api/bakery-sliders?populate=*&filters[isLab][$eq]=true');
+                const res = await axios.get('http://192.168.1.3:1337/api/collection-types?populate=*');
+                const fetchSliderData = await axios.get('http://192.168.1.3:1337/api/bakery-sliders?populate=*&filters[isLab][$eq]=true');
                 setSlider(fetchSliderData.data.data);
                 setData(res.data.data);
             } catch (err) {

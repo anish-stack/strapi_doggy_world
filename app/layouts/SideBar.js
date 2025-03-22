@@ -76,14 +76,17 @@ export default function Sidebar({ open, onClose }) {
         onPress={() => handleNavigation(item.screen)}
         activeOpacity={0.7}
       >
-        <View style={styles.navIconContainer}>
-          <Ionicons name={item.icon} size={22} color="#6366F1" />
+        <View style={styles.navContent}>
+          <View style={styles.navIconContainer}>
+            <Ionicons name={item.icon} size={22} color="#B82830" />
+          </View>
+          <Text style={styles.navText}>{item.title}</Text>
+          <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
         </View>
-        <Text style={styles.navText}>{item.title}</Text>
-        <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
       </TouchableOpacity>
     );
   };
+
 
   return (
     <>
@@ -238,9 +241,15 @@ const styles = StyleSheet.create({
   },
   navItem: {
     flexDirection: 'row',
+    width: "100%",
     alignItems: 'center',
     padding: 12,
     paddingHorizontal: 24,
+  },
+  navContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
   },
   navIconContainer: {
     width: 36,

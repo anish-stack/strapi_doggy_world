@@ -14,7 +14,7 @@ export const fetchSettings = createAsyncThunk(
   async (_, thunkApi) => {
     try {
       console.log("Fetching settings from server...");
-      const { data } = await axios.get("http://192.168.1.3/api/settings");
+      const { data } = await axios.get("http://192.168.1.3:1337/api/settings");
       return data.data[0];
     } catch (error) {
       return thunkApi.rejectWithValue(

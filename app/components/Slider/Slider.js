@@ -45,7 +45,7 @@ export default function CustomSlider() {
         <View >
             <View style={styles.imageContainer} {...panResponder.panHandlers}>
                 <Image source={images[activeIndex].src} style={styles.image} />
-               
+
             </View>
 
             <Text style={styles.counter}>
@@ -60,11 +60,10 @@ const styles = StyleSheet.create({
     imageContainer: {
         width: width,
         height: 200,
-    
+        backgroundColor: "#fff",
         overflow: 'hidden',
-
         position: 'relative',
-        // marginBottom: 20,
+   
     },
     image: {
         width: '100%',

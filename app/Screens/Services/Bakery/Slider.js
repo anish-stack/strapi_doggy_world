@@ -48,10 +48,10 @@ export default function CustomSlider({ autoPlay, Dealy, isUri = false, imagesByP
                 {navigationShow && (
                     <View style={styles.navigation}>
                         <TouchableOpacity onPress={goToPrevious} style={styles.navButton}>
-                            <Icon name="chevron-back" size={moderateScale(30)} color="#fff" />
+                            <Icon name="chevron-back" size={moderateScale(15)} color="#fff" />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={goToNext} style={styles.navButton}>
-                            <Icon name="chevron-forward" size={moderateScale(30)} color="#fff" />
+                            <Icon name="chevron-forward" size={moderateScale(15)} color="#fff" />
                         </TouchableOpacity>
                     </View>
                 )}

@@ -17,7 +17,7 @@ const Lab_Clinic = ({ navigation }) => {
     const [lastClickedIndex, setLastClickedIndex] = useState(null);
     const fetchClinics = async () => {
         try {
-            const response = await axios.get('http://192.168.1.3/api/clinics?populate=*');
+            const response = await axios.get('http://192.168.1.3:1337/api/clinics?populate=*');
             setClinics(response.data.data);
         } catch (error) {
             console.error('Error fetching clinics:', error);
