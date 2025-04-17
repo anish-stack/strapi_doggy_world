@@ -352,7 +352,7 @@ module.exports = {
                 return ctx.notFound('No account found with this contact number. Please sign up first.');
             }
 
-            const generatedOtp = crypto.randomInt(100000, 999999);
+            const generatedOtp = 123456
             const otpExpiryTime = new Date();
             otpExpiryTime.setMinutes(otpExpiryTime.getMinutes() + 2);
             await sendOtp(contact_number, generatedOtp);
@@ -449,7 +449,7 @@ module.exports = {
             }
 
             // Generate new OTP
-            const newOtp = crypto.randomInt(100000, 999999);
+            const newOtp = 123456
             const newOtpExpiry = new Date();
             newOtpExpiry.setMinutes(newOtpExpiry.getMinutes() + 2); // Expires in 2 minutes
 
