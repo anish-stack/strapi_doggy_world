@@ -26,7 +26,7 @@ export default function Layout({ children ,isHeaderShow=true }) {
     useEffect(() => {
         const interval = setInterval(() => {
             getToken();
-        }, 5000); // Check every 30 seconds
+        }, 30000); // Check every 30 seconds
 
         return () => clearInterval(interval);
     }, []);

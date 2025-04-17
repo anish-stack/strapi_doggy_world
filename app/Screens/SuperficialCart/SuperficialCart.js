@@ -26,6 +26,7 @@ import CartItem from './CartItem';
 import EmpetyCart from './EmpetyCart';
 import Checkbox from 'expo-checkbox';
 import { getUser } from '../../hooks/getUserHook';
+import CartHeader from '../../components/CartHeader/CartHeader';
 
 export default function SuperficialCart() {
   const { labTests } = useSelector((state) => state.labCart) || [];
@@ -142,7 +143,8 @@ export default function SuperficialCart() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <UpperLayout title="Lab Cart" />
+      <CartHeader />
+      {/* <UpperLayout title="Lab Cart" /> */}
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
 
         <View style={styles.sectionContainer}>

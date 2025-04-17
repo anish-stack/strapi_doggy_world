@@ -9,31 +9,43 @@ import {
   ActivityIndicator,
   SafeAreaView
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Feather, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { UpdateCartItem } from '../../redux/slice/cartSlice';
 import PaymentInfos from './PaymentInfos';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import CartHeader from '../../components/CartHeader/CartHeader';
 
 const { width, height } = Dimensions.get('window');
+
+// Create memoized selector
+const selectCartItems = state => state.cart.CartItems;
 
 export default function Cart() {
   const navigation = useNavigation();
   const route = useRoute();
   const { offerClick } = route.params || {};
-  const { CartItems } = useSelector((state) => ({
-    CartItems: state.cart.CartItems
-  }));
+  
+  // Use the simple selector to avoid creating new objects
+  const cartItems = useSelector(selectCartItems);
+  
   const dispatch = useDispatch();
   const [loadingItems, setLoadingItems] = useState({});
 
-  const handleQuantityChange = async (pastQuantity, ProductId, action) => {
+  // Memoize the calculation of payable price
+  const payablePrice = useMemo(() => {
+    return cartItems.reduce((total, item) => total + item.Pricing.disc_price * item.quantity, 0);
+  }, [cartItems]);
+
+  const handleQuantityChange = useCallback(async (pastQuantity, ProductId, action) => {
     setLoadingItems(prev => ({ ...prev, [ProductId]: true }));
 
     try {
       const newQuantity = action === 'increase' ? pastQuantity + 1 : pastQuantity - 1;
-      await dispatch(UpdateCartItem({ ProductId, quantity: newQuantity }));
+      if (newQuantity >= 1) {
+        await dispatch(UpdateCartItem({ ProductId, quantity: newQuantity }));
+      }
     } catch (error) {
       console.error('Failed to update quantity:', error);
     } finally {
@@ -41,13 +53,15 @@ export default function Cart() {
         setLoadingItems(prev => ({ ...prev, [ProductId]: false }));
       }, 300);
     }
-  };
+  }, [dispatch]);
 
-  const calculatePayablePrice = () => {
-    return CartItems.reduce((total, item) => total + item.Pricing.disc_price * item.quantity, 0);
-  };
+  const navigateToHome = useCallback(() => navigation.navigate('Home'), [navigation]);
+  const navigateToPetShop = useCallback(() => navigation.navigate('Pet_Shop'), [navigation]);
+  const navigateToOffers = useCallback(() => {
+    navigation.navigate('Available_Offer', { payAmount: payablePrice });
+  }, [navigation, payablePrice]);
 
-  const renderEmptyCart = () => (
+  const renderEmptyCart = useCallback(() => (
     <View style={styles.emptyCartContainer}>
       <Image
         source={require('./rb_27558.png')}
@@ -58,17 +72,17 @@ export default function Cart() {
       </Text>
       <TouchableOpacity
         style={styles.startShoppingButton}
-        onPress={() => navigation.navigate('Home')}
+        onPress={navigateToHome}
       >
         <Text style={styles.startShoppingText}>Start Shopping</Text>
       </TouchableOpacity>
     </View>
-  );
+  ), [navigateToHome]);
 
-  const renderOfferBanner = () => (
+  const renderOfferBanner = useCallback(() => (
     <TouchableOpacity
       activeOpacity={0.8}
-      onPress={() => navigation.navigate('Available_Offer', { payAmount: calculatePayablePrice() })}
+      onPress={navigateToOffers}
       style={styles.offerBanner}
     >
       <View style={styles.offerContent}>
@@ -79,9 +93,9 @@ export default function Cart() {
       </View>
       <Feather name="chevron-right" size={24} color="#000" />
     </TouchableOpacity>
-  );
+  ), [navigateToOffers]);
 
-  const renderCartItem = (item) => (
+  const renderCartItem = useCallback((item) => (
     <View key={item.ProductId} style={styles.cartItem}>
       <Image source={{ uri: item.image }} style={styles.productImage} />
       <View style={styles.productDetails}>
@@ -101,9 +115,9 @@ export default function Cart() {
         </View>
         <View style={styles.quantityControls}>
           <TouchableOpacity
-            style={[styles.quantityButton]}
+            style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
             onPress={() => handleQuantityChange(item.quantity, item.ProductId, 'decrease')}
-
+            disabled={item.quantity <= 1 || loadingItems[item.ProductId]}
           >
             <Feather name="minus" size={18} color={"#FF3B30"} />
           </TouchableOpacity>
@@ -126,34 +140,41 @@ export default function Cart() {
         </View>
       </View>
     </View>
-  );
+  ), [handleQuantityChange, loadingItems]);
+
+  const cartContent = useMemo(() => {
+    if (!cartItems || cartItems.length === 0) {
+      return renderEmptyCart();
+    }
+
+    return (
+      <>
+        {cartItems.map(renderCartItem)}
+        <TouchableOpacity
+          style={styles.addMoreButton}
+          onPress={navigateToPetShop}
+        >
+          <Text style={styles.addMoreText}>Add More Items</Text>
+          <Feather name="plus-circle" size={20} color="#FF3B30" />
+        </TouchableOpacity>
+      </>
+    );
+  }, [cartItems, renderCartItem, renderEmptyCart, navigateToPetShop]);
 
   return (
     <SafeAreaView style={styles.container}>
+      <CartHeader />
       <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
         {renderOfferBanner()}
 
         <View style={styles.cartContainer}>
-          {CartItems && CartItems.length > 0 ? (
-            <>
-              {CartItems.map(renderCartItem)}
-              <TouchableOpacity
-                style={styles.addMoreButton}
-                onPress={() => navigation.navigate('Pet_Shop')}
-              >
-                <Text style={styles.addMoreText}>Add More Items</Text>
-                <Feather name="plus-circle" size={20} color="#FF3B30" />
-              </TouchableOpacity>
-            </>
-          ) : (
-            renderEmptyCart()
-          )}
+          {cartContent}
         </View>
 
-        {CartItems.length > 0 && <PaymentInfos offer={offerClick} cartItems={CartItems} />}
+        {cartItems && cartItems.length > 0 && (
+          <PaymentInfos offer={offerClick} cartItems={cartItems} />
+        )}
       </ScrollView>
-
-
     </SafeAreaView>
   );
 }

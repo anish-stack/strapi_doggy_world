@@ -485,7 +485,7 @@ const App = () => {
             </View>
           )}
 
-          {labTestsCount > 0 ? <SuperficialNoter /> : null}
+          {/* {labTestsCount > 0 ? <SuperficialNoter /> : null} */}
         </>
       )}
 

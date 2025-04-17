@@ -98,7 +98,7 @@ const ImageSlider = ({ images }) => {
     );
 };
 
-const ConsultationCard = ({ item, navigation }) => (
+const ConsultationCard = ({ item, navigation, showText, toggle }) => (
     <TouchableOpacity
         activeOpacity={0.9}
         style={styles.card}
@@ -126,10 +126,20 @@ const ConsultationCard = ({ item, navigation }) => (
         </View> */}
 
                 <Text style={styles.cardTitle}>{item.name}</Text>
-                <Text style={styles.cardDescription} numberOfLines={3}>
+                <Text
+                    style={styles.cardDescription}
+                    numberOfLines={showText ? undefined : 3}
+                >
                     {item.description}
                 </Text>
 
+                {item.description.length > 100 && (
+                    <TouchableOpacity onPress={() => toggle()}>
+                        <Text style={styles.readMore}>
+                            {showText ? 'Read Less ▲' : 'Read More ▼'}
+                        </Text>
+                    </TouchableOpacity>
+                )}
                 <View style={styles.priceSection}>
                     <View>
                         <Text style={styles.priceLabel}>Starting from</Text>
@@ -168,6 +178,10 @@ export default function Consultation() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
+    const [showFullText, setShowFullText] = useState(false);
+
+    const toggleText = () => setShowFullText(prev => !prev);
+
 
     const images = [
         { id: 1, src: require('./cs.png') },
@@ -225,23 +239,25 @@ export default function Consultation() {
             >
                 <ImageSlider images={images} />
                 <Call_Header />
-               
+
                 <View style={styles.consultationsContainer}>
                     {consultation.map(item => (
                         <ConsultationCard
                             key={item.id}
                             item={item}
+                            showText={showFullText}
+                            toggle={() => setShowFullText(!showFullText)}
                             navigation={navigation}
                         />
                     ))}
                 </View>
                 <WebView
-                        source={{ uri: "https://e646aa95356d411688ca904e76e00491.elf.site" }}
-                        style={{  overflow:"hidden", height: 500 }}
-                    />
-               
+                    source={{ uri: "https://e646aa95356d411688ca904e76e00491.elf.site" }}
+                    style={{ overflow: "hidden", height: 500 }}
+                />
+
             </ScrollView>
-          
+
         </SafeAreaView>
     );
 }
@@ -417,5 +433,10 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: moderateScale(14),
         fontWeight: '600',
+    },
+    readMore: {
+        color: '#0d6efd',
+        marginTop: 4,
+        fontWeight: 'bold',
     },
 });
