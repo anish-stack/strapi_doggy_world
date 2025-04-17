@@ -31,7 +31,7 @@ module.exports = {
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            const Generateotp = crypto.randomInt(100000, 999999);
+            const Generateotp = 123456
 
             const otpExpired = new Date();
             otpExpired.setMinutes(otpExpired.getMinutes() + 2);
@@ -103,7 +103,7 @@ module.exports = {
             const userData = user[0];
 
             // Generate a new OTP (6-digit random number)
-            const newOtp = crypto.randomInt(100000, 999999).toString();
+            const newOtp = 123456
 
             // Set OTP expiration (5 minutes from now)
             const otpExpiration = new Date();
@@ -479,25 +479,25 @@ module.exports = {
 
 
 
-    async  findMe(ctx) {
+    async findMe(ctx) {
         try {
             const authHeader = ctx.request.headers.authorization;
             console.log("authHeader:", authHeader);
-    
+
             if (!authHeader || !authHeader.startsWith("Bearer ")) {
                 return ctx.unauthorized("Missing Authorization header.");
             }
-    
+
             const token = authHeader.split(" ")[1]?.trim();
-            
+
             // ⛔️ Check for null/empty token
             if (!token || token === "null" || token.split(".").length !== 3) {
                 console.error("Invalid token format:", token);
                 return ctx.unauthorized("Invalid or missing token.");
             }
-    
+
             const jwtSecret = strapi.config.get("plugin::users-permissions.jwtSecret");
-    
+
             let decoded;
             try {
                 decoded = jwt.verify(token, jwtSecret);
@@ -505,24 +505,24 @@ module.exports = {
                 console.error("JWT Verification Error:", error);
                 return ctx.unauthorized("Invalid or expired token.");
             }
-    
+
             if (!decoded || !decoded.id) {
                 return ctx.unauthorized("Token verification failed.");
             }
-    
+
             const currentTime = Math.floor(Date.now() / 1000);
             if (decoded.exp < currentTime) {
                 return ctx.unauthorized("Token expired, please log in again.");
             }
-    
+
             await new Promise(resolve => setTimeout(resolve, 100));
-    
+
             const user = await strapi.query("api::auth.auth").findOne({ where: { id: decoded.id } });
-    
+
             if (!user) {
                 return ctx.notFound("User not found.");
             }
-    
+
             return ctx.send({
                 success: true,
                 data: {
@@ -536,12 +536,12 @@ module.exports = {
                     Age: user.Age,
                 }
             });
-    
+
         } catch (error) {
             console.error("Error in findMe:", error);
             return ctx.badRequest("An error occurred while fetching user data.");
         }
-    } ,
+    },
 
     async findMyAllOrders(ctx) {
         try {

@@ -21,7 +21,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.happy_coding.DoggyWorldCare"
+      "package": "com.hbsdevelopersteam.DoggyWorldCare"
     },
     "web": {
       "favicon": "./assets/adaptive-icon.png"
@@ -33,7 +33,6 @@
     },
     "plugins": [
       "expo-secure-store"
-     
     ]
   }
 }
